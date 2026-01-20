@@ -1,5 +1,63 @@
 # Changelog
 
+## 2026-01-20 - Session Update #3
+
+### UI/UX 개선
+
+#### 1. Install Focus 패널 개선
+**Files**: `src/components/editor/InstallFocusPanel.tsx`, `src/components/editor/Toolbar.tsx`, `src/components/editor/ConceptPanel.tsx`
+
+- 왼쪽 Toolbar에서 Install Focus 버튼 제거
+- ConceptPanel 하단에 Install Focus 버튼 추가 (오렌지색)
+- 커스텀 영상 링크 추가 기능 (YouTube/Instagram)
+  - URL 입력 시 플랫폼 자동 감지
+  - YouTube: 빨간색 아이콘
+  - Instagram: 그라데이션 아이콘
+  - 영상 추가/삭제 기능
+
+#### 2. Pass/Run 토글 버튼
+**File**: `src/components/editor/SituationHeader.tsx`
+
+- 상단 헤더에 Pass/Run 토글 버튼 추가
+- 클릭 시 Pass ↔ Run 전환
+- Pass: 파란색 배경 (🏈 Pass)
+- Run: 초록색 배경 (🏃 Run)
+- conceptStore의 typeFilter와 자동 연동
+
+#### 3. 공(Ball) 위치 수정
+**File**: `src/store/editorStore.ts`
+
+- 모든 14개 포메이션에서 공 위치를 LOS 정중앙으로 이동
+- 변경: `y: -0.01` → `y: 0`
+- 센터(y: -0.03)와 겹치지 않음
+
+#### 4. 키보드 단축키 도움말 위치 이동
+**File**: `src/components/editor/PlayEditor.tsx`
+
+- 도움말 패널을 오른쪽 하단에서 왼쪽 하단으로 이동
+- Install Focus 패널과의 겹침 해결
+- 변경: `bottom-4 right-4` → `bottom-4 left-4`
+
+### 수정된 파일
+
+| 파일 | 변경 내용 |
+|------|----------|
+| `InstallFocusPanel.tsx` | 커스텀 영상 링크 추가 기능, YouTube/Instagram 아이콘 |
+| `Toolbar.tsx` | Install Focus 버튼 제거, props 정리 |
+| `ConceptPanel.tsx` | Install Focus 버튼 추가 (하단) |
+| `PlayEditor.tsx` | Toolbar props 정리, 도움말 위치 이동 |
+| `SituationHeader.tsx` | Pass/Run 토글 버튼 추가 |
+| `editorStore.ts` | Ball 위치 y: 0으로 수정 |
+
+### Git Commits
+```
+commit 14f9dff - docs: Update CHANGELOG with session #2 features and bug fix
+commit dc0dc8f - feat: Update UI - Install Focus panel, Pass/Run toggle, ball position
+commit e5940d5 - fix: Move keyboard shortcuts help panel to left side
+```
+
+---
+
 ## 2026-01-20 - Session Update #2
 
 ### New Features
