@@ -1,5 +1,99 @@
 # Changelog
 
+## 2026-01-20 - Session Update #2
+
+### New Features
+
+#### 1. Situation Header (Down & Distance, Defense Settings)
+**File**: `src/components/editor/SituationHeader.tsx` (NEW)
+
+캔버스 상단에 게임 상황 및 수비 설정을 표시하는 헤더 추가:
+
+**Situation (Down & Distance)**
+- DOWN: 1, 2, 3, 4 버튼 선택
+- Distance: 1-20 yards, Goal 선택
+- Field Position: OWN 5-40, 50, OPP 40-5, Red Zone
+
+**Defense Settings**
+- Box Count: 6, 7, 8명 선택 (컨셉 추천에 반영)
+- Front: Even (4-3), Odd (3-4), Bear, Over, Under
+- 3-Tech Position: Strong, Weak, Both, None
+- Shell: 1-High (Cover 1/3), 2-High (Cover 2/4), Quarters
+- Blitz Tendency: Low, Medium, High
+
+**상황 힌트 배지**
+- Run Situation: 짧은 야드 (1-2), 골라인
+- Pass Situation: 긴 야드 (8+), 3rd & long
+- Balanced: 일반 상황
+
+#### 2. Defense-Based Concept Filtering
+**File**: `src/store/conceptStore.ts`
+
+`computeRecommendations` 함수 개선:
+
+**Pass Concepts**
+| 설정 | 점수 영향 |
+|------|----------|
+| Box 6 (Light) | -10 기본, Zone beater +15 |
+| Box 8 (Heavy) | +15 (패스 기회) |
+| 1-High Shell | Man beater +20, Deep +10 |
+| 2-High Shell | Zone beater +15, MOF attack +15, Deep -10 |
+
+**Run Concepts**
+| 설정 | 점수 영향 |
+|------|----------|
+| Box 매칭 | +25, 불매칭시 8-man box -25 |
+| Front 매칭 | +20, 불매칭 -5 |
+| 3T 매칭 | +15, Gap/Power 불매칭 -10 |
+
+#### 3. Player Assignments Display
+**Files**: `src/components/editor/ConceptCard.tsx`, `src/types/concept.ts`
+
+컨셉 카드 선택 시 각 선수의 assignment 표시:
+
+```typescript
+interface RoleAssignmentDisplay {
+  roleName: string;      // e.g., 'STICK', 'FLAT', 'ZONE_LT'
+  appliesTo: string[];   // e.g., ['X', 'Z'], ['RG']
+  action: string;        // e.g., 'Slant @ 6 yds', 'Zone block'
+  notes?: string;
+}
+```
+
+#### 4. Concepts & Install Focus Mutual Exclusivity
+**Files**: `src/components/editor/PlayEditor.tsx`, `src/components/editor/Toolbar.tsx`
+
+두 패널이 서로 배타적으로 동작:
+- Show Concepts 클릭 → Install Focus 패널 닫힘
+- Install Focus 클릭 → Concepts 패널 닫힘
+- 버튼 텍스트 동적 변경: Show/Hide
+
+#### 5. Ball in All Formations
+**File**: `src/store/editorStore.ts`
+
+모든 14개 포메이션에 공(Ball) 추가 (football 모양)
+
+#### 6. New Formation Presets (8개 추가, 총 14개)
+**File**: `src/store/editorStore.ts`
+
+신규 8개:
+- Trips Right, Bunch Right, Pistol, Twins Right
+- Wing-T, Ace, Goal Line, Slot Right
+
+### Bug Fix
+
+**TypeScript Build Error 수정**
+- `FORMATION_PRESETS` 타입에서 `shape?: string`을 `shape?: PlayerShape`로 변경
+- `PlayerShape` 타입 import 추가
+
+### Git Commits
+```
+commit 50a210d - feat: Add situation header, defense filtering, and UI improvements
+commit 1c719d5 - fix: Fix TypeScript type error for PlayerShape in FORMATION_PRESETS
+```
+
+---
+
 ## 2026-01-20 - 에디터 UX 개선 업데이트
 
 ### 새로운 기능
