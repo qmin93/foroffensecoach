@@ -15,6 +15,7 @@ import {
   BlockAction,
   MotionAction,
   PlayerAppearance,
+  PlayerShape,
   DrawingConfig,
   DrawingPhase,
   DrawLineType,
@@ -171,7 +172,7 @@ const createEmptyPlay = (): Play => ({
 // Offense direction is UPWARD. All players must be below LOS (negative Y values)
 // Visible range: y = -0.4 (bottom, 10 yards back) to y = 0.6 (top, 15 yards ahead)
 // Scale: 0.04 = 1 yard
-export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ role: string; label: string; x: number; y: number; appearance?: { shape?: string; fill?: string; stroke?: string; showLabel?: boolean; radius?: number } }> }> = {
+export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ role: string; label: string; x: number; y: number; appearance?: { shape?: PlayerShape; fill?: string; stroke?: string; showLabel?: boolean; radius?: number } }> }> = {
   iFormation: {
     name: 'I Formation',
     players: [
