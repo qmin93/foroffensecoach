@@ -58,6 +58,12 @@ interface EditorState {
   // Stage dimensions
   stageWidth: number;
   stageHeight: number;
+
+  // Zoom
+  zoom: number;
+
+  // Grid snap
+  gridSnapEnabled: boolean;
 }
 
 interface EditorActions {
@@ -127,6 +133,15 @@ interface EditorActions {
 
   // Stage
   setStageSize: (width: number, height: number) => void;
+
+  // Zoom
+  setZoom: (zoom: number) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
+
+  // Grid snap
+  toggleGridSnap: () => void;
 }
 
 const createEmptyPlay = (): Play => ({
@@ -279,6 +294,8 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     historyIndex: -1,
     stageWidth: 800,
     stageHeight: 600,
+    zoom: 1,
+    gridSnapEnabled: false,
 
     // Mode
     setMode: (mode) => set((state) => {
@@ -1338,6 +1355,28 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     setStageSize: (width, height) => set((state) => {
       state.stageWidth = width;
       state.stageHeight = height;
+    }),
+
+    // Zoom
+    setZoom: (zoom) => set((state) => {
+      state.zoom = Math.max(0.5, Math.min(2, zoom));
+    }),
+
+    zoomIn: () => set((state) => {
+      state.zoom = Math.min(2, state.zoom + 0.1);
+    }),
+
+    zoomOut: () => set((state) => {
+      state.zoom = Math.max(0.5, state.zoom - 0.1);
+    }),
+
+    resetZoom: () => set((state) => {
+      state.zoom = 1;
+    }),
+
+    // Grid snap
+    toggleGridSnap: () => set((state) => {
+      state.gridSnapEnabled = !state.gridSnapEnabled;
     }),
   }))
 );

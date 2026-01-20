@@ -129,6 +129,8 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
       ref={menuRef}
       className="fixed z-50 bg-zinc-800 border border-zinc-600 rounded-lg shadow-xl py-1 min-w-[180px]"
       style={{ left: pos.x, top: pos.y }}
+      role="menu"
+      aria-label="Context menu"
     >
       {menuItems.map((item, index) => {
         if (item.type === 'separator') {
@@ -139,13 +141,14 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
           <button
             key={index}
             onClick={item.onClick}
+            role="menuitem"
             className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-zinc-700 transition-colors ${
               item.danger ? 'text-red-400 hover:text-red-300' : 'text-white'
             }`}
           >
             <span>{item.label}</span>
             {item.shortcut && (
-              <span className="text-xs text-zinc-500 ml-4">{item.shortcut}</span>
+              <span className="text-xs text-zinc-500 ml-4" aria-hidden="true">{item.shortcut}</span>
             )}
           </button>
         );

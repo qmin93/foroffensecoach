@@ -219,14 +219,14 @@ export function PlayerNode({
 
       {renderShape()}
 
-      {showLabel && (
+      {showLabel && player.label && (
         <Text
           text={player.label}
           fontSize={labelFontSize}
           fill={labelColor}
           align="center"
           verticalAlign="middle"
-          offsetX={player.label.length * (labelFontSize * 0.3)}
+          offsetX={(player.label?.length || 0) * (labelFontSize * 0.3)}
           offsetY={labelFontSize / 2}
           fontStyle="bold"
         />

@@ -44,7 +44,12 @@ export function UndoToast({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
+    <div
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up"
+      role="alert"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <div className="bg-zinc-800 border border-zinc-600 rounded-lg shadow-xl overflow-hidden">
         {/* Progress bar */}
         <div className="h-1 bg-zinc-700">
@@ -81,12 +86,14 @@ export function UndoToast({
             <button
               onClick={onUndo}
               className="px-3 py-1.5 text-sm font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded transition-colors"
+              aria-label="Undo action"
             >
               Undo
             </button>
             <button
               onClick={onDismiss}
               className="p-1 text-zinc-400 hover:text-white rounded transition-colors"
+              aria-label="Dismiss notification"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path

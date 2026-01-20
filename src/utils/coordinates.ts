@@ -17,9 +17,12 @@ export function toPixel(
   stageWidth: number,
   stageHeight: number
 ): { x: number; y: number } {
+  // Ensure valid dimensions
+  const width = Math.max(1, stageWidth);
+  const height = Math.max(1, stageHeight);
   return {
-    x: normalized.x * stageWidth,
-    y: (0.6 - normalized.y) * stageHeight, // LOS (y=0) at 60% down
+    x: normalized.x * width,
+    y: (0.6 - normalized.y) * height, // LOS (y=0) at 60% down
   };
 }
 
@@ -31,9 +34,12 @@ export function toNormalized(
   stageWidth: number,
   stageHeight: number
 ): Point {
+  // Prevent division by zero
+  const width = Math.max(1, stageWidth);
+  const height = Math.max(1, stageHeight);
   return {
-    x: pixel.x / stageWidth,
-    y: 0.6 - pixel.y / stageHeight, // LOS (y=0) at 60% down
+    x: pixel.x / width,
+    y: 0.6 - pixel.y / height, // LOS (y=0) at 60% down
   };
 }
 

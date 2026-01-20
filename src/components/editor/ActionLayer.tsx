@@ -107,6 +107,10 @@ function LineWithMarker({
   const shadowBlur = isHovered && !isSelected ? 6 : 0;
 
   // Calculate end point and angle for markers
+  // Ensure we have at least 2 points (4 values in the flat array)
+  if (points.length < 4) {
+    return null;
+  }
   const lastX = points[points.length - 2];
   const lastY = points[points.length - 1];
   const prevX = points.length >= 4 ? points[points.length - 4] : lastX;

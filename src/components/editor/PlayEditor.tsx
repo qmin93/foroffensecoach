@@ -25,6 +25,8 @@ import { ShareModal } from '@/components/share/ShareModal';
 import { UpgradeModal } from '@/components/subscription/UpgradeModal';
 import { FeatureAccess } from '@/lib/subscription';
 import { toast } from '@/store/toastStore';
+import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
+import { ZoomControls } from './ZoomControls';
 
 export function PlayEditor() {
   const stageRef = useRef<Konva.Stage>(null);
@@ -57,6 +59,9 @@ export function PlayEditor() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState<keyof FeatureAccess | undefined>();
 
+  // Keyboard shortcuts modal
+  const [showShortcuts, setShowShortcuts] = useState(false);
+
   // Auth state
   const { user, workspace } = useAuthStore();
 
@@ -85,6 +90,12 @@ export function PlayEditor() {
   const editingActionId = useEditorStore((state) => state.editingActionId);
   const updateEditingPoint = useEditorStore((state) => state.updateEditingPoint);
   const finishEditingAction = useEditorStore((state) => state.finishEditingAction);
+  const zoom = useEditorStore((state) => state.zoom);
+  const zoomIn = useEditorStore((state) => state.zoomIn);
+  const zoomOut = useEditorStore((state) => state.zoomOut);
+  const resetZoom = useEditorStore((state) => state.resetZoom);
+  const gridSnapEnabled = useEditorStore((state) => state.gridSnapEnabled);
+  const toggleGridSnap = useEditorStore((state) => state.toggleGridSnap);
 
   // Responsive canvas sizing
   useEffect(() => {
@@ -314,6 +325,25 @@ export function PlayEditor() {
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         store.moveSelectedByOffset(moveAmount, 0);
+      }
+
+      // Zoom controls
+      if ((e.metaKey || e.ctrlKey) && (e.key === '=' || e.key === '+')) {
+        e.preventDefault();
+        store.zoomIn();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === '-') {
+        e.preventDefault();
+        store.zoomOut();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === '0') {
+        e.preventDefault();
+        store.resetZoom();
+      }
+
+      // Show keyboard shortcuts (?)
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        setShowShortcuts(true);
       }
     };
 
@@ -583,10 +613,46 @@ export function PlayEditor() {
       {/* Canvas */}
       <div
         ref={containerRef}
-        className="flex-1 flex items-center justify-center p-2 md:p-4 min-h-0"
+        className="flex-1 flex flex-col items-center justify-center p-2 md:p-4 min-h-0"
         style={{ cursor: getCursor() }}
       >
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+        {/* Zoom Controls */}
+        <div className="hidden md:flex items-center gap-2 mb-2">
+          <ZoomControls
+            zoom={zoom}
+            onZoomIn={zoomIn}
+            onZoomOut={zoomOut}
+            onZoomReset={resetZoom}
+          />
+          <button
+            onClick={toggleGridSnap}
+            className={`p-2 rounded-lg border transition-colors ${
+              gridSnapEnabled
+                ? 'bg-blue-600 border-blue-500 text-white'
+                : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700'
+            }`}
+            title={`Grid snap: ${gridSnapEnabled ? 'ON' : 'OFF'}`}
+            aria-pressed={gridSnapEnabled}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setShowShortcuts(true)}
+            className="p-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 transition-colors"
+            title="Keyboard shortcuts (?)"
+            aria-label="Show keyboard shortcuts"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+        </div>
+        <div
+          className="bg-white rounded-lg shadow-xl overflow-hidden"
+          style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
+        >
           <Stage
             ref={stageRef}
             width={stageWidth}
@@ -713,6 +779,12 @@ export function PlayEditor() {
         currentTier={tier}
         blockedFeature={upgradeFeature}
         suggestedTier="pro"
+      />
+
+      {/* Keyboard Shortcuts Modal */}
+      <KeyboardShortcutsModal
+        isOpen={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
       />
     </div>
   );
