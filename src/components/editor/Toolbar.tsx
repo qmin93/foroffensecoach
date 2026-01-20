@@ -95,12 +95,10 @@ const LINE_STYLES: { value: LineStyle; label: string }[] = [
 ];
 
 interface ToolbarProps {
-  showInstallFocus?: boolean;
-  onToggleInstallFocus?: () => void;
   onConceptPanelToggle?: (isOpen: boolean) => void;
 }
 
-export function Toolbar({ showInstallFocus = false, onToggleInstallFocus, onConceptPanelToggle }: ToolbarProps) {
+export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
   const mode = useEditorStore((state) => state.mode);
   const setMode = useEditorStore((state) => state.setMode);
   const addPlayer = useEditorStore((state) => state.addPlayer);
@@ -245,7 +243,7 @@ export function Toolbar({ showInstallFocus = false, onToggleInstallFocus, onConc
         </Select>
       </div>
 
-      {/* Concepts & Install Focus Buttons (mutually exclusive) */}
+      {/* Concepts Button */}
       <div className="space-y-2">
         <Button
           onClick={() => {
@@ -253,28 +251,14 @@ export function Toolbar({ showInstallFocus = false, onToggleInstallFocus, onConc
             toggleConceptPanel();
             onConceptPanelToggle?.(newState);
           }}
-          variant={isPanelOpen && !showInstallFocus ? 'default' : 'outline'}
-          className={`w-full ${isPanelOpen && !showInstallFocus ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-600'}`}
+          variant={isPanelOpen ? 'default' : 'outline'}
+          className={`w-full ${isPanelOpen ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-600'}`}
         >
           <span className="mr-2">💡</span>
-          {isPanelOpen && !showInstallFocus ? 'Hide Concepts' : 'Show Concepts'}
+          {isPanelOpen ? 'Hide Concepts' : 'Show Concepts'}
         </Button>
-        {onToggleInstallFocus && (
-          <Button
-            onClick={onToggleInstallFocus}
-            variant={showInstallFocus ? 'default' : 'outline'}
-            className={`w-full ${
-              showInstallFocus
-                ? 'bg-orange-500 hover:bg-orange-400 text-white'
-                : 'border-zinc-600 hover:bg-zinc-700'
-            }`}
-          >
-            <span className="mr-2">📋</span>
-            {showInstallFocus ? 'Hide Install Focus' : 'Install Focus'}
-          </Button>
-        )}
         <p className="text-[10px] text-zinc-500 text-center">
-          Formation → Concept → Drills
+          Formation → Concept
         </p>
       </div>
 

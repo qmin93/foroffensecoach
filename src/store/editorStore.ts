@@ -177,7 +177,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
     name: 'I Formation',
     players: [
       // Ball at center
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       // O-Line
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
@@ -196,7 +196,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   shotgun: {
     name: 'Shotgun',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -213,7 +213,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   spread: {
     name: 'Spread 2x2',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -230,7 +230,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   trips: {
     name: 'Trips Right',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -247,7 +247,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   bunch: {
     name: 'Bunch Right',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -264,7 +264,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   singleBack: {
     name: 'Single Back',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -281,7 +281,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   proSet: {
     name: 'Pro Set',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -298,7 +298,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   pistol: {
     name: 'Pistol',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -315,7 +315,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   twins: {
     name: 'Twins Right',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -332,7 +332,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   wingT: {
     name: 'Wing-T',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -349,7 +349,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   ace: {
     name: 'Ace (12 Personnel)',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -366,7 +366,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   emptySet: {
     name: 'Empty Set',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -383,7 +383,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   goalLine: {
     name: 'Goal Line',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -400,7 +400,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   slot: {
     name: 'Slot Right',
     players: [
-      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'BALL', label: '🏈', x: 0.5, y: 0, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },

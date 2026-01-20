@@ -517,15 +517,6 @@ export function PlayEditor() {
       >
         <div className="flex-1 overflow-y-auto">
           <Toolbar
-            showInstallFocus={showInstallFocus}
-            onToggleInstallFocus={() => {
-              const newState = !showInstallFocus;
-              setShowInstallFocus(newState);
-              // Close concepts panel when opening Install Focus
-              if (newState) {
-                useConceptStore.getState().closePanel();
-              }
-            }}
             onConceptPanelToggle={(isOpen) => {
               // Close Install Focus when opening concepts panel
               if (isOpen) {
@@ -586,28 +577,6 @@ export function PlayEditor() {
               Free tier: PDF exports include watermark
             </p>
           )}
-          <Button
-            onClick={() => {
-              const newState = !showInstallFocus;
-              setShowInstallFocus(newState);
-              // Close concepts panel when opening Install Focus
-              if (newState) {
-                useConceptStore.getState().closePanel();
-              }
-              setIsMobileMenuOpen(false);
-            }}
-            variant={showInstallFocus ? 'default' : 'outline'}
-            className={`w-full flex items-center justify-center gap-2 ${
-              showInstallFocus
-                ? 'bg-orange-500 hover:bg-orange-400 text-white'
-                : 'border-zinc-600 hover:bg-zinc-800'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-            {showInstallFocus ? 'Hide Install Focus' : 'Install Focus'}
-          </Button>
           {isAuthenticated && play.id && !play.id.startsWith('new-') && (
             <Button
               onClick={() => { handleShareClick(); setIsMobileMenuOpen(false); }}
@@ -778,7 +747,15 @@ export function PlayEditor() {
       )}
 
       {/* Concept Panel - hidden when Install Focus is open */}
-      {!showInstallFocus && <ConceptPanel onApplyConcept={handleApplyConcept} />}
+      {!showInstallFocus && (
+        <ConceptPanel
+          onApplyConcept={handleApplyConcept}
+          onOpenInstallFocus={() => {
+            setShowInstallFocus(true);
+            useConceptStore.getState().closePanel();
+          }}
+        />
+      )}
 
       {/* Install Focus Panel - mutually exclusive with Concept Panel */}
       <InstallFocusPanel

@@ -14,6 +14,9 @@ export function SituationHeader({ onDefenseChange }: SituationHeaderProps) {
   const [distance, setDistance] = useState<number>(10);
   const [fieldPosition, setFieldPosition] = useState<string>('OWN 25');
 
+  // Play type toggle (Pass/Run)
+  const [playType, setPlayType] = useState<'pass' | 'run'>('pass');
+
   // Defense state
   const [boxCount, setBoxCount] = useState<6 | 7 | 8>(7);
   const [front, setFront] = useState<FrontType>('even');
@@ -37,16 +40,13 @@ export function SituationHeader({ onDefenseChange }: SituationHeaderProps) {
     onDefenseChange?.();
   }, [boxCount, front, threeTech, shell, blitzTendency, setDefenseContext, updateRecommendations, onDefenseChange]);
 
-  // Determine pass/run preference based on situation
-  const getSituationHint = () => {
-    if (distance <= 2) return 'run';
-    if (distance >= 8) return 'pass';
-    if (fieldPosition === 'Red Zone' || fieldPosition === 'OPP 5') return 'run';
-    if (down >= 3 && distance >= 7) return 'pass';
-    return 'balanced';
-  };
+  // Update play type preference in the concept store
+  const setTypeFilter = useConceptStore((state) => state.setTypeFilter);
 
-  const situationHint = getSituationHint();
+  // Sync play type to concept store filter
+  useEffect(() => {
+    setTypeFilter(playType);
+  }, [playType, setTypeFilter]);
 
   return (
     <div className="bg-zinc-900 border-b border-zinc-700 px-2 md:px-4 py-2 overflow-x-auto">
@@ -120,19 +120,19 @@ export function SituationHeader({ onDefenseChange }: SituationHeaderProps) {
             <span className="text-white font-bold text-sm">{distance === 0 ? 'G' : distance}</span>
           </div>
 
-          <span
+          {/* Pass/Run Toggle Button */}
+          <button
+            onClick={() => setPlayType(playType === 'pass' ? 'run' : 'pass')}
             className={`
-              px-1.5 py-0.5 rounded text-[9px] md:text-[10px] font-medium uppercase whitespace-nowrap
-              ${situationHint === 'run'
-                ? 'bg-green-500/20 text-green-400'
-                : situationHint === 'pass'
-                  ? 'bg-blue-500/20 text-blue-400'
-                  : 'bg-zinc-700 text-zinc-400'
+              px-2 py-1 rounded text-xs md:text-sm font-bold uppercase whitespace-nowrap transition-colors
+              ${playType === 'pass'
+                ? 'bg-blue-500 text-white hover:bg-blue-400'
+                : 'bg-green-500 text-white hover:bg-green-400'
               }
             `}
           >
-            {situationHint === 'run' ? '🏃 Run' : situationHint === 'pass' ? '🏈 Pass' : '⚖️'}
-          </span>
+            {playType === 'pass' ? '🏈 Pass' : '🏃 Run'}
+          </button>
         </div>
 
         <div className="hidden md:block w-px h-6 bg-zinc-600" />
