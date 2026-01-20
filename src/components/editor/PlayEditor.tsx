@@ -682,7 +682,7 @@ export function PlayEditor() {
       </div>
 
       {/* Instructions - Desktop */}
-      <div className="hidden md:block absolute bottom-4 right-4 bg-black/70 text-white text-xs p-3 rounded max-w-xs">
+      <div className="hidden md:block absolute bottom-4 left-4 bg-black/70 text-white text-xs p-3 rounded max-w-xs z-10">
         <div className="font-semibold mb-1">Mode: {mode.toUpperCase()}</div>
         {mode === 'select' && (
           <>
