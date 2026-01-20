@@ -10,11 +10,7 @@ export default function LandingPage() {
   const { user } = useAuthStore();
 
   const handleGetStarted = () => {
-    if (user) {
-      router.push('/dashboard');
-    } else {
-      router.push('/editor');
-    }
+    router.push('/editor');
   };
 
   return (

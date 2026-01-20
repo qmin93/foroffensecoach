@@ -39,7 +39,7 @@ export default function DashboardPage() {
   };
 
   const handleCreatePlay = () => {
-    router.push('/');
+    router.push('/editor');
   };
 
   const handleOpenPlay = (playId: string) => {
@@ -196,7 +196,7 @@ export default function DashboardPage() {
                 <FormationRecommendPanel
                   onSelectFormation={(formationId) => {
                     // Navigate to editor with selected formation
-                    router.push(`/?formation=${formationId}`);
+                    router.push(`/editor?formation=${formationId}`);
                   }}
                 />
               </div>
