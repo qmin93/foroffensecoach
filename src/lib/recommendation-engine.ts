@@ -7,7 +7,7 @@
  *
  * Design principles:
  * - Recommendations are filtering, not judgment
- * - Results limited to 8-12 concepts
+ * - Results limited to 20 concepts
  * - Run recommendations include 3-line rationale (Numbers/Angle/Surface)
  * - No AI predictions or success rates
  */
@@ -31,7 +31,7 @@ import { ALL_CONCEPTS } from '@/data/concepts';
 // ============================================
 
 const CONFIG = {
-  maxResults: 12,
+  maxResults: 20,
   minScore: 25,
   weights: {
     // Pass weights

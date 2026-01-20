@@ -21,7 +21,7 @@ export interface Point {
   y: number; // -1.0 ~ +1.0 (LOS = 0)
 }
 
-export type PlayerShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'star' | 'x_mark';
+export type PlayerShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'star' | 'x_mark' | 'football';
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 export type PathType = 'straight' | 'quadratic' | 'bezier' | 'tension';
 export type EndMarker = 'arrow' | 'none' | 'circle' | 't_block';

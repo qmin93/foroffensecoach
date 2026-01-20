@@ -24,9 +24,10 @@ import {
 } from '@/components/ui/popover';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const PLAYER_PRESETS = [
+const OFFENSE_PRESETS = [
   { role: 'QB', label: 'QB' },
   { role: 'RB', label: 'RB' },
+  { role: 'FB', label: 'FB' },
   { role: 'WR', label: 'WR' },
   { role: 'TE', label: 'TE' },
   { role: 'C', label: 'C' },
@@ -36,6 +37,29 @@ const PLAYER_PRESETS = [
   { role: 'RT', label: 'RT' },
 ];
 
+const DEFENSE_PRESETS = [
+  { role: 'DE', label: 'DE' },
+  { role: 'DT', label: 'DT' },
+  { role: 'NT', label: 'NT' },
+  { role: 'OLB', label: 'OLB' },
+  { role: 'ILB', label: 'ILB' },
+  { role: 'MLB', label: 'MLB' },
+  { role: 'CB', label: 'CB' },
+  { role: 'SS', label: 'SS' },
+  { role: 'FS', label: 'FS' },
+  { role: 'NB', label: 'NB' },
+];
+
+const SPECIAL_PRESETS = [
+  { role: 'K', label: 'K' },
+  { role: 'P', label: 'P' },
+  { role: 'LS', label: 'LS' },
+  { role: 'H', label: 'H' },
+  { role: 'KR', label: 'KR' },
+  { role: 'PR', label: 'PR' },
+  { role: 'BALL', label: '🏈' },
+];
+
 const SHAPES: { value: PlayerShape; icon: string }[] = [
   { value: 'circle', icon: '●' },
   { value: 'square', icon: '■' },
@@ -43,6 +67,7 @@ const SHAPES: { value: PlayerShape; icon: string }[] = [
   { value: 'diamond', icon: '◆' },
   { value: 'star', icon: '★' },
   { value: 'x_mark', icon: '✕' },
+  { value: 'football', icon: '🏈' },
 ];
 
 const COLORS = [
@@ -125,7 +150,18 @@ export function Toolbar() {
   };
 
   const handleAddPlayer = (role: string) => {
-    addPlayer(role, { x: 0.5, y: 0 });
+    // Special handling for football (BALL)
+    if (role === 'BALL') {
+      addPlayer(role, { x: 0.5, y: 0 }, {
+        shape: 'football',
+        fill: '#8B4513',
+        stroke: '#ffffff',
+        showLabel: false,
+        radius: 12,
+      });
+    } else {
+      addPlayer(role, { x: 0.5, y: 0 });
+    }
     setAddPlayerOpen(false);
   };
 
@@ -326,19 +362,57 @@ export function Toolbar() {
               + Add Player
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-48 bg-zinc-800 border-zinc-700 p-2">
-            <div className="grid grid-cols-3 gap-1">
-              {PLAYER_PRESETS.map(({ role, label }) => (
-                <Button
-                  key={role}
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleAddPlayer(role)}
-                  className="bg-zinc-700 hover:bg-zinc-600 text-white"
-                >
-                  {label}
-                </Button>
-              ))}
+          <PopoverContent className="w-64 bg-zinc-800 border-zinc-700 p-3" align="start">
+            {/* Offense */}
+            <div className="mb-3">
+              <Label className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1.5 block">Offense</Label>
+              <div className="grid grid-cols-5 gap-1">
+                {OFFENSE_PRESETS.map(({ role, label }) => (
+                  <Button
+                    key={role}
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleAddPlayer(role)}
+                    className="bg-green-900/50 hover:bg-green-800 text-green-200 text-xs px-1"
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            {/* Defense */}
+            <div className="mb-3">
+              <Label className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1.5 block">Defense</Label>
+              <div className="grid grid-cols-5 gap-1">
+                {DEFENSE_PRESETS.map(({ role, label }) => (
+                  <Button
+                    key={role}
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleAddPlayer(role)}
+                    className="bg-red-900/50 hover:bg-red-800 text-red-200 text-xs px-1"
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            {/* Special */}
+            <div>
+              <Label className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1.5 block">Special</Label>
+              <div className="grid grid-cols-5 gap-1">
+                {SPECIAL_PRESETS.map(({ role, label }) => (
+                  <Button
+                    key={role}
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleAddPlayer(role)}
+                    className="bg-zinc-700 hover:bg-zinc-600 text-white text-xs px-1"
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -591,7 +665,32 @@ export function Toolbar() {
 
       <Separator className="bg-zinc-700" />
 
-      {/* Actions */}
+      {/* Play Actions */}
+      <div>
+        <Label className="text-xs text-zinc-400 mb-2 block">Play Actions</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => useEditorStore.getState().flipPlay()}
+            className="bg-zinc-800 hover:bg-zinc-700 border-zinc-600 text-xs"
+          >
+            ↔ Flip
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => useEditorStore.getState().duplicatePlay()}
+            className="bg-zinc-800 hover:bg-zinc-700 border-zinc-600 text-xs"
+          >
+            ⧉ Duplicate
+          </Button>
+        </div>
+      </div>
+
+      <Separator className="bg-zinc-700" />
+
+      {/* Undo/Redo */}
       <div className="flex gap-2">
         <Button
           variant="secondary"

@@ -137,6 +137,44 @@ export function PlayerNode({
           />
         );
 
+      case 'football':
+        return (
+          <Shape
+            {...shapeProps}
+            sceneFunc={(context, shape) => {
+              const w = radius * 1.6; // Width
+              const h = radius * 1.0; // Height
+              context.beginPath();
+              // Draw football/rugby ball shape using bezier curves
+              context.moveTo(-w, 0);
+              context.bezierCurveTo(-w, -h * 1.2, w, -h * 1.2, w, 0);
+              context.bezierCurveTo(w, h * 1.2, -w, h * 1.2, -w, 0);
+              context.closePath();
+              context.fillStrokeShape(shape);
+              // Draw laces
+              const laceColor = isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : stroke;
+              context.save();
+              context.strokeStyle = laceColor;
+              context.lineWidth = strokeWidth * 0.7;
+              // Center line
+              context.beginPath();
+              context.moveTo(-w * 0.3, 0);
+              context.lineTo(w * 0.3, 0);
+              context.stroke();
+              // Cross laces
+              const laceSpacing = w * 0.15;
+              for (let i = -2; i <= 2; i++) {
+                const lx = i * laceSpacing;
+                context.beginPath();
+                context.moveTo(lx, -h * 0.25);
+                context.lineTo(lx, h * 0.25);
+                context.stroke();
+              }
+              context.restore();
+            }}
+          />
+        );
+
       default:
         return <Circle {...shapeProps} radius={radius} />;
     }

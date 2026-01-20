@@ -114,6 +114,8 @@ interface EditorActions {
   updatePlayName: (name: string) => void;
   resetPlay: () => void;
   loadFormation: (formationKey: string) => void;
+  flipPlay: () => void;
+  duplicatePlay: () => void;
 
   // Concept auto-build
   applyConceptTemplate: (conceptId: string) => { success: boolean; actionsCreated: number; message: string };
@@ -758,6 +760,86 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       state.play.updatedAt = new Date().toISOString();
     }),
 
+    // Flip play horizontally (mirror)
+    flipPlay: () => set((state) => {
+      get().saveToHistory();
+
+      // Flip all players horizontally (mirror around x=0.5)
+      state.play.roster.players.forEach((player) => {
+        player.alignment.x = 1 - player.alignment.x;
+      });
+
+      // Flip all actions
+      state.play.actions.forEach((action) => {
+        if (action.actionType === 'route' && 'route' in action) {
+          action.route.controlPoints = action.route.controlPoints.map((p) => ({
+            x: 1 - p.x,
+            y: p.y,
+          }));
+        } else if (action.actionType === 'block' && 'block' in action) {
+          action.block.pathPoints = action.block.pathPoints.map((p) => ({
+            x: 1 - p.x,
+            y: p.y,
+          }));
+          if (action.block.target?.landmark) {
+            action.block.target.landmark.x = 1 - action.block.target.landmark.x;
+          }
+        } else if (action.actionType === 'motion' && 'motion' in action) {
+          action.motion.pathPoints = action.motion.pathPoints.map((p) => ({
+            x: 1 - p.x,
+            y: p.y,
+          }));
+          if (action.motion.endAlignment) {
+            action.motion.endAlignment.x = 1 - action.motion.endAlignment.x;
+          }
+        } else if (action.actionType === 'landmark' && 'landmark' in action) {
+          action.landmark.x = 1 - action.landmark.x;
+        } else if (action.actionType === 'text' && 'text' in action) {
+          action.text.x = 1 - action.text.x;
+        }
+      });
+
+      // Flip strength
+      if (state.play.meta.strength === 'left') {
+        state.play.meta.strength = 'right';
+      } else if (state.play.meta.strength === 'right') {
+        state.play.meta.strength = 'left';
+      }
+
+      state.play.updatedAt = new Date().toISOString();
+    }),
+
+    // Duplicate play (create a copy with new ID)
+    duplicatePlay: () => set((state) => {
+      // Create a deep copy of the current play
+      const newPlay = JSON.parse(JSON.stringify(state.play));
+      newPlay.id = uuidv4();
+      newPlay.name = `${state.play.name} (Copy)`;
+      newPlay.createdAt = new Date().toISOString();
+      newPlay.updatedAt = new Date().toISOString();
+
+      // Assign new IDs to all players and actions
+      const playerIdMap: Record<string, string> = {};
+      newPlay.roster.players.forEach((player: { id: string }) => {
+        const oldId = player.id;
+        const newId = uuidv4();
+        playerIdMap[oldId] = newId;
+        player.id = newId;
+      });
+
+      // Update action references
+      newPlay.actions.forEach((action: { id: string; fromPlayerId?: string }) => {
+        action.id = uuidv4();
+        if (action.fromPlayerId && playerIdMap[action.fromPlayerId]) {
+          action.fromPlayerId = playerIdMap[action.fromPlayerId];
+        }
+      });
+
+      state.play = newPlay;
+      state.history = [];
+      state.historyIndex = -1;
+    }),
+
     // Concept auto-build
     applyConceptTemplate: (conceptId) => {
       const concept = getConceptById(conceptId);
@@ -778,6 +860,9 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       let actionsCreated = 0;
 
       set((draft) => {
+        // Clear existing actions when applying a new concept
+        draft.play.actions = [];
+
         const template = concept.template;
         const assignedPlayerIds = new Set<string>();
 
