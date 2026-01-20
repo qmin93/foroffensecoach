@@ -83,7 +83,7 @@ interface ConceptActions {
 // ============================================
 
 const initialState: ConceptState = {
-  isPanelOpen: false,
+  isPanelOpen: true,
   activeTab: 'recommended',
 
   filters: {
