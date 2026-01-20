@@ -287,7 +287,7 @@ function computeRecommendations(
     // Check requirements match
     const req = concept.requirements;
 
-    // Pass concepts: check receiver count
+    // Pass concepts: check receiver count and defense coverage
     if (concept.conceptType === 'pass') {
       if (req.minEligibleReceivers && formation.receiverCount >= req.minEligibleReceivers) {
         score += 20;
@@ -304,6 +304,52 @@ function computeRecommendations(
       if (req.preferredStructures?.includes(formation.structure as any)) {
         score += 15;
       }
+
+      // Defense context for pass concepts
+      if (defense && concept.suggestionHints.passHints) {
+        const passHints = concept.suggestionHints.passHints;
+
+        // Light box = more defenders in coverage = harder to pass
+        if (defense.boxCount === 6) {
+          score -= 10; // Light box means more DBs
+          if (passHints.zoneBeater) {
+            score += 15;
+            rationale.push('Zone beater vs light box coverage');
+          }
+        }
+
+        // Heavy box = easier to pass, harder to run
+        if (defense.boxCount === 8) {
+          score += 15;
+          rationale.push('Heavy box creates passing opportunities');
+        }
+
+        // Coverage shell adjustments
+        if (defense.coverage === '1-high') {
+          // Single high = man or Cover 3
+          if (passHints.manBeater) {
+            score += 20;
+            rationale.push('Man beater vs 1-high shell');
+          }
+          if (passHints.category === 'deep') {
+            score += 10;
+            rationale.push('Deep shots available vs 1-high');
+          }
+        } else if (defense.coverage === '2-high') {
+          // Two high = Cover 2 or Cover 4
+          if (passHints.zoneBeater) {
+            score += 15;
+            rationale.push('Zone beater vs 2-high shell');
+          }
+          if (passHints.stress?.includes('mof')) {
+            score += 15;
+            rationale.push('Attacks middle of field vs 2-high');
+          }
+          if (passHints.category === 'deep') {
+            score -= 10; // Harder to throw deep vs 2-high
+          }
+        }
+      }
     }
 
     // Run concepts: check defense context
@@ -317,28 +363,45 @@ function computeRecommendations(
 
       // Puller needs
       if (req.needsPuller && req.needsPuller !== 'none') {
-        // Assume we have pullers available
         score += 5;
       }
 
-      // Defense context bonuses
+      // Defense context bonuses/penalties
       if (defense) {
-        // Box count
-        if (runHints.bestWhenBox?.includes(String(defense.boxCount) as any)) {
-          score += 20;
-          rationale.push(`Box: ${defense.boxCount}-man box is favorable`);
+        // Box count - strong effect on run concepts
+        const boxStr = String(defense.boxCount) as '6' | '7' | '8';
+        if (runHints.bestWhenBox?.includes(boxStr)) {
+          score += 25;
+          rationale.push(`✓ Box: ${defense.boxCount}-man box is favorable`);
+        } else {
+          // Penalize if running into unfavorable box
+          if (defense.boxCount === 8) {
+            score -= 25;
+            rationale.push(`⚠ Heavy 8-man box`);
+          } else if (defense.boxCount === 6 && runHints.category !== 'outside_zone') {
+            // Light box but inside run
+            score -= 10;
+          }
         }
 
-        // Front match
+        // Front match - moderate effect
         if (defense.front && runHints.bestVsFront?.includes(defense.front)) {
-          score += 15;
-          rationale.push(`Front: Works well vs ${defense.front}`);
+          score += 20;
+          rationale.push(`✓ Front: Effective vs ${defense.front}`);
+        } else if (defense.front) {
+          // Slight penalty for non-optimal front
+          score -= 5;
         }
 
-        // 3-tech position
+        // 3-tech position - important for gap schemes
         if (defense.threeTech && runHints.bestVs3T?.includes(defense.threeTech)) {
-          score += 10;
-          rationale.push(`3T: ${defense.threeTech} side creates angle`);
+          score += 15;
+          rationale.push(`✓ 3T: ${defense.threeTech} side creates angle`);
+        } else if (defense.threeTech && defense.threeTech !== 'none') {
+          // Slight penalty for unfavorable 3T
+          if (runHints.category === 'gap' || runHints.category === 'power') {
+            score -= 10;
+          }
         }
       }
     }
@@ -351,6 +414,29 @@ function computeRecommendations(
           ? hints.passHints?.category ?? 'quick'
           : hints.runHints?.category ?? 'inside_zone';
 
+      // Build roles display
+      const roles = concept.template.roles.map((role) => {
+        let action = '';
+        if (role.defaultRoute) {
+          const route = role.defaultRoute;
+          action = route.pattern.replace(/_/g, ' ');
+          if (route.depth) action += ` @ ${route.depth} yds`;
+          if (route.direction) action += ` (${route.direction})`;
+        } else if (role.defaultBlock) {
+          const block = role.defaultBlock;
+          action = block.scheme.replace(/_/g, ' ');
+          if (block.target) action += ` → ${block.target}`;
+        } else {
+          action = 'Assignment';
+        }
+        return {
+          roleName: role.roleName,
+          appliesTo: role.appliesTo,
+          action: action.charAt(0).toUpperCase() + action.slice(1),
+          notes: role.notes,
+        };
+      });
+
       results.push({
         id: concept.id,
         name: concept.name,
@@ -360,6 +446,7 @@ function computeRecommendations(
         badges: concept.badges ?? [],
         matchScore: Math.min(100, Math.max(0, score)),
         rationale: rationale.length > 0 ? rationale : undefined,
+        roles,
       });
     }
   }

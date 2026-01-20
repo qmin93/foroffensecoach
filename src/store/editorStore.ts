@@ -171,11 +171,13 @@ const createEmptyPlay = (): Play => ({
 // Offense direction is UPWARD. All players must be below LOS (negative Y values)
 // Visible range: y = -0.4 (bottom, 10 yards back) to y = 0.6 (top, 15 yards ahead)
 // Scale: 0.04 = 1 yard
-export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ role: string; label: string; x: number; y: number }> }> = {
+export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ role: string; label: string; x: number; y: number; appearance?: { shape?: string; fill?: string; stroke?: string; showLabel?: boolean; radius?: number } }> }> = {
   iFormation: {
     name: 'I Formation',
     players: [
-      // O-Line: tight spacing (gap of 0.05), below LOS (y: -0.03)
+      // Ball at center
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      // O-Line
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -193,6 +195,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   shotgun: {
     name: 'Shotgun',
     players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -207,8 +210,9 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
     ],
   },
   spread: {
-    name: 'Spread',
+    name: 'Spread 2x2',
     players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -222,9 +226,44 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
     ],
   },
+  trips: {
+    name: 'Trips Right',
+    players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'C', label: 'C', x: 0.5, y: -0.03 },
+      { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
+      { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
+      { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
+      { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
+      { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
+      { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
+      { role: 'WR', label: 'H', x: 0.72, y: -0.03 },
+      { role: 'WR', label: 'Y', x: 0.82, y: -0.03 },
+      { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
+    ],
+  },
+  bunch: {
+    name: 'Bunch Right',
+    players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'C', label: 'C', x: 0.5, y: -0.03 },
+      { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
+      { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
+      { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
+      { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
+      { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
+      { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
+      { role: 'TE', label: 'Y', x: 0.75, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.78, y: -0.08 },
+      { role: 'WR', label: 'Z', x: 0.82, y: -0.03 },
+    ],
+  },
   singleBack: {
     name: 'Single Back',
     players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -241,6 +280,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
   proSet: {
     name: 'Pro Set',
     players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -254,9 +294,78 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
     ],
   },
+  pistol: {
+    name: 'Pistol',
+    players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'C', label: 'C', x: 0.5, y: -0.03 },
+      { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
+      { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
+      { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
+      { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
+      { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.2, y: -0.03 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.10 },
+      { role: 'RB', label: 'RB', x: 0.5, y: -0.18 },
+      { role: 'WR', label: 'Y', x: 0.8, y: -0.03 },
+      { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
+    ],
+  },
+  twins: {
+    name: 'Twins Right',
+    players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'C', label: 'C', x: 0.5, y: -0.03 },
+      { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
+      { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
+      { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
+      { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
+      { role: 'TE', label: 'Y', x: 0.65, y: -0.03 },
+      { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
+      { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
+      { role: 'WR', label: 'H', x: 0.78, y: -0.03 },
+      { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
+    ],
+  },
+  wingT: {
+    name: 'Wing-T',
+    players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'C', label: 'C', x: 0.5, y: -0.03 },
+      { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
+      { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
+      { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
+      { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
+      { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
+      { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'FB', label: 'FB', x: 0.5, y: -0.13 },
+      { role: 'RB', label: 'WB', x: 0.70, y: -0.07 },
+      { role: 'RB', label: 'TB', x: 0.42, y: -0.13 },
+    ],
+  },
+  ace: {
+    name: 'Ace (12 Personnel)',
+    players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'C', label: 'C', x: 0.5, y: -0.03 },
+      { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
+      { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
+      { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
+      { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
+      { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
+      { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
+      { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
+      { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
+    ],
+  },
   emptySet: {
     name: 'Empty Set',
     players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
       { role: 'C', label: 'C', x: 0.5, y: -0.03 },
       { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
@@ -268,6 +377,40 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'Y', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'F', x: 0.85, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
+    ],
+  },
+  goalLine: {
+    name: 'Goal Line',
+    players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'C', label: 'C', x: 0.5, y: -0.03 },
+      { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
+      { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
+      { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
+      { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
+      { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
+      { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'FB', label: 'FB', x: 0.5, y: -0.11 },
+      { role: 'RB', label: 'RB', x: 0.5, y: -0.17 },
+      { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
+    ],
+  },
+  slot: {
+    name: 'Slot Right',
+    players: [
+      { role: 'BALL', label: '🏈', x: 0.5, y: -0.01, appearance: { shape: 'football', fill: '#8B4513', stroke: '#ffffff', showLabel: false, radius: 10 } },
+      { role: 'C', label: 'C', x: 0.5, y: -0.03 },
+      { role: 'LG', label: 'LG', x: 0.45, y: -0.03 },
+      { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
+      { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
+      { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
+      { role: 'TE', label: 'Y', x: 0.65, y: -0.03 },
+      { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
+      { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
+      { role: 'WR', label: 'H', x: 0.78, y: -0.03 },
+      { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
     ],
   },
 };
@@ -769,6 +912,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
           },
           appearance: {
             ...DEFAULT_PLAYER_APPEARANCE,
+            ...p.appearance, // Preserve ball/custom appearance from preset
           },
         };
         state.play.roster.players.push(player);

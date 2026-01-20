@@ -27,6 +27,7 @@ import { FeatureAccess } from '@/lib/subscription';
 import { toast } from '@/store/toastStore';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { ZoomControls } from './ZoomControls';
+import { SituationHeader } from './SituationHeader';
 
 export function PlayEditor() {
   const stageRef = useRef<Konva.Stage>(null);
@@ -515,7 +516,23 @@ export function PlayEditor() {
         `}
       >
         <div className="flex-1 overflow-y-auto">
-          <Toolbar />
+          <Toolbar
+            showInstallFocus={showInstallFocus}
+            onToggleInstallFocus={() => {
+              const newState = !showInstallFocus;
+              setShowInstallFocus(newState);
+              // Close concepts panel when opening Install Focus
+              if (newState) {
+                useConceptStore.getState().closePanel();
+              }
+            }}
+            onConceptPanelToggle={(isOpen) => {
+              // Close Install Focus when opening concepts panel
+              if (isOpen) {
+                setShowInstallFocus(false);
+              }
+            }}
+          />
         </div>
         <div className="p-4 border-t border-zinc-800 bg-zinc-900 space-y-2">
           {isAuthenticated ? (
@@ -570,16 +587,26 @@ export function PlayEditor() {
             </p>
           )}
           <Button
-            onClick={() => { setShowInstallFocus(!showInstallFocus); setIsMobileMenuOpen(false); }}
-            variant="outline"
-            className={`w-full border-zinc-600 hover:bg-zinc-800 flex items-center justify-center gap-2 ${
-              showInstallFocus ? 'bg-orange-500/20 border-orange-500/50 text-orange-400' : ''
+            onClick={() => {
+              const newState = !showInstallFocus;
+              setShowInstallFocus(newState);
+              // Close concepts panel when opening Install Focus
+              if (newState) {
+                useConceptStore.getState().closePanel();
+              }
+              setIsMobileMenuOpen(false);
+            }}
+            variant={showInstallFocus ? 'default' : 'outline'}
+            className={`w-full flex items-center justify-center gap-2 ${
+              showInstallFocus
+                ? 'bg-orange-500 hover:bg-orange-400 text-white'
+                : 'border-zinc-600 hover:bg-zinc-800'
             }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
-            Install Focus
+            {showInstallFocus ? 'Hide Install Focus' : 'Install Focus'}
           </Button>
           {isAuthenticated && play.id && !play.id.startsWith('new-') && (
             <Button
@@ -618,12 +645,17 @@ export function PlayEditor() {
         />
       )}
 
-      {/* Canvas */}
-      <div
-        ref={containerRef}
-        className="flex-1 flex flex-col items-center justify-center p-2 md:p-4 min-h-0"
-        style={{ cursor: getCursor() }}
-      >
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Situation Header - Down & Distance, Defense Settings */}
+        <SituationHeader />
+
+        {/* Canvas */}
+        <div
+          ref={containerRef}
+          className="flex-1 flex flex-col items-center justify-center p-2 md:p-4 min-h-0"
+          style={{ cursor: getCursor() }}
+        >
         {/* Zoom Controls */}
         <div className="hidden md:flex items-center gap-2 mb-2">
           <ZoomControls
@@ -677,6 +709,7 @@ export function PlayEditor() {
             <PlayerLayer width={stageWidth} height={stageHeight} />
           </Stage>
         </div>
+      </div>
       </div>
 
       {/* Instructions - Desktop */}
@@ -744,10 +777,10 @@ export function PlayEditor() {
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={closeContextMenu} />
       )}
 
-      {/* Concept Panel */}
-      <ConceptPanel onApplyConcept={handleApplyConcept} />
+      {/* Concept Panel - hidden when Install Focus is open */}
+      {!showInstallFocus && <ConceptPanel onApplyConcept={handleApplyConcept} />}
 
-      {/* Install Focus Panel */}
+      {/* Install Focus Panel - mutually exclusive with Concept Panel */}
       <InstallFocusPanel
         isOpen={showInstallFocus}
         onClose={() => setShowInstallFocus(false)}

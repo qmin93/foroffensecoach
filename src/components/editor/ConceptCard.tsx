@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import type { ConceptCardData } from '@/types/concept';
+import type { ConceptCardData, RoleAssignmentDisplay } from '@/types/concept';
 import { BADGE_LABELS, CATEGORY_LABELS } from '@/types/concept';
 
 interface ConceptCardProps {
@@ -106,6 +106,30 @@ export const ConceptCard = memo(function ConceptCard({
         </div>
       )}
 
+      {/* Player Assignments (shown when selected) */}
+      {isSelected && concept.roles && concept.roles.length > 0 && (
+        <div className="mt-2 pt-2 border-t border-zinc-700/50">
+          <h5 className="text-[10px] font-semibold text-zinc-300 uppercase tracking-wide mb-1.5">
+            Player Assignments
+          </h5>
+          <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
+            {concept.roles.map((role, idx) => (
+              <div key={idx} className="text-[10px] flex items-start gap-1.5 bg-zinc-700/30 rounded px-1.5 py-1">
+                <span className="font-medium text-yellow-400 min-w-[28px]">
+                  {role.appliesTo.length > 0 ? role.appliesTo.join('/') : '—'}
+                </span>
+                <span className="text-zinc-300">{role.action}</span>
+                {role.notes && (
+                  <span className="text-zinc-500 ml-auto truncate" title={role.notes}>
+                    {role.notes.length > 20 ? role.notes.slice(0, 20) + '...' : role.notes}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Apply button (shown on hover/select) */}
       {(isSelected || isHovered) && (
         <button
@@ -113,10 +137,11 @@ export const ConceptCard = memo(function ConceptCard({
             e.stopPropagation();
             onApply?.(concept.id);
           }}
-          className="
+          className={`
             absolute bottom-2 right-2 px-2 py-1 rounded text-xs font-medium
             bg-blue-600 hover:bg-blue-500 text-white transition-colors
-          "
+            ${isSelected && concept.roles ? 'relative mt-2' : ''}
+          `}
         >
           Apply
         </button>

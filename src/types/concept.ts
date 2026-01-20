@@ -240,6 +240,13 @@ export interface Concept {
 // Concept Display Types (for UI)
 // ============================================
 
+export interface RoleAssignmentDisplay {
+  roleName: string;
+  appliesTo: string[];
+  action: string; // e.g., "Slant @ 6 yds" or "Zone block"
+  notes?: string;
+}
+
 export interface ConceptCardData {
   id: string;
   name: string;
@@ -249,6 +256,7 @@ export interface ConceptCardData {
   badges: string[];
   matchScore?: number; // 0-100, for recommendation ranking
   rationale?: string[]; // 3-line explanation for run concepts
+  roles?: RoleAssignmentDisplay[]; // Player assignments for this concept
 }
 
 // ============================================
