@@ -131,6 +131,14 @@ export function PlayEditor() {
     return () => resizeObserver.disconnect();
   }, [setStageSize]);
 
+  // Prevent scrolling on editor page
+  useEffect(() => {
+    document.body.classList.add('no-scroll');
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, []);
+
   // Handle stage click for drawing and deselection
   const handleStageClick = useCallback(
     (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
