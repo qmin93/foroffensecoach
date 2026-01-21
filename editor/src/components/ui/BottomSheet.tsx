@@ -65,8 +65,8 @@ export function BottomSheet({
         className={`
           fixed inset-x-0 bottom-0 z-50
           max-h-[75vh] rounded-t-2xl
-          md:relative md:inset-auto md:z-auto
-          md:w-80 md:max-h-none md:rounded-none md:flex-shrink-0
+          md:inset-x-auto md:right-0 md:top-0 md:bottom-0
+          md:w-80 md:max-h-none md:rounded-none
           bg-zinc-900 border-l border-zinc-700 flex flex-col
           transform transition-transform duration-300 ease-out
           translate-y-0 md:translate-y-0
