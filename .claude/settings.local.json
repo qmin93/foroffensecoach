@@ -44,7 +44,8 @@
       "Bash(npx tsc:*)",
       "Bash(npm run lint)",
       "Skill(배포)",
-      "Skill(배포:*)"
+      "Skill(배포:*)",
+      "Bash(npx vercel:*)"
     ]
   }
 }

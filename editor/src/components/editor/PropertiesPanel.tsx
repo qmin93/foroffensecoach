@@ -55,6 +55,23 @@ export function PropertiesPanel() {
     ? play.actions.find((a) => a.id === selectedActionIds[0])
     : null;
 
+  // Check if selected action has ActionStyle (route, block, motion)
+  const hasActionStyle = selectedAction &&
+    (selectedAction.actionType === 'route' ||
+     selectedAction.actionType === 'block' ||
+     selectedAction.actionType === 'motion');
+
+  // Get style values with type safety
+  const actionLineStyle = hasActionStyle && 'lineStyle' in selectedAction.style
+    ? selectedAction.style.lineStyle
+    : 'solid';
+  const actionEndMarker = hasActionStyle && 'endMarker' in selectedAction.style
+    ? selectedAction.style.endMarker
+    : 'arrow';
+  const actionStrokeWidth = hasActionStyle && 'strokeWidth' in selectedAction.style
+    ? selectedAction.style.strokeWidth
+    : 2;
+
   // No selection
   if (!selectedPlayer && !selectedAction) {
     return null;
@@ -174,72 +191,74 @@ export function PropertiesPanel() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            {/* Line Style */}
-            <div className="space-y-1">
-              <Label className="text-xs text-zinc-400">Style</Label>
-              <Select
-                value={selectedAction.style?.lineStyle || 'solid'}
-                onValueChange={(value: LineStyle) =>
-                  updateActionStyle(selectedAction.id, { lineStyle: value })
-                }
-              >
-                <SelectTrigger className="h-8 text-sm bg-zinc-800 border-zinc-600">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-600">
-                  {LINE_STYLES.map((style) => (
-                    <SelectItem key={style.value} value={style.value}>
-                      {style.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {hasActionStyle && (
+            <div className="grid grid-cols-3 gap-3">
+              {/* Line Style */}
+              <div className="space-y-1">
+                <Label className="text-xs text-zinc-400">Style</Label>
+                <Select
+                  value={actionLineStyle}
+                  onValueChange={(value: LineStyle) =>
+                    updateActionStyle(selectedAction.id, { lineStyle: value })
+                  }
+                >
+                  <SelectTrigger className="h-8 text-sm bg-zinc-800 border-zinc-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-600">
+                    {LINE_STYLES.map((style) => (
+                      <SelectItem key={style.value} value={style.value}>
+                        {style.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* End Marker */}
-            <div className="space-y-1">
-              <Label className="text-xs text-zinc-400">End</Label>
-              <Select
-                value={selectedAction.style?.endMarker || 'arrow'}
-                onValueChange={(value: EndMarker) =>
-                  updateActionStyle(selectedAction.id, { endMarker: value })
-                }
-              >
-                <SelectTrigger className="h-8 text-sm bg-zinc-800 border-zinc-600">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-600">
-                  {END_MARKERS.map((marker) => (
-                    <SelectItem key={marker.value} value={marker.value}>
-                      {marker.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              {/* End Marker */}
+              <div className="space-y-1">
+                <Label className="text-xs text-zinc-400">End</Label>
+                <Select
+                  value={actionEndMarker}
+                  onValueChange={(value: EndMarker) =>
+                    updateActionStyle(selectedAction.id, { endMarker: value })
+                  }
+                >
+                  <SelectTrigger className="h-8 text-sm bg-zinc-800 border-zinc-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-600">
+                    {END_MARKERS.map((marker) => (
+                      <SelectItem key={marker.value} value={marker.value}>
+                        {marker.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Stroke Width */}
-            <div className="space-y-1">
-              <Label className="text-xs text-zinc-400">Width</Label>
-              <Select
-                value={String(selectedAction.style?.strokeWidth || 2)}
-                onValueChange={(value) =>
-                  updateActionStyle(selectedAction.id, { strokeWidth: parseInt(value) })
-                }
-              >
-                <SelectTrigger className="h-8 text-sm bg-zinc-800 border-zinc-600">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-600">
-                  <SelectItem value="1">Thin</SelectItem>
-                  <SelectItem value="2">Normal</SelectItem>
-                  <SelectItem value="3">Thick</SelectItem>
-                  <SelectItem value="4">Bold</SelectItem>
-                </SelectContent>
-              </Select>
+              {/* Stroke Width */}
+              <div className="space-y-1">
+                <Label className="text-xs text-zinc-400">Width</Label>
+                <Select
+                  value={String(actionStrokeWidth)}
+                  onValueChange={(value) =>
+                    updateActionStyle(selectedAction.id, { strokeWidth: parseInt(value) })
+                  }
+                >
+                  <SelectTrigger className="h-8 text-sm bg-zinc-800 border-zinc-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-600">
+                    <SelectItem value="1">Thin</SelectItem>
+                    <SelectItem value="2">Normal</SelectItem>
+                    <SelectItem value="3">Thick</SelectItem>
+                    <SelectItem value="4">Bold</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Tip */}
           <p className="text-[10px] text-zinc-500 mt-2">

@@ -936,19 +936,16 @@ export function PlayEditor() {
       <FloatingActions
         onAddPlayer={() => {
           // Add a new player at center field
-          const newPlayer = {
-            id: `player-${Date.now()}`,
-            role: 'WR',
-            label: 'WR',
-            alignment: { x: 0.5, y: -0.1 },
-            appearance: {
-              shape: 'circle' as const,
+          useEditorStore.getState().addPlayer(
+            'WR',
+            { x: 0.5, y: -0.1 },
+            {
+              shape: 'circle',
               fill: '#ffffff',
               stroke: '#000000',
               showLabel: true,
-            },
-          };
-          useEditorStore.getState().addPlayer(newPlayer);
+            }
+          );
         }}
         onOpenConcepts={() => {
           openConceptPanel();
