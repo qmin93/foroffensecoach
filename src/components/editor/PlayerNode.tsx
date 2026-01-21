@@ -44,8 +44,14 @@ export function PlayerNode({
   );
 
   const { appearance } = player;
-  const { shape, fill, stroke, strokeWidth, radius, labelColor, labelFontSize, showLabel } =
+  const { shape, strokeWidth, labelFontSize, showLabel } =
     appearance;
+
+  // Responsive sizing: scale radius and font based on stage width
+  // Desktop (~1200px): radius ~30px, Mobile (~400px): radius ~12px
+  const baseRadius = Math.max(12, Math.min(30, stageWidth * 0.025));
+  const radius = baseRadius;
+  const responsiveLabelFontSize = Math.max(8, Math.min(14, stageWidth * 0.012));
 
   // Check if this player is the drawing source
   const isDrawingSource = drawingFromPlayerId === player.id;
@@ -153,8 +159,8 @@ export function PlayerNode({
               context.bezierCurveTo(w, h * 1.2, -w, h * 1.2, -w, 0);
               context.closePath();
               context.fillStrokeShape(shape);
-              // Draw laces
-              const laceColor = isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : stroke;
+              // Draw laces (black, or blue when selected/hovered)
+              const laceColor = isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : '#000000';
               context.save();
               context.strokeStyle = laceColor;
               context.lineWidth = strokeWidth * 0.7;
@@ -224,12 +230,12 @@ export function PlayerNode({
       {showLabel && player.label && (
         <Text
           text={player.label}
-          fontSize={labelFontSize}
+          fontSize={responsiveLabelFontSize}
           fill="#000000"
           align="center"
           verticalAlign="middle"
-          offsetX={(player.label?.length || 0) * (labelFontSize * 0.3)}
-          offsetY={labelFontSize / 2}
+          offsetX={(player.label?.length || 0) * (responsiveLabelFontSize * 0.3)}
+          offsetY={responsiveLabelFontSize / 2}
           fontStyle="bold"
         />
       )}
