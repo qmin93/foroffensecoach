@@ -78,8 +78,10 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Turbopack config (empty to silence the warning, Next.js 16 uses Turbopack by default)
-  turbopack: {},
+  // Turbopack config - explicitly set root to avoid monorepo detection issues
+  turbopack: {
+    root: __dirname,
+  },
 
   // Production source maps for debugging (can disable for smaller builds)
   productionBrowserSourceMaps: false,
