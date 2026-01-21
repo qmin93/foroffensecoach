@@ -355,7 +355,9 @@ export function buildConceptActions(
       // Create route action if specified
       if (role.defaultRoute) {
         // Convert yards to normalized coordinates: 1 yard = 0.04 normalized y
-        const routeDepth = (role.defaultRoute.depth ?? 10) * 0.04;
+        // Cap at 14 yards (0.56) to keep routes within canvas
+        const rawDepth = (role.defaultRoute.depth ?? 10) * 0.04;
+        const routeDepth = Math.min(rawDepth, 0.56);
         const { endPoint, controlPoint } = calculateRouteEndPoint(
           startPoint,
           role.defaultRoute.pattern,
@@ -591,7 +593,7 @@ export function buildConceptActions(
     if (role === 'WR' || ['X', 'Z', 'H', 'F'].includes(label)) {
       if (isPassConcept) {
         // Default go route for unassigned WRs (15 yards)
-        const wrRouteDepth = 15 * 0.04; // 15 yards in normalized coords
+        const wrRouteDepth = 14 * 0.04; // 14 yards in normalized coords (max)
         const endPoint: Point = {
           x: startPoint.x,
           y: startPoint.y + wrRouteDepth,
@@ -676,7 +678,7 @@ export function buildConceptActions(
         actionsCreated++;
       } else {
         // Run path for RB (15 yards) - draw a path toward the play side
-        const rbRunDepth = 15 * 0.04; // 15 yards in normalized coords
+        const rbRunDepth = 14 * 0.04; // 14 yards in normalized coords (max)
         const runEndPoint: Point = {
           x: startPoint.x + (defaultSide === 'right' ? 0.05 : -0.05),
           y: startPoint.y + rbRunDepth,

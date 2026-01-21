@@ -34,7 +34,8 @@ function calculateMaxRadius(players: Player[], width: number, height: number): n
 
   // Max radius is half the minimum distance minus some padding
   // This ensures no overlap (each player takes half the distance)
-  const maxRadius = Math.max(8, (minDistance / 2) - 2);
+  // Minimum 24px to ensure readable player nodes
+  const maxRadius = Math.max(24, (minDistance / 2) - 2);
   return maxRadius;
 }
 
