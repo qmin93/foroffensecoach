@@ -8,6 +8,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Core value proposition: Formation → Concept recommendation → Auto-build → Export/Share → Install Focus (drill connection)
 
+## Git Repository
+
+- **URL**: https://github.com/qmin93/foroffensecoach.git
+- **Branch**: master
+- **Note**: If git commands fail, ensure `.git` folder exists in `c:\FOC`. If missing, run:
+  ```bash
+  git init && git remote add origin https://github.com/qmin93/foroffensecoach.git && git fetch origin && git reset --hard origin/master
+  ```
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router) + TypeScript
