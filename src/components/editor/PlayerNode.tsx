@@ -79,11 +79,13 @@ export function PlayerNode({
     // Highlight when selected, hovered, or when it's the drawing source
     const isHighlighted = isSelected || isDrawingSource;
 
+    // Editor uses only black and white: white fill, black border
+    // Selection/hover states use blue for visibility
     const shapeProps = {
       x: 0,
       y: 0,
-      fill,
-      stroke: isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : stroke,
+      fill: '#ffffff', // Always white fill
+      stroke: isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : '#000000', // Black border (blue when selected/hovered)
       strokeWidth: isHighlighted ? strokeWidth + 2 : isHovered ? strokeWidth + 1 : strokeWidth,
       shadowColor: isHovered && !isSelected ? '#3b82f6' : undefined,
       shadowBlur: isHovered && !isSelected ? 8 : 0,
@@ -223,7 +225,7 @@ export function PlayerNode({
         <Text
           text={player.label}
           fontSize={labelFontSize}
-          fill={labelColor}
+          fill="#000000"
           align="center"
           verticalAlign="middle"
           offsetX={(player.label?.length || 0) * (labelFontSize * 0.3)}

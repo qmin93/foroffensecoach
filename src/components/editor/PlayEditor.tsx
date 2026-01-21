@@ -674,8 +674,8 @@ export function PlayEditor() {
             onContextMenu={handleContextMenu}
           >
             <FieldLayer width={stageWidth} height={stageHeight} />
-            <ActionLayer width={stageWidth} height={stageHeight} />
             <PlayerLayer width={stageWidth} height={stageHeight} />
+            <ActionLayer width={stageWidth} height={stageHeight} />
           </Stage>
         </div>
       </div>
