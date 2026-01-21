@@ -19,10 +19,10 @@ export default function LandingPage() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-sm border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <span className="text-2xl">🏈</span>
               <span className="font-bold text-xl">ForOffenseCoach</span>
-            </div>
+            </Link>
             <nav className="flex items-center gap-4">
               {user ? (
                 <>
@@ -203,10 +203,10 @@ export default function LandingPage() {
       <footer className="border-t border-zinc-800 py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <span className="text-xl">🏈</span>
               <span className="font-semibold">ForOffenseCoach</span>
-            </div>
+            </Link>
             <nav className="flex items-center gap-6 text-sm text-zinc-400">
               <Link href="/pricing" className="hover:text-white transition-colors">
                 Pricing

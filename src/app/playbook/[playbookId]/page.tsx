@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuthStore } from '@/store/authStore';
 import { usePlaybookStore } from '@/store/playbookStore';
@@ -150,7 +151,9 @@ export default function PlaybookPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-xl font-bold">ForOffenseCoach</h1>
+            <Link href="/" className="text-xl font-bold hover:text-zinc-300 transition-colors">
+              ForOffenseCoach
+            </Link>
           </div>
         </div>
       </header>

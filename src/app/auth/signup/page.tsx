@@ -2,6 +2,7 @@
 
 import { useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuthStore, selectIsAuthenticated } from '@/store/authStore';
 import { AuthForm } from '@/components/auth/AuthForm';
 
@@ -34,9 +35,9 @@ function SignupContent() {
     <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-zinc-900">
       {/* Logo/Brand */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md mb-8">
-        <h1 className="text-center text-3xl font-bold text-white">
+        <Link href="/" className="block text-center text-3xl font-bold text-white hover:text-zinc-300 transition-colors">
           ForOffenseCoach
-        </h1>
+        </Link>
         <p className="mt-2 text-center text-zinc-400">
           Create your account to start building playbooks
         </p>

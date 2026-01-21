@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuthStore, selectIsAuthenticated, selectIsLoading } from '@/store/authStore';
 import { usePlaybookStore } from '@/store/playbookStore';
 import { PlaysGrid } from '@/components/dashboard/PlaysGrid';
@@ -68,7 +69,9 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="border-b border-zinc-700 bg-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold">ForOffenseCoach</h1>
+          <Link href="/" className="text-xl font-bold hover:text-zinc-300 transition-colors">
+            ForOffenseCoach
+          </Link>
 
           <div className="flex items-center gap-4">
             <span className="text-sm text-zinc-400">
