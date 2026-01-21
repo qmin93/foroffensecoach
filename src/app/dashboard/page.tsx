@@ -178,7 +178,7 @@ export default function DashboardPage() {
                 Quick Start
               </h3>
               <p className="text-white/80">
-                포메이션 선택 → 30개 플레이 자동 생성 → 원하는 것만 선택
+                Select formations → Auto-generate 30 plays → Pick your favorites
               </p>
             </div>
             <div className="text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all">

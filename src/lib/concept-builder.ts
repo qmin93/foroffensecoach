@@ -532,6 +532,65 @@ export function buildConceptActions(
       continue;
     }
 
+    // WR gets routes
+    if (role === 'WR' || ['X', 'Z', 'H', 'F'].includes(label)) {
+      if (isPassConcept) {
+        // Default go route for unassigned WRs
+        const endPoint: Point = {
+          x: startPoint.x,
+          y: startPoint.y + 0.2,
+        };
+
+        const routeAction: RouteAction = {
+          id: uuidv4(),
+          actionType: 'route',
+          fromPlayerId: player.id,
+          layer: 'primary',
+          style: DEFAULT_ACTION_STYLE,
+          route: {
+            pattern: 'go',
+            depth: 15,
+            controlPoints: [startPoint, endPoint],
+            pathType: 'straight',
+            tension: 0,
+          },
+        };
+
+        actions.push(routeAction);
+        actionsCreated++;
+      } else {
+        // Run blocking - stalk block for run plays
+        const endPoint: Point = {
+          x: startPoint.x + (startPoint.x > 0.5 ? -0.05 : 0.05),
+          y: startPoint.y + 0.08,
+        };
+
+        const blockAction: BlockAction = {
+          id: uuidv4(),
+          actionType: 'block',
+          fromPlayerId: player.id,
+          layer: 'primary',
+          style: {
+            ...DEFAULT_ACTION_STYLE,
+            endMarker: 't_block',
+          },
+          block: {
+            scheme: 'stalk',
+            target: {
+              toPlayerId: undefined,
+              landmark: endPoint,
+            },
+            pathPoints: [startPoint, endPoint],
+            pathType: 'straight',
+          },
+        };
+
+        actions.push(blockAction);
+        actionsCreated++;
+      }
+      continue;
+    }
+
     // RB gets run path or checkdown
     if (role === 'RB' || label === 'RB' || label === 'HB') {
       if (isPassConcept) {
@@ -558,8 +617,39 @@ export function buildConceptActions(
 
         actions.push(routeAction);
         actionsCreated++;
+      } else {
+        // Run path for RB - draw a path toward the play side
+        const runEndPoint: Point = {
+          x: startPoint.x + (defaultSide === 'right' ? 0.05 : -0.05),
+          y: startPoint.y + 0.15, // Run forward toward LOS and beyond
+        };
+
+        const controlPoint: Point = {
+          x: startPoint.x,
+          y: startPoint.y + 0.08,
+        };
+
+        const routeAction: RouteAction = {
+          id: uuidv4(),
+          actionType: 'route',
+          fromPlayerId: player.id,
+          layer: 'primary',
+          style: {
+            ...DEFAULT_ACTION_STYLE,
+            strokeWidth: 3,
+          },
+          route: {
+            pattern: 'go',
+            depth: 15,
+            controlPoints: [startPoint, controlPoint, runEndPoint],
+            pathType: 'tension',
+            tension: 0.3,
+          },
+        };
+
+        actions.push(routeAction);
+        actionsCreated++;
       }
-      // For run plays, RB usually doesn't need explicit action (will be drawn manually)
       continue;
     }
   }

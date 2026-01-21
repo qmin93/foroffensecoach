@@ -51,32 +51,34 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-green-400 to-white bg-clip-text text-transparent">
-            Build Your Playbook<br />in Minutes
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            Build Your Playbook
+            <span className="block text-green-500">In Minutes</span>
           </h1>
-          <p className="text-xl text-zinc-400 mb-8 max-w-2xl mx-auto">
-            Professional football playbook builder with intelligent concept recommendations.
-            Design plays, share with your team, and prepare for game day.
+          <p className="text-xl text-zinc-400 mb-10 max-w-2xl mx-auto">
+            The simplest way to create, organize, and share football plays.
+            Formation presets, smart recommendations, and easy export.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
-              onClick={() => router.push(user ? '/dashboard?quickstart=true' : '/auth/signup?redirect=/dashboard?quickstart=true')}
+              onClick={handleGetStarted}
               size="lg"
-              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 text-lg px-8 py-6 shadow-lg shadow-green-600/20"
+              className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6"
             >
-              <span className="mr-2">⚡</span> Quick Start - 포메이션만 선택하면 끝
+              Start Building Free
             </Button>
             <Button
-              onClick={() => router.push('/editor')}
-              variant="outline"
+              onClick={() => router.push(user ? '/dashboard?quickstart=true' : '/auth/signup?redirect=/dashboard?quickstart=true')}
               size="lg"
-              className="border-zinc-600 hover:bg-zinc-800 text-lg px-8 py-6"
+              variant="outline"
+              className="border-blue-500 text-blue-400 hover:bg-blue-500/10 text-lg px-8 py-6"
             >
-              Try Demo
+              <span className="mr-2">⚡</span>
+              Quick Start
             </Button>
           </div>
-          <p className="mt-4 text-sm text-zinc-500">
-            No credit card required • Free forever for basic use
+          <p className="text-sm text-zinc-500 mt-4">
+            Quick Start: Select formations and auto-generate 30 plays instantly
           </p>
         </div>
       </section>

@@ -178,9 +178,9 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                 Quick Start
               </h2>
               <p className="text-white/80 mt-1">
-                {step === 'formations' && '포메이션을 선택하면 30개의 플레이를 자동 생성합니다'}
-                {step === 'generating' && '플레이를 생성 중입니다...'}
-                {step === 'review' && '원하는 플레이를 선택하세요'}
+                {step === 'formations' && 'Select formations to auto-generate 30 plays'}
+                {step === 'generating' && 'Generating plays...'}
+                {step === 'review' && 'Select the plays you want to keep'}
               </p>
             </div>
             <button
@@ -198,13 +198,13 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
               step === 'formations' ? 'bg-white text-green-600' : 'bg-white/20 text-white'
             }`}>
-              <span>1</span> 포메이션 선택
+              <span>1</span> Select Formations
             </div>
             <div className="w-8 h-0.5 bg-white/30" />
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
               step === 'review' ? 'bg-white text-blue-600' : 'bg-white/20 text-white'
             }`}>
-              <span>2</span> 플레이 선택
+              <span>2</span> Select Plays
             </div>
           </div>
         </div>
@@ -217,14 +217,14 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
               {/* Selected Count */}
               <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-lg">
                 <span className="text-white font-medium">
-                  선택됨: <span className="text-green-400">{selectedFormations.length}</span> / 10
+                  Selected: <span className="text-green-400">{selectedFormations.length}</span> / 10
                 </span>
                 {selectedFormations.length > 0 && (
                   <button
                     onClick={() => setSelectedFormations([])}
                     className="text-xs text-zinc-400 hover:text-white"
                   >
-                    전체 해제
+                    Clear All
                   </button>
                 )}
               </div>
@@ -281,8 +281,8 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                               className="text-sm text-blue-400 hover:text-blue-300 font-medium"
                             >
                               {validFormations.every(f => selectedFormations.includes(f))
-                                ? '전체 해제'
-                                : '전체 선택'}
+                                ? 'Deselect All'
+                                : 'Select All'}
                             </button>
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -329,9 +329,9 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                   <span className="text-4xl">🏈</span>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mt-6">플레이 생성 중...</h3>
+              <h3 className="text-xl font-bold text-white mt-6">Generating Plays...</h3>
               <p className="text-zinc-400 mt-2">
-                {selectedFormations.length}개 포메이션 기반으로 30개 플레이 생성
+                Creating 30 plays based on {selectedFormations.length} formations
               </p>
             </div>
           )}
@@ -343,36 +343,36 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
               <div className="grid grid-cols-3 gap-4">
                 <div className="p-4 bg-zinc-800 rounded-lg text-center">
                   <div className="text-3xl font-bold text-green-400">{stats.selected}</div>
-                  <div className="text-sm text-zinc-400">선택됨</div>
+                  <div className="text-sm text-zinc-400">Selected</div>
                 </div>
                 <div className="p-4 bg-zinc-800 rounded-lg text-center">
                   <div className="text-3xl font-bold text-blue-400">{stats.passPlays}</div>
-                  <div className="text-sm text-zinc-400">패스 플레이</div>
+                  <div className="text-sm text-zinc-400">Pass Plays</div>
                 </div>
                 <div className="p-4 bg-zinc-800 rounded-lg text-center">
                   <div className="text-3xl font-bold text-orange-400">{stats.runPlays}</div>
-                  <div className="text-sm text-zinc-400">런 플레이</div>
+                  <div className="text-sm text-zinc-400">Run Plays</div>
                 </div>
               </div>
 
               {/* Actions */}
               <div className="flex justify-between items-center">
                 <span className="text-sm text-zinc-400">
-                  {stats.selected}개 플레이가 플레이북에 추가됩니다
+                  {stats.selected} plays will be added to your playbook
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={handleSelectAll}
                     className="text-sm text-blue-400 hover:text-blue-300"
                   >
-                    전체 선택
+                    Select All
                   </button>
                   <span className="text-zinc-600">|</span>
                   <button
                     onClick={handleDeselectAll}
                     className="text-sm text-zinc-400 hover:text-white"
                   >
-                    전체 해제
+                    Deselect All
                   </button>
                 </div>
               </div>
@@ -419,7 +419,7 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-medium text-green-400">{play.score}%</div>
-                        <div className="text-xs text-zinc-500">매칭</div>
+                        <div className="text-xs text-zinc-500">Match</div>
                       </div>
                     </div>
                   </div>
@@ -439,9 +439,9 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-white">플레이북 생성 중...</h3>
+                  <h3 className="text-xl font-bold text-white">Creating Playbook...</h3>
                   <p className="text-zinc-400 mt-2">
-                    {creationProgress.current} / {creationProgress.total} 플레이 추가됨
+                    {creationProgress.current} / {creationProgress.total} plays added
                   </p>
                 </div>
 
@@ -471,7 +471,7 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                 variant="outline"
                 className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
               >
-                ← 포메이션 다시 선택
+                ← Back to Formations
               </Button>
             )}
 
@@ -482,7 +482,7 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
               variant="outline"
               className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
             >
-              취소
+              Cancel
             </Button>
 
             {step === 'formations' && (
@@ -491,7 +491,7 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                 disabled={selectedFormations.length === 0}
                 className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 text-white px-8"
               >
-                30개 플레이 생성 →
+                Generate 30 Plays →
               </Button>
             )}
 
@@ -501,7 +501,7 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                 disabled={stats.selected === 0}
                 className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 text-white px-8"
               >
-                플레이북 만들기 ({stats.selected}개)
+                Create Playbook ({stats.selected})
               </Button>
             )}
           </div>
