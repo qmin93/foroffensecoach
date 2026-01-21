@@ -28,6 +28,11 @@ import { toast } from '@/store/toastStore';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { ZoomControls } from './ZoomControls';
 import { SituationHeader } from './SituationHeader';
+import { TopBar } from './TopBar';
+import { FormationBar } from './FormationBar';
+import { MobileBottomBar } from './MobileBottomBar';
+import { FloatingActions } from './FloatingActions';
+import { PropertiesPanel } from './PropertiesPanel';
 
 export function PlayEditor() {
   const stageRef = useRef<Konva.Stage>(null);
@@ -100,6 +105,13 @@ export function PlayEditor() {
   const resetZoom = useEditorStore((state) => state.resetZoom);
   const gridSnapEnabled = useEditorStore((state) => state.gridSnapEnabled);
   const toggleGridSnap = useEditorStore((state) => state.toggleGridSnap);
+  const historyIndex = useEditorStore((state) => state.historyIndex);
+  const history = useEditorStore((state) => state.history);
+  const redo = useEditorStore((state) => state.redo);
+
+  // Computed undo/redo availability
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
 
   // Concept panel state for mobile toggle buttons
   const isConceptPanelOpen = useConceptStore((state) => state.isPanelOpen);
@@ -500,7 +512,21 @@ export function PlayEditor() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full bg-zinc-950">
+    <div className="flex flex-col h-full bg-zinc-950">
+      {/* Desktop TopBar */}
+      <TopBar
+        onSave={save}
+        isSaving={isSaving}
+        lastSaved={lastSaved}
+        onExportPNG={handleExport}
+        onExportPDF={handlePDFClick}
+        onShare={handleShareClick}
+        canShare={!!(canShareLinks && isAuthenticated && play.id && !play.id.startsWith('new-'))}
+      />
+
+      {/* Desktop FormationBar */}
+      <FormationBar />
+
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-3 border-b border-zinc-800 bg-zinc-900">
         <button
@@ -553,6 +579,8 @@ export function PlayEditor() {
         </div>
       </div>
 
+      {/* Main Content with Sidebar */}
+      <div className="flex-1 flex flex-row min-h-0">
       {/* Toolbar - Slide-out on mobile */}
       <div
         className={`
@@ -778,6 +806,7 @@ export function PlayEditor() {
         </div>
       </div>
       </div>
+      </div> {/* End Main Content with Sidebar */}
 
       {/* Instructions - Desktop */}
       <div className="hidden md:block absolute bottom-4 left-4 bg-black/70 text-white text-xs p-3 rounded max-w-xs z-10">
@@ -901,6 +930,44 @@ export function PlayEditor() {
       <KeyboardShortcutsModal
         isOpen={showShortcuts}
         onClose={() => setShowShortcuts(false)}
+      />
+
+      {/* Floating Action Button - Desktop only */}
+      <FloatingActions
+        onAddPlayer={() => {
+          // Add a new player at center field
+          const newPlayer = {
+            id: `player-${Date.now()}`,
+            role: 'WR',
+            label: 'WR',
+            alignment: { x: 0.5, y: -0.1 },
+            appearance: {
+              shape: 'circle' as const,
+              fill: '#ffffff',
+              stroke: '#000000',
+              showLabel: true,
+            },
+          };
+          useEditorStore.getState().addPlayer(newPlayer);
+        }}
+        onOpenConcepts={() => {
+          openConceptPanel();
+          setShowInstallFocus(false);
+        }}
+      />
+
+      {/* Properties Panel - Shows when element is selected */}
+      <PropertiesPanel />
+
+      {/* Mobile Bottom Bar - Fixed at bottom */}
+      <MobileBottomBar
+        onOpenMenu={() => setIsMobileMenuOpen(true)}
+        onOpenConcepts={() => {
+          openConceptPanel();
+          setShowInstallFocus(false);
+        }}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
     </div>
   );

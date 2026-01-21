@@ -27,11 +27,11 @@ export function PlayCard({ play, onOpen, onDuplicate, onDelete }: PlayCardProps)
 
   return (
     <div
-      className="group relative bg-zinc-800 border border-zinc-700 rounded-lg overflow-hidden hover:border-blue-500 transition-colors cursor-pointer"
+      className="group relative bg-card border border-border rounded-lg overflow-hidden hover:border-primary transition-colors cursor-pointer shadow-sm"
       onClick={() => onOpen(play.id)}
     >
       {/* Thumbnail */}
-      <div className="aspect-[4/3] bg-zinc-900 relative">
+      <div className="aspect-[4/3] bg-muted relative">
         {play.thumbnail_url ? (
           <img
             src={play.thumbnail_url}
@@ -49,7 +49,7 @@ export function PlayCard({ play, onOpen, onDuplicate, onDelete }: PlayCardProps)
               e.stopPropagation();
               setShowMenu(!showMenu);
             }}
-            className="p-1.5 bg-zinc-900/80 hover:bg-zinc-900 rounded-md text-zinc-400 hover:text-white"
+            className="p-1.5 bg-background/80 hover:bg-background rounded-md text-muted-foreground hover:text-foreground border border-border"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -59,7 +59,7 @@ export function PlayCard({ play, onOpen, onDuplicate, onDelete }: PlayCardProps)
           {/* Dropdown Menu */}
           {showMenu && (
             <div
-              className="absolute right-0 mt-1 w-36 bg-zinc-900 border border-zinc-700 rounded-md shadow-lg z-10"
+              className="absolute right-0 mt-1 w-36 bg-popover border border-border rounded-md shadow-lg z-10"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -67,7 +67,7 @@ export function PlayCard({ play, onOpen, onDuplicate, onDelete }: PlayCardProps)
                   onDuplicate(play.id);
                   setShowMenu(false);
                 }}
-                className="w-full px-3 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                className="w-full px-3 py-2 text-left text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground"
               >
                 Duplicate
               </button>
@@ -77,7 +77,7 @@ export function PlayCard({ play, onOpen, onDuplicate, onDelete }: PlayCardProps)
                   setShowMenu(false);
                 }}
                 disabled={isDeleting}
-                className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-zinc-800 hover:text-red-300 disabled:opacity-50"
+                className="w-full px-3 py-2 text-left text-sm text-destructive hover:bg-accent disabled:opacity-50"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
@@ -88,8 +88,8 @@ export function PlayCard({ play, onOpen, onDuplicate, onDelete }: PlayCardProps)
 
       {/* Info */}
       <div className="p-3">
-        <h3 className="font-medium text-white truncate">{play.name}</h3>
-        <p className="text-xs text-zinc-500 mt-1">
+        <h3 className="font-medium text-foreground truncate">{play.name}</h3>
+        <p className="text-xs text-muted-foreground mt-1">
           {formatDistanceToNow(new Date(play.updated_at), { addSuffix: true })}
         </p>
         {play.tags && play.tags.length > 0 && (
@@ -97,13 +97,13 @@ export function PlayCard({ play, onOpen, onDuplicate, onDelete }: PlayCardProps)
             {play.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="px-1.5 py-0.5 text-xs bg-zinc-700 text-zinc-300 rounded"
+                className="px-1.5 py-0.5 text-xs bg-secondary text-secondary-foreground rounded"
               >
                 {tag}
               </span>
             ))}
             {play.tags.length > 3 && (
-              <span className="text-xs text-zinc-500">+{play.tags.length - 3}</span>
+              <span className="text-xs text-muted-foreground">+{play.tags.length - 3}</span>
             )}
           </div>
         )}

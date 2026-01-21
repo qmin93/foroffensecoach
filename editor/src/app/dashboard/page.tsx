@@ -122,14 +122,14 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Handle quickstart query param */}
       <Suspense fallback={null}>
         <QuickStartHandler onQuickStart={() => setShowQuickStart(true)} />
@@ -143,7 +143,7 @@ export default function DashboardPage() {
         {/* Workspace Info */}
         <div className="mb-4 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">{workspace?.name || 'My Workspace'}</h2>
-          <p className="text-sm sm:text-base text-zinc-400">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your playbooks and plays
           </p>
         </div>
@@ -175,53 +175,53 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-8">
           <button
             onClick={handleCreatePlay}
-            className="p-4 sm:p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-green-500 transition-colors group"
+            className="p-4 sm:p-6 bg-card border border-border rounded-lg text-left hover:border-green-500 hover:shadow-md transition-all group"
           >
             <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">+</div>
-            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-green-400">
+            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-green-600">
               New Play
             </h3>
-            <p className="text-xs sm:text-sm text-zinc-400">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Create a new play in the editor
             </p>
           </button>
 
           <button
             onClick={() => setShowCreatePlaybook(true)}
-            className="p-4 sm:p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-blue-500 transition-colors group"
+            className="p-4 sm:p-6 bg-card border border-border rounded-lg text-left hover:border-blue-500 hover:shadow-md transition-all group"
           >
             <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">📁</div>
-            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-blue-400">
+            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-blue-600">
               New Playbook
             </h3>
-            <p className="text-xs sm:text-sm text-zinc-400">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Organize plays into a playbook
             </p>
           </button>
 
           <button
             onClick={() => router.push('/team-profile')}
-            className="p-4 sm:p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-purple-500 transition-colors group"
+            className="p-4 sm:p-6 bg-card border border-border rounded-lg text-left hover:border-purple-500 hover:shadow-md transition-all group"
           >
             <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">🏈</div>
-            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-purple-400">
+            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-purple-600">
               Team Profile
             </h3>
-            <p className="text-xs sm:text-sm text-zinc-400">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Set up roster and get recommendations
             </p>
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-zinc-700 mb-4 sm:mb-6 overflow-x-auto">
+        <div className="border-b border-border mb-4 sm:mb-6 overflow-x-auto">
           <nav className="flex gap-4 sm:gap-8 min-w-max">
             <button
               onClick={() => setActiveTab('plays')}
               className={`pb-3 px-1 border-b-2 text-sm font-medium transition-colors ${
                 activeTab === 'plays'
-                  ? 'border-blue-500 text-blue-400'
-                  : 'border-transparent text-zinc-400 hover:text-white'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               Plays
@@ -230,8 +230,8 @@ export default function DashboardPage() {
               onClick={() => setActiveTab('playbooks')}
               className={`pb-3 px-1 border-b-2 text-sm font-medium transition-colors ${
                 activeTab === 'playbooks'
-                  ? 'border-blue-500 text-blue-400'
-                  : 'border-transparent text-zinc-400 hover:text-white'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               Playbooks
@@ -240,8 +240,8 @@ export default function DashboardPage() {
               onClick={() => setActiveTab('formations')}
               className={`pb-3 px-1 border-b-2 text-sm font-medium transition-colors ${
                 activeTab === 'formations'
-                  ? 'border-blue-500 text-blue-400'
-                  : 'border-transparent text-zinc-400 hover:text-white'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               Formations
@@ -269,7 +269,7 @@ export default function DashboardPage() {
               />
             )}
             {activeTab === 'formations' && (
-              <div className="h-[600px] rounded-lg overflow-hidden">
+              <div className="h-[600px] rounded-lg overflow-hidden border border-border">
                 <FormationRecommendPanel
                   onSelectFormation={(formationId) => {
                     // Navigate to editor with selected formation

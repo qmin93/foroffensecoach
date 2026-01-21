@@ -3,13 +3,49 @@ import { stripe, priceIdToTier } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
-// Use service role for webhook operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Validate required environment variables at startup
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+
+// Use service role for webhook operations (only create if env vars are set)
+const supabaseAdmin = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+  : null;
+
+/**
+ * Get the supabase admin client, throwing if not configured.
+ * This is safe to call after the POST handler validates configuration.
+ */
+function getSupabaseAdmin() {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase admin client is not configured');
+  }
+  return supabaseAdmin;
+}
+
+// In-memory set for idempotency (in production, use Redis or database)
+const processedEvents = new Set<string>();
+const MAX_PROCESSED_EVENTS = 10000;
 
 export async function POST(request: NextRequest) {
+  // Validate environment configuration
+  if (!STRIPE_WEBHOOK_SECRET) {
+    console.error('STRIPE_WEBHOOK_SECRET is not configured');
+    return NextResponse.json(
+      { error: 'Webhook not configured' },
+      { status: 500 }
+    );
+  }
+
+  if (!supabaseAdmin) {
+    console.error('Supabase admin client is not configured');
+    return NextResponse.json(
+      { error: 'Database not configured' },
+      { status: 500 }
+    );
+  }
+
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
@@ -26,15 +62,29 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      STRIPE_WEBHOOK_SECRET
     );
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err);
+  } catch {
+    // Log without exposing internal details
+    console.error('Webhook signature verification failed');
     return NextResponse.json(
       { error: 'Invalid signature' },
       { status: 400 }
     );
   }
+
+  // Idempotency check - prevent duplicate processing
+  if (processedEvents.has(event.id)) {
+    console.log(`Skipping duplicate event: ${event.id}`);
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+
+  // Add to processed events (with size limit to prevent memory leak)
+  if (processedEvents.size >= MAX_PROCESSED_EVENTS) {
+    const firstKey = processedEvents.values().next().value;
+    if (firstKey) processedEvents.delete(firstKey);
+  }
+  processedEvents.add(event.id);
 
   try {
     switch (event.type) {
@@ -102,7 +152,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     );
     if (customer.deleted) return;
 
-    const { data: profile } = await supabaseAdmin
+    const { data: profile } = await getSupabaseAdmin()
       .from('profiles')
       .select('id')
       .eq('stripe_customer_id', customer.id)
@@ -137,7 +187,7 @@ async function updateSubscription(userId: string, subscription: Stripe.Subscript
     cancel_at_period_end: boolean;
   };
 
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from('subscriptions')
     .upsert({
       user_id: userId,
@@ -170,7 +220,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     );
     if (customer.deleted) return;
 
-    const { data: profile } = await supabaseAdmin
+    const { data: profile } = await getSupabaseAdmin()
       .from('profiles')
       .select('id')
       .eq('stripe_customer_id', customer.id)
@@ -186,7 +236,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function revertToFree(userId: string) {
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from('subscriptions')
     .upsert({
       user_id: userId,
@@ -212,7 +262,7 @@ async function revertToFree(userId: string) {
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
   const customerId = invoice.customer as string;
 
-  const { data: profile } = await supabaseAdmin
+  const { data: profile } = await getSupabaseAdmin()
     .from('profiles')
     .select('id, email')
     .eq('stripe_customer_id', customerId)
@@ -221,7 +271,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   if (!profile) return;
 
   // Update subscription status to past_due
-  await supabaseAdmin
+  await getSupabaseAdmin()
     .from('subscriptions')
     .update({
       status: 'past_due',

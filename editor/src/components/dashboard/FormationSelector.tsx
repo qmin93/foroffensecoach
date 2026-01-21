@@ -86,12 +86,12 @@ export function FormationSelector({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-zinc-400">
+        <span className="text-sm text-muted-foreground">
           Selected: {selectedFormations.length} / {maxSelections}
         </span>
         <button
           onClick={() => onSelectionChange([])}
-          className="text-xs text-zinc-500 hover:text-zinc-300"
+          className="text-xs text-muted-foreground hover:text-foreground"
         >
           Clear All
         </button>
@@ -99,12 +99,12 @@ export function FormationSelector({
 
       {/* Selected Formations Preview */}
       {selectedFormations.length > 0 && (
-        <div className="flex flex-wrap gap-2 p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
+        <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg border border-border">
           {selectedFormations.map(key => (
             <span
               key={key}
               onClick={() => toggleFormation(key)}
-              className="px-2 py-1 text-xs bg-blue-600/80 text-white rounded cursor-pointer hover:bg-red-600/80 transition-colors"
+              className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded cursor-pointer hover:bg-destructive transition-colors"
               title="Click to remove"
             >
               {getFormationName(key)} ×
@@ -121,28 +121,28 @@ export function FormationSelector({
           const isExpanded = expandedCategory === category;
 
           return (
-            <div key={category} className="border border-zinc-700 rounded-lg overflow-hidden">
+            <div key={category} className="border border-border rounded-lg overflow-hidden">
               {/* Category Header */}
               <button
                 onClick={() => setExpandedCategory(isExpanded ? null : category)}
-                className="w-full flex items-center justify-between p-3 bg-zinc-800 hover:bg-zinc-750 transition-colors"
+                className="w-full flex items-center justify-between p-3 bg-muted hover:bg-muted/80 transition-colors"
               >
-                <span className="font-medium text-white">{category}</span>
+                <span className="font-medium text-foreground">{category}</span>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-400">
+                  <span className="text-xs text-muted-foreground">
                     {selectedInCategory}/{validFormations.length}
                   </span>
-                  <span className="text-zinc-400">{isExpanded ? '▲' : '▼'}</span>
+                  <span className="text-muted-foreground">{isExpanded ? '▲' : '▼'}</span>
                 </div>
               </button>
 
               {/* Formation Grid */}
               {isExpanded && (
-                <div className="p-3 bg-zinc-900">
+                <div className="p-3 bg-background">
                   <div className="flex justify-end mb-2">
                     <button
                       onClick={() => selectAllInCategory(category)}
-                      className="text-xs text-blue-400 hover:text-blue-300"
+                      className="text-xs text-blue-600 hover:text-blue-500"
                     >
                       {validFormations.every(f => selectedFormations.includes(f))
                         ? 'Deselect All'
@@ -162,10 +162,10 @@ export function FormationSelector({
                           className={`
                             p-2 text-sm rounded border transition-all
                             ${isSelected
-                              ? 'bg-blue-600 border-blue-500 text-white'
+                              ? 'bg-primary border-primary text-primary-foreground'
                               : isDisabled
-                                ? 'bg-zinc-800 border-zinc-700 text-zinc-600 cursor-not-allowed'
-                                : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-blue-500 hover:text-white'
+                                ? 'bg-muted border-border text-muted-foreground cursor-not-allowed'
+                                : 'bg-card border-border text-foreground hover:border-primary'
                             }
                           `}
                         >

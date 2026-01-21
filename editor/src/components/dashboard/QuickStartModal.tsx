@@ -165,10 +165,10 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70" onClick={handleClose} />
+      <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
 
       {/* Modal */}
-      <div className="relative bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="relative bg-background border border-border rounded-xl shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-600 to-blue-600 p-6">
           <div className="flex items-center justify-between">
@@ -215,14 +215,14 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
           {step === 'formations' && (
             <div className="space-y-4">
               {/* Selected Count */}
-              <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-lg">
-                <span className="text-white font-medium">
-                  Selected: <span className="text-green-400">{selectedFormations.length}</span> / 10
+              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <span className="text-foreground font-medium">
+                  Selected: <span className="text-green-600">{selectedFormations.length}</span> / 10
                 </span>
                 {selectedFormations.length > 0 && (
                   <button
                     onClick={() => setSelectedFormations([])}
-                    className="text-xs text-zinc-400 hover:text-white"
+                    className="text-xs text-muted-foreground hover:text-foreground"
                   >
                     Clear All
                   </button>
@@ -255,30 +255,30 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                   const isExpanded = expandedCategory === category;
 
                   return (
-                    <div key={category} className="border border-zinc-700 rounded-lg overflow-hidden">
+                    <div key={category} className="border border-border rounded-lg overflow-hidden">
                       {/* Category Header */}
                       <button
                         onClick={() => setExpandedCategory(isExpanded ? null : category)}
-                        className="w-full flex items-center justify-between p-4 bg-zinc-800 hover:bg-zinc-750 transition-colors"
+                        className="w-full flex items-center justify-between p-4 bg-muted hover:bg-muted/80 transition-colors"
                       >
-                        <span className="font-semibold text-white text-lg">{category}</span>
+                        <span className="font-semibold text-foreground text-lg">{category}</span>
                         <div className="flex items-center gap-3">
                           {selectedInCategory > 0 && (
                             <span className="px-2 py-0.5 bg-green-600 text-white text-xs rounded-full">
                               {selectedInCategory} selected
                             </span>
                           )}
-                          <span className="text-zinc-400 text-xl">{isExpanded ? '−' : '+'}</span>
+                          <span className="text-muted-foreground text-xl">{isExpanded ? '−' : '+'}</span>
                         </div>
                       </button>
 
                       {/* Formation Grid */}
                       {isExpanded && (
-                        <div className="p-4 bg-zinc-900/50">
+                        <div className="p-4 bg-background">
                           <div className="flex justify-end mb-3">
                             <button
                               onClick={() => selectAllInCategory(category)}
-                              className="text-sm text-blue-400 hover:text-blue-300 font-medium"
+                              className="text-sm text-blue-600 hover:text-blue-500 font-medium"
                             >
                               {validFormations.every(f => selectedFormations.includes(f))
                                 ? 'Deselect All'
@@ -300,8 +300,8 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                                     ${isSelected
                                       ? 'bg-green-600 border-green-500 text-white shadow-lg shadow-green-600/20'
                                       : isDisabled
-                                        ? 'bg-zinc-800 border-zinc-700 text-zinc-600 cursor-not-allowed'
-                                        : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-green-500 hover:text-white'
+                                        ? 'bg-muted border-border text-muted-foreground cursor-not-allowed'
+                                        : 'bg-card border-border text-foreground hover:border-green-500'
                                     }
                                   `}
                                 >
@@ -329,8 +329,8 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                   <span className="text-4xl">🏈</span>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mt-6">Generating Plays...</h3>
-              <p className="text-zinc-400 mt-2">
+              <h3 className="text-xl font-bold text-foreground mt-6">Generating Plays...</h3>
+              <p className="text-muted-foreground mt-2">
                 Creating 30 plays based on {selectedFormations.length} formations
               </p>
             </div>
@@ -341,36 +341,36 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
             <div className="space-y-4">
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="p-4 bg-zinc-800 rounded-lg text-center">
-                  <div className="text-3xl font-bold text-green-400">{stats.selected}</div>
-                  <div className="text-sm text-zinc-400">Selected</div>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <div className="text-3xl font-bold text-green-600">{stats.selected}</div>
+                  <div className="text-sm text-muted-foreground">Selected</div>
                 </div>
-                <div className="p-4 bg-zinc-800 rounded-lg text-center">
-                  <div className="text-3xl font-bold text-blue-400">{stats.passPlays}</div>
-                  <div className="text-sm text-zinc-400">Pass Plays</div>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <div className="text-3xl font-bold text-blue-600">{stats.passPlays}</div>
+                  <div className="text-sm text-muted-foreground">Pass Plays</div>
                 </div>
-                <div className="p-4 bg-zinc-800 rounded-lg text-center">
-                  <div className="text-3xl font-bold text-orange-400">{stats.runPlays}</div>
-                  <div className="text-sm text-zinc-400">Run Plays</div>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <div className="text-3xl font-bold text-orange-600">{stats.runPlays}</div>
+                  <div className="text-sm text-muted-foreground">Run Plays</div>
                 </div>
               </div>
 
               {/* Actions */}
               <div className="flex justify-between items-center">
-                <span className="text-sm text-zinc-400">
+                <span className="text-sm text-muted-foreground">
                   {stats.selected} plays will be added to your playbook
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={handleSelectAll}
-                    className="text-sm text-blue-400 hover:text-blue-300"
+                    className="text-sm text-blue-600 hover:text-blue-500"
                   >
                     Select All
                   </button>
-                  <span className="text-zinc-600">|</span>
+                  <span className="text-border">|</span>
                   <button
                     onClick={handleDeselectAll}
-                    className="text-sm text-zinc-400 hover:text-white"
+                    className="text-sm text-muted-foreground hover:text-foreground"
                   >
                     Deselect All
                   </button>
@@ -386,14 +386,14 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                     className={`
                       p-3 rounded-lg border-2 cursor-pointer transition-all
                       ${play.selected
-                        ? 'bg-green-600/10 border-green-500'
-                        : 'bg-zinc-800/50 border-zinc-700 opacity-50'
+                        ? 'bg-green-50 border-green-500'
+                        : 'bg-muted/50 border-border opacity-50'
                       }
                     `}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        play.selected ? 'border-green-500 bg-green-500' : 'border-zinc-600'
+                        play.selected ? 'border-green-500 bg-green-500' : 'border-border'
                       }`}>
                         {play.selected && (
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -403,23 +403,23 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-zinc-500">#{index + 1}</span>
-                          <span className="font-medium text-white">{play.name}</span>
+                          <span className="text-xs text-muted-foreground">#{index + 1}</span>
+                          <span className="font-medium text-foreground">{play.name}</span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <span className={`px-2 py-0.5 text-xs rounded ${
                             play.concept.conceptType === 'pass'
-                              ? 'bg-blue-500/20 text-blue-400'
-                              : 'bg-orange-500/20 text-orange-400'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-orange-100 text-orange-700'
                           }`}>
                             {play.concept.conceptType === 'pass' ? 'Pass' : 'Run'}
                           </span>
-                          <span className="text-xs text-zinc-500">{play.formationName}</span>
+                          <span className="text-xs text-muted-foreground">{play.formationName}</span>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-medium text-green-400">{play.score}%</div>
-                        <div className="text-xs text-zinc-500">Match</div>
+                        <div className="text-sm font-medium text-green-600">{play.score}%</div>
+                        <div className="text-xs text-muted-foreground">Match</div>
                       </div>
                     </div>
                   </div>
@@ -433,19 +433,19 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
             <div className="flex flex-col items-center justify-center py-16">
               <div className="w-full max-w-md">
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-600/20 mb-4">
-                    <svg className="animate-spin h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                    <svg className="animate-spin h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-white">Creating Playbook...</h3>
-                  <p className="text-zinc-400 mt-2">
+                  <h3 className="text-xl font-bold text-foreground">Creating Playbook...</h3>
+                  <p className="text-muted-foreground mt-2">
                     {creationProgress.current} / {creationProgress.total} plays added
                   </p>
                 </div>
 
-                <div className="h-3 bg-zinc-700 rounded-full overflow-hidden">
+                <div className="h-3 bg-muted rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-300"
                     style={{ width: `${(creationProgress.current / creationProgress.total) * 100}%` }}
@@ -453,7 +453,7 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                 </div>
 
                 {creationProgress.currentPlayName && (
-                  <p className="text-sm text-zinc-500 text-center mt-3 truncate">
+                  <p className="text-sm text-muted-foreground text-center mt-3 truncate">
                     {creationProgress.currentPlayName}
                   </p>
                 )}
@@ -463,13 +463,12 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-zinc-700 bg-zinc-900">
+        <div className="p-6 border-t border-border bg-background">
           <div className="flex gap-3">
             {step === 'review' && !isCreating && (
               <Button
                 onClick={() => setStep('formations')}
                 variant="outline"
-                className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
               >
                 ← Back to Formations
               </Button>
@@ -480,7 +479,6 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
             <Button
               onClick={handleClose}
               variant="outline"
-              className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
             >
               Cancel
             </Button>

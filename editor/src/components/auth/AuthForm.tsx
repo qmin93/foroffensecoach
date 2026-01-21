@@ -8,6 +8,23 @@ interface AuthFormProps {
   mode: 'login' | 'signup';
 }
 
+// Password validation helper
+function validatePassword(password: string): { valid: boolean; message: string } {
+  if (password.length < 8) {
+    return { valid: false, message: 'Password must be at least 8 characters' };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one lowercase letter' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one number' };
+  }
+  return { valid: true, message: '' };
+}
+
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,9 +49,19 @@ export function AuthForm({ mode }: AuthFormProps) {
       return;
     }
 
-    if (password.length < 6) {
-      setLocalError('Password must be at least 6 characters');
-      return;
+    // Stronger password validation for signup
+    if (mode === 'signup') {
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        setLocalError(passwordValidation.message);
+        return;
+      }
+    } else {
+      // For login, just check minimum length
+      if (password.length < 6) {
+        setLocalError('Password must be at least 6 characters');
+        return;
+      }
     }
 
     let result;
@@ -152,7 +179,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={mode === 'signup' ? 8 : 6}
               className="w-full px-4 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
             />

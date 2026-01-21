@@ -6,10 +6,38 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
+// Allowed redirect paths (whitelist for security)
+const ALLOWED_REDIRECT_PATHS = [
+  '/dashboard',
+  '/editor',
+  '/playbook',
+  '/team-profile',
+  '/workspace/settings',
+  '/pricing',
+];
+
+/**
+ * Validate redirect path to prevent open redirect attacks
+ */
+function validateRedirectPath(path: string): string {
+  // Must start with /
+  if (!path.startsWith('/')) {
+    return '/dashboard';
+  }
+
+  // Check against whitelist (prefix match)
+  const isAllowed = ALLOWED_REDIRECT_PATHS.some(
+    allowed => path === allowed || path.startsWith(allowed + '/')
+  );
+
+  return isAllowed ? path : '/dashboard';
+}
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/dashboard';
+  const rawNext = searchParams.get('next') ?? '/dashboard';
+  const next = validateRedirectPath(rawNext);
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 

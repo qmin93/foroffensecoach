@@ -27,12 +27,12 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
   // Minimal variant for editor pages
   if (variant === 'minimal') {
     return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-900/95 backdrop-blur border-b border-zinc-800">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-b border-border">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12">
             <Link
               href="/"
-              className="text-lg font-bold text-white hover:text-zinc-300 transition-colors"
+              className="text-lg font-bold text-foreground hover:text-muted-foreground transition-colors"
             >
               FOC
             </Link>
@@ -40,7 +40,7 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
               {isAuthenticated && (
                 <Link
                   href="/dashboard"
-                  className="text-sm text-zinc-400 hover:text-white transition-colors"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -53,13 +53,13 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-zinc-900/95 backdrop-blur border-b border-zinc-800">
+    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <Link
             href="/"
-            className="text-xl font-bold text-white hover:text-zinc-300 transition-colors"
+            className="text-xl font-bold text-foreground hover:text-muted-foreground transition-colors"
           >
             FOC
           </Link>
@@ -72,8 +72,8 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
                   href="/dashboard"
                   className={`text-sm font-medium transition-colors ${
                     pathname === '/dashboard'
-                      ? 'text-white'
-                      : 'text-zinc-400 hover:text-white'
+                      ? 'text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Dashboard
@@ -82,8 +82,8 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
                   href="/editor"
                   className={`text-sm font-medium transition-colors ${
                     pathname?.startsWith('/editor')
-                      ? 'text-white'
-                      : 'text-zinc-400 hover:text-white'
+                      ? 'text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Editor
@@ -92,8 +92,8 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
                   href="/team-profile"
                   className={`text-sm font-medium transition-colors ${
                     pathname === '/team-profile'
-                      ? 'text-white'
-                      : 'text-zinc-400 hover:text-white'
+                      ? 'text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Team Profile
@@ -104,8 +104,8 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
               href="/pricing"
               className={`text-sm font-medium transition-colors ${
                 pathname === '/pricing'
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Pricing
@@ -116,12 +116,12 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
           <div className="flex items-center gap-2 sm:gap-4">
             {isAuthenticated ? (
               <>
-                <span className="hidden sm:inline text-sm text-zinc-400 truncate max-w-[150px]">
+                <span className="hidden sm:inline text-sm text-muted-foreground truncate max-w-[150px]">
                   {profile?.display_name || profile?.email}
                 </span>
                 <button
                   onClick={handleSignOut}
-                  className="text-sm text-zinc-400 hover:text-white transition-colors"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Sign Out
                 </button>
@@ -130,13 +130,13 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
               <>
                 <Link
                   href="/auth/login"
-                  className="text-sm text-zinc-400 hover:text-white transition-colors"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Login
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium rounded-lg transition-colors"
                 >
                   Sign Up
                 </Link>
@@ -152,8 +152,8 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
               href="/dashboard"
               className={`text-sm font-medium whitespace-nowrap transition-colors ${
                 pathname === '/dashboard'
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Dashboard
@@ -162,8 +162,8 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
               href="/editor"
               className={`text-sm font-medium whitespace-nowrap transition-colors ${
                 pathname?.startsWith('/editor')
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Editor
@@ -172,8 +172,8 @@ export function GlobalNavbar({ variant = 'default' }: GlobalNavbarProps) {
               href="/team-profile"
               className={`text-sm font-medium whitespace-nowrap transition-colors ${
                 pathname === '/team-profile'
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Team

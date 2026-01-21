@@ -4,6 +4,49 @@ const nextConfig: NextConfig = {
   // Enable React strict mode for catching bugs early
   reactStrictMode: true,
 
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+      {
+        // Add HSTS only in production
+        source: '/(.*)',
+        headers: process.env.NODE_ENV === 'production'
+          ? [
+              {
+                key: 'Strict-Transport-Security',
+                value: 'max-age=31536000; includeSubDomains',
+              },
+            ]
+          : [],
+      },
+    ];
+  },
+
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],

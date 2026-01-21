@@ -20,11 +20,36 @@ Core value proposition: Formation → Concept recommendation → Auto-build → 
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router) + TypeScript
+- **UI Components**: shadcn/ui (Tailwind CSS + Radix UI)
 - **Editor**: Konva.js (Canvas 2D library) with react-konva
 - **State**: Zustand + Immer
 - **Export**: Konva.toDataURL() for PNG, jsPDF for PDF
 - **Data Model**: JSON-based DSL (Domain Specific Language)
 - **Deployment**: Vercel + Supabase
+
+## UI Theming (shadcn/ui)
+
+**IMPORTANT**: UI 스타일링 작업 시 반드시 `docs/shadcn-ui-theming.md` 문서를 참조할 것.
+
+### 핵심 규칙
+1. **Semantic Color 사용**: `zinc-*`, `gray-*` 등 하드코딩 색상 대신 semantic color 변수 사용
+2. **Light Theme 기본**: 흰색 배경 기반의 기본 shadcn/ui 테마 사용
+3. **문서 참조**: 색상 변환이 필요할 때 `docs/shadcn-ui-theming.md`의 매핑 테이블 확인
+
+### Quick Reference (Dark → Light 변환)
+| Dark Theme | Light Theme |
+|------------|-------------|
+| `bg-zinc-900` | `bg-background` |
+| `bg-zinc-800` | `bg-card` / `bg-muted` |
+| `text-white` | `text-foreground` |
+| `text-zinc-400` | `text-muted-foreground` |
+| `border-zinc-700` | `border-border` |
+| `bg-blue-600` | `bg-primary` |
+| `bg-red-600` | `bg-destructive` |
+
+### 참조 문서
+- 로컬: `docs/shadcn-ui-theming.md`
+- 공식: https://ui.shadcn.com/docs/theming
 
 ## Commands
 

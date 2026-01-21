@@ -215,19 +215,19 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60"
+        className="absolute inset-0 bg-black/50"
         onClick={handleClose}
       />
 
       {/* Modal */}
-      <div className="relative bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
+      <div className="relative bg-background border border-border rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-zinc-700">
+        <div className="p-6 border-b border-border">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-white">Create New Playbook</h2>
+            <h2 className="text-xl font-bold text-foreground">Create New Playbook</h2>
             <button
               onClick={handleClose}
-              className="text-zinc-400 hover:text-white transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -242,21 +242,21 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                 <div className={`
                   w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
                   ${step === s
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-primary text-primary-foreground'
                     : ['info', 'formations', 'review'].indexOf(step) > i
                       ? 'bg-green-600 text-white'
-                      : 'bg-zinc-700 text-zinc-400'}
+                      : 'bg-muted text-muted-foreground'}
                 `}>
                   {['info', 'formations', 'review'].indexOf(step) > i ? '✓' : i + 1}
                 </div>
                 {i < 2 && (
                   <div className={`w-12 h-0.5 mx-1 ${
-                    ['info', 'formations', 'review'].indexOf(step) > i ? 'bg-green-600' : 'bg-zinc-700'
+                    ['info', 'formations', 'review'].indexOf(step) > i ? 'bg-green-600' : 'bg-muted'
                   }`} />
                 )}
               </div>
             ))}
-            <span className="ml-4 text-sm text-zinc-400">{getStepTitle()}</span>
+            <span className="ml-4 text-sm text-muted-foreground">{getStepTitle()}</span>
           </div>
         </div>
 
@@ -266,7 +266,7 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
           {step === 'info' && (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name" className="text-zinc-300">
+                <Label htmlFor="name" className="text-foreground">
                   Playbook Name
                 </Label>
                 <Input
@@ -274,13 +274,13 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder="e.g., 2024 Season Playbook"
-                  className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                  className="mt-1"
                   autoFocus
                 />
               </div>
 
               <div>
-                <Label htmlFor="tags" className="text-zinc-300">
+                <Label htmlFor="tags" className="text-foreground">
                   Tags (comma separated)
                 </Label>
                 <Input
@@ -288,16 +288,16 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                   value={tagsInput}
                   onChange={e => setTagsInput(e.target.value)}
                   placeholder="e.g., offense, varsity, 2024"
-                  className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                  className="mt-1"
                 />
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Optional. Use tags to organize your playbooks.
                 </p>
               </div>
 
               {/* Play Naming Options */}
-              <div className="mt-6 p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg">
-                <h3 className="font-medium text-white mb-3">Play Naming Format</h3>
+              <div className="mt-6 p-4 bg-muted/50 border border-border rounded-lg">
+                <h3 className="font-medium text-foreground mb-3">Play Naming Format</h3>
 
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 cursor-pointer">
@@ -306,11 +306,11 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                       name="namingFormat"
                       checked={namingOptions.format === 'formation_concept'}
                       onChange={() => setNamingOptions(prev => ({ ...prev, format: 'formation_concept' }))}
-                      className="w-4 h-4 accent-blue-500"
+                      className="w-4 h-4 accent-primary"
                     />
                     <div>
-                      <span className="text-sm text-white">Formation + Concept</span>
-                      <span className="block text-xs text-zinc-500">e.g., "Shotgun Mesh"</span>
+                      <span className="text-sm text-foreground">Formation + Concept</span>
+                      <span className="block text-xs text-muted-foreground">e.g., "Shotgun Mesh"</span>
                     </div>
                   </label>
 
@@ -320,11 +320,11 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                       name="namingFormat"
                       checked={namingOptions.format === 'concept_only'}
                       onChange={() => setNamingOptions(prev => ({ ...prev, format: 'concept_only' }))}
-                      className="w-4 h-4 accent-blue-500"
+                      className="w-4 h-4 accent-primary"
                     />
                     <div>
-                      <span className="text-sm text-white">Concept Only</span>
-                      <span className="block text-xs text-zinc-500">e.g., "Mesh"</span>
+                      <span className="text-sm text-foreground">Concept Only</span>
+                      <span className="block text-xs text-muted-foreground">e.g., "Mesh"</span>
                     </div>
                   </label>
 
@@ -334,11 +334,11 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                       name="namingFormat"
                       checked={namingOptions.format === 'numbered'}
                       onChange={() => setNamingOptions(prev => ({ ...prev, format: 'numbered' }))}
-                      className="w-4 h-4 accent-blue-500"
+                      className="w-4 h-4 accent-primary"
                     />
                     <div>
-                      <span className="text-sm text-white">Numbered</span>
-                      <span className="block text-xs text-zinc-500">e.g., "Play 1 - Mesh"</span>
+                      <span className="text-sm text-foreground">Numbered</span>
+                      <span className="block text-xs text-muted-foreground">e.g., "Play 1 - Mesh"</span>
                     </div>
                   </label>
 
@@ -348,11 +348,11 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                       name="namingFormat"
                       checked={namingOptions.format === 'custom_prefix'}
                       onChange={() => setNamingOptions(prev => ({ ...prev, format: 'custom_prefix' }))}
-                      className="w-4 h-4 accent-blue-500"
+                      className="w-4 h-4 accent-primary"
                     />
                     <div>
-                      <span className="text-sm text-white">Custom Prefix</span>
-                      <span className="block text-xs text-zinc-500">Add your own prefix</span>
+                      <span className="text-sm text-foreground">Custom Prefix</span>
+                      <span className="block text-xs text-muted-foreground">Add your own prefix</span>
                     </div>
                   </label>
 
@@ -362,7 +362,7 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                         value={namingOptions.customPrefix}
                         onChange={e => setNamingOptions(prev => ({ ...prev, customPrefix: e.target.value }))}
                         placeholder="e.g., Red Zone, Goal Line..."
-                        className="bg-zinc-800 border-zinc-600 text-white text-sm"
+                        className="text-sm"
                       />
                     </div>
                   )}
@@ -373,17 +373,17 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                         type="checkbox"
                         checked={namingOptions.includeNumber}
                         onChange={e => setNamingOptions(prev => ({ ...prev, includeNumber: e.target.checked }))}
-                        className="w-4 h-4 accent-blue-500 rounded"
+                        className="w-4 h-4 accent-primary rounded"
                       />
-                      <span className="text-sm text-zinc-400">Add play number prefix (1. 2. 3...)</span>
+                      <span className="text-sm text-muted-foreground">Add play number prefix (1. 2. 3...)</span>
                     </label>
                   )}
                 </div>
               </div>
 
-              <div className="p-4 bg-blue-900/20 border border-blue-700/30 rounded-lg mt-4">
-                <h3 className="font-medium text-blue-400 mb-2">Auto-Generate Plays</h3>
-                <p className="text-sm text-zinc-400">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mt-4">
+                <h3 className="font-medium text-blue-700 mb-2">Auto-Generate Plays</h3>
+                <p className="text-sm text-blue-600">
                   In the next step, you&apos;ll select your preferred formations.
                   We&apos;ll automatically generate 30 plays optimized for those formations,
                   and you can select which ones to include in your playbook.
@@ -395,7 +395,7 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
           {/* Step 2: Formation Selection */}
           {step === 'formations' && (
             <div className="space-y-4">
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-muted-foreground">
                 Select the formations you want to use in your playbook.
                 We recommend selecting 3-6 formations for a balanced playbook.
               </p>
@@ -415,20 +415,20 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                 /* Progress Display */
                 <div className="space-y-4 py-8">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-600/20 mb-4">
-                      <svg className="animate-spin h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                      <svg className="animate-spin h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
                       Creating Playbook...
                     </h3>
-                    <p className="text-sm text-zinc-400 mb-4">
+                    <p className="text-sm text-muted-foreground mb-4">
                       Adding play {creationProgress.current} of {creationProgress.total}
                     </p>
                     {creationProgress.currentPlayName && (
-                      <p className="text-xs text-zinc-500 truncate max-w-xs mx-auto">
+                      <p className="text-xs text-muted-foreground truncate max-w-xs mx-auto">
                         {creationProgress.currentPlayName}
                       </p>
                     )}
@@ -436,7 +436,7 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
 
                   {/* Progress Bar */}
                   <div className="max-w-md mx-auto">
-                    <div className="h-2 bg-zinc-700 rounded-full overflow-hidden">
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-green-500 transition-all duration-300 ease-out"
                         style={{
@@ -444,7 +444,7 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                         }}
                       />
                     </div>
-                    <div className="flex justify-between text-xs text-zinc-500 mt-2">
+                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
                       <span>{creationProgress.current} completed</span>
                       <span>{creationProgress.total - creationProgress.current} remaining</span>
                     </div>
@@ -453,7 +453,7 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
               ) : (
                 /* Normal Review State */
                 <>
-                  <p className="text-sm text-zinc-400">
+                  <p className="text-sm text-muted-foreground">
                     We&apos;ve generated {generatedPlays.length} plays based on your selected formations.
                     Uncheck any plays you don&apos;t want to include, then click Create to finish.
                   </p>
@@ -470,19 +470,18 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
           )}
 
           {error && (
-            <p className="text-red-400 text-sm mt-4">{error}</p>
+            <p className="text-destructive text-sm mt-4">{error}</p>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-zinc-700">
+        <div className="p-6 border-t border-border">
           <div className="flex gap-3">
             {step !== 'info' && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleBack}
-                className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
               >
                 Back
               </Button>
@@ -494,7 +493,6 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
               type="button"
               variant="outline"
               onClick={handleClose}
-              className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
             >
               Cancel
             </Button>
@@ -503,7 +501,6 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
               <Button
                 type="button"
                 onClick={handleNextFromInfo}
-                className="bg-blue-600 hover:bg-blue-500"
               >
                 Next: Select Formations
               </Button>
@@ -514,7 +511,6 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                 type="button"
                 onClick={handleNextFromFormations}
                 disabled={isGenerating || selectedFormations.length === 0}
-                className="bg-blue-600 hover:bg-blue-500"
               >
                 {isGenerating ? (
                   <>
@@ -535,7 +531,7 @@ export function CreatePlaybookModal({ isOpen, onClose, onCreate }: CreatePlayboo
                 type="button"
                 onClick={handleCreate}
                 disabled={isCreating || stats.selected === 0}
-                className="bg-green-600 hover:bg-green-500 min-w-[200px]"
+                className="bg-green-600 hover:bg-green-500 text-white min-w-[200px]"
               >
                 {isCreating && creationProgress ? (
                   <div className="flex items-center">

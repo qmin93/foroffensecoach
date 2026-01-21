@@ -40,7 +40,11 @@
       "Bash(git remote add:*)",
       "Bash(git fetch:*)",
       "Bash(git checkout:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run lint)",
+      "Skill(배포)",
+      "Skill(배포:*)"
     ]
   }
 }

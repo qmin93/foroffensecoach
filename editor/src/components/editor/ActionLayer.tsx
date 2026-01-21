@@ -1,10 +1,13 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Layer, Arrow, Line, Shape, Circle, Text } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useEditorStore } from '@/store/editorStore';
+import { useConceptStore } from '@/store/conceptStore';
 import { Action, RouteAction, BlockAction, MotionAction, LandmarkAction, TextAction, Point, EndMarker, Player } from '@/types/dsl';
 import { toPixel, toNormalized, pointsToPixelArray, findClosestSegment } from '@/utils/coordinates';
+import { generateConceptPreview } from '@/lib/concept-preview';
 
 interface ActionLayerProps {
   width: number;
@@ -779,7 +782,16 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
   const deleteRoutePoint = useEditorStore((state) => state.deleteRoutePoint);
   const mode = useEditorStore((state) => state.mode);
 
+  // Concept hover preview state
+  const hoveredConceptId = useConceptStore((state) => state.hoveredConceptId);
+
   const actions = propActions ?? storeActions;
+
+  // Generate concept preview actions when a concept is hovered
+  const previewActions = useMemo(() => {
+    if (!hoveredConceptId || isReadOnly) return [];
+    return generateConceptPreview(hoveredConceptId, players);
+  }, [hoveredConceptId, players, isReadOnly]);
 
   // Editing state
   const editingActionId = useEditorStore((state) => state.editingActionId);
@@ -1069,9 +1081,65 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
     );
   };
 
+  // Render concept preview actions with semi-transparent blue style
+  const renderConceptPreview = () => {
+    if (previewActions.length === 0) return null;
+
+    return previewActions.map((action) => {
+      if (action.actionType === 'route') {
+        const routeAction = action as RouteAction;
+        const player = players.find((p) => p.id === routeAction.fromPlayerId);
+        let controlPoints = [...routeAction.route.controlPoints];
+        if (player && controlPoints.length > 0) {
+          controlPoints[0] = { x: player.alignment.x, y: player.alignment.y };
+        }
+        const points = pointsToPixelArray(controlPoints, width, height);
+        const tension = routeAction.route.pathType === 'tension' ? (routeAction.route.tension || 0.3) : 0;
+
+        return (
+          <LineWithMarker
+            key={action.id}
+            points={points}
+            stroke="#3b82f6"
+            strokeWidth={3}
+            dash={undefined}
+            tension={tension}
+            endMarker={routeAction.style?.endMarker || 'arrow'}
+            isSelected={false}
+            isHovered={false}
+            opacity={0.6}
+          />
+        );
+      }
+
+      if (action.actionType === 'block') {
+        const blockAction = action as BlockAction;
+        const points = pointsToPixelArray(blockAction.block.pathPoints, width, height);
+
+        return (
+          <LineWithMarker
+            key={action.id}
+            points={points}
+            stroke="#3b82f6"
+            strokeWidth={3}
+            dash={undefined}
+            tension={0}
+            endMarker="t_block"
+            isSelected={false}
+            isHovered={false}
+            opacity={0.6}
+          />
+        );
+      }
+
+      return null;
+    });
+  };
+
   return (
     <Layer>
       {actions.map(renderAction)}
+      {!isReadOnly && renderConceptPreview()}
       {!isReadOnly && renderDrawingPreview()}
     </Layer>
   );

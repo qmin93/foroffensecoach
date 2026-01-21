@@ -59,9 +59,23 @@ export async function createShareLink(
 }
 
 /**
+ * Validate share token format (alphanumeric, 16 chars)
+ */
+function isValidShareToken(token: string): boolean {
+  return /^[a-f0-9]{16}$/i.test(token);
+}
+
+/**
  * Get a share link by token
+ * Includes basic security checks and access logging
  */
 export async function getShareLink(token: string): Promise<SharedLinkWithPlay | null> {
+  // Validate token format to prevent injection
+  if (!token || !isValidShareToken(token)) {
+    console.warn('Invalid share token format attempted');
+    return null;
+  }
+
   const supabase = createClient();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,8 +89,9 @@ export async function getShareLink(token: string): Promise<SharedLinkWithPlay | 
     if (error.code === 'PGRST116') {
       return null; // Not found
     }
-    console.error('Error fetching share link:', error);
-    throw error;
+    // Log error without exposing details
+    console.error('Error fetching share link');
+    throw new Error('Failed to fetch share link');
   }
 
   const linkData = data as SharedLinkRow;
@@ -85,6 +100,9 @@ export async function getShareLink(token: string): Promise<SharedLinkWithPlay | 
   if (linkData.expires_at && new Date(linkData.expires_at) < new Date()) {
     return null; // Expired
   }
+
+  // Log access for audit trail (in production, store in database)
+  console.log(`Share link accessed: ${linkData.id} at ${new Date().toISOString()}`);
 
   return linkData;
 }

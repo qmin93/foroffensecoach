@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe, tierToPriceId } from '@/lib/stripe';
-import { SubscriptionTier } from '@/lib/subscription';
+import { z } from 'zod';
+
+// Input validation schema
+const CheckoutRequestSchema = z.object({
+  tier: z.enum(['pro', 'team'], {
+    message: 'Invalid subscription tier',
+  }),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,14 +22,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { tier } = await request.json() as { tier: SubscriptionTier };
-
-    if (tier !== 'pro' && tier !== 'team') {
+    // Validate and parse request body
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
       return NextResponse.json(
-        { error: 'Invalid subscription tier' },
+        { error: 'Invalid JSON body' },
         { status: 400 }
       );
     }
+
+    const parseResult = CheckoutRequestSchema.safeParse(body);
+    if (!parseResult.success) {
+      return NextResponse.json(
+        { error: parseResult.error.issues[0]?.message || 'Invalid request' },
+        { status: 400 }
+      );
+    }
+
+    const { tier } = parseResult.data;
 
     const priceId = tierToPriceId(tier);
     if (!priceId) {
@@ -82,7 +101,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
-    console.error('Checkout error:', error);
+    // Log error internally but don't expose details to client
+    console.error('Checkout error:', error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

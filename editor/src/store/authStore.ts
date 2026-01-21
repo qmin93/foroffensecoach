@@ -50,6 +50,44 @@ interface AuthActions {
 }
 
 // ============================================
+// Error Message Sanitization
+// ============================================
+
+/**
+ * Sanitize error messages to prevent information leakage
+ * Maps internal Supabase errors to user-friendly messages
+ */
+function sanitizeAuthError(error: { message?: string; code?: string } | null): string {
+  if (!error) return 'An unexpected error occurred';
+
+  const message = error.message?.toLowerCase() || '';
+  const code = error.code || '';
+
+  // Common auth errors with safe user-facing messages
+  if (message.includes('invalid login credentials') || message.includes('invalid_grant')) {
+    return 'Invalid email or password';
+  }
+  if (message.includes('email not confirmed')) {
+    return 'Please verify your email address';
+  }
+  if (message.includes('user already registered') || code === '23505') {
+    return 'An account with this email already exists';
+  }
+  if (message.includes('password') && message.includes('weak')) {
+    return 'Password does not meet security requirements';
+  }
+  if (message.includes('rate limit') || message.includes('too many requests')) {
+    return 'Too many attempts. Please try again later';
+  }
+  if (message.includes('network') || message.includes('fetch')) {
+    return 'Network error. Please check your connection';
+  }
+
+  // Generic fallback (don't expose internal details)
+  return 'Authentication failed. Please try again';
+}
+
+// ============================================
 // Initial State
 // ============================================
 
@@ -134,8 +172,9 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
       });
 
       if (error) {
-        set({ error: error.message });
-        return { error: error.message };
+        const sanitizedError = sanitizeAuthError(error);
+        set({ error: sanitizedError });
+        return { error: sanitizedError };
       }
 
       set({
@@ -148,9 +187,9 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
 
       return { error: null };
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Sign in failed';
-      set({ error: message });
-      return { error: message };
+      const sanitizedError = sanitizeAuthError(error as { message?: string });
+      set({ error: sanitizedError });
+      return { error: sanitizedError };
     } finally {
       set({ loading: false });
     }
@@ -174,8 +213,9 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
       });
 
       if (error) {
-        set({ error: error.message });
-        return { error: error.message };
+        const sanitizedError = sanitizeAuthError(error);
+        set({ error: sanitizedError });
+        return { error: sanitizedError };
       }
 
       // If email confirmation is required, the user won't be signed in yet
@@ -196,9 +236,9 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
 
       return { error: null };
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Sign up failed';
-      set({ error: message });
-      return { error: message };
+      const sanitizedError = sanitizeAuthError(error as { message?: string });
+      set({ error: sanitizedError });
+      return { error: sanitizedError };
     } finally {
       set({ loading: false });
     }
@@ -219,15 +259,16 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
       });
 
       if (error) {
-        set({ error: error.message });
-        return { error: error.message };
+        const sanitizedError = sanitizeAuthError(error);
+        set({ error: sanitizedError });
+        return { error: sanitizedError };
       }
 
       return { error: null };
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Google sign in failed';
-      set({ error: message });
-      return { error: message };
+      const sanitizedError = sanitizeAuthError(error as { message?: string });
+      set({ error: sanitizedError });
+      return { error: sanitizedError };
     } finally {
       set({ loading: false });
     }
