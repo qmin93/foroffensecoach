@@ -58,13 +58,13 @@ export default function LandingPage() {
             Professional football playbook builder with intelligent concept recommendations.
             Design plays, share with your team, and prepare for game day.
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
-              onClick={handleGetStarted}
+              onClick={() => router.push(user ? '/dashboard?quickstart=true' : '/auth/signup?redirect=/dashboard?quickstart=true')}
               size="lg"
-              className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6"
+              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 text-lg px-8 py-6 shadow-lg shadow-green-600/20"
             >
-              Start Building Free
+              <span className="mr-2">⚡</span> Quick Start - 포메이션만 선택하면 끝
             </Button>
             <Button
               onClick={() => router.push('/editor')}

@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore, selectIsAuthenticated, selectIsLoading } from '@/store/authStore';
 import { usePlaybookStore } from '@/store/playbookStore';
 import { PlaysGrid } from '@/components/dashboard/PlaysGrid';
 import { PlaybooksGrid } from '@/components/dashboard/PlaybooksGrid';
 import { CreatePlaybookModal } from '@/components/dashboard/CreatePlaybookModal';
+import { QuickStartModal } from '@/components/dashboard/QuickStartModal';
 import { FormationRecommendPanel } from '@/components/recommendation';
 import { type GeneratedPlay, convertGeneratedPlayToPlayDSL } from '@/lib/playbook-generator';
 import { createPlay } from '@/lib/api/plays';
@@ -15,12 +16,29 @@ import { addPlayToPlaybook } from '@/lib/api/playbooks';
 
 type TabType = 'plays' | 'playbooks' | 'formations';
 
+// Component to handle search params (needs Suspense boundary)
+function QuickStartHandler({ onQuickStart }: { onQuickStart: () => void }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams.get('quickstart') === 'true') {
+      onQuickStart();
+      router.replace('/dashboard', { scroll: false });
+    }
+  }, [searchParams, router, onQuickStart]);
+
+  return null;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('plays');
   const [showCreatePlaybook, setShowCreatePlaybook] = useState(false);
+  const [showQuickStart, setShowQuickStart] = useState(false);
 
   const { initialize, initialized, profile, workspace, user, signOut } = useAuthStore();
+
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const isLoading = useAuthStore(selectIsLoading);
   const { createPlaybook } = usePlaybookStore();
@@ -112,6 +130,11 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white">
+      {/* Handle quickstart query param */}
+      <Suspense fallback={null}>
+        <QuickStartHandler onQuickStart={() => setShowQuickStart(true)} />
+      </Suspense>
+
       {/* Header */}
       <header className="border-b border-zinc-700 bg-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
@@ -142,6 +165,29 @@ export default function DashboardPage() {
             Manage your playbooks and plays
           </p>
         </div>
+
+        {/* Quick Start - Featured Button */}
+        <button
+          onClick={() => setShowQuickStart(true)}
+          className="w-full mb-6 p-6 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl text-left hover:from-green-500 hover:to-blue-500 transition-all shadow-lg shadow-green-600/20 group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="text-5xl">⚡</div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-white mb-1">
+                Quick Start
+              </h3>
+              <p className="text-white/80">
+                포메이션 선택 → 30개 플레이 자동 생성 → 원하는 것만 선택
+              </p>
+            </div>
+            <div className="text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </button>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -258,6 +304,13 @@ export default function DashboardPage() {
       <CreatePlaybookModal
         isOpen={showCreatePlaybook}
         onClose={() => setShowCreatePlaybook(false)}
+        onCreate={handleCreatePlaybook}
+      />
+
+      {/* Quick Start Modal */}
+      <QuickStartModal
+        isOpen={showQuickStart}
+        onClose={() => setShowQuickStart(false)}
         onCreate={handleCreatePlaybook}
       />
     </div>
