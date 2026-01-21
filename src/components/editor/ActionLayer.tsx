@@ -102,9 +102,9 @@ function LineWithMarker({
   onMouseLeave?: () => void;
   opacity?: number;
 }) {
-  // Replace white/near-white strokes with visible blue (fixes old plays with #ffffff stroke)
-  const visibleStroke = stroke === '#ffffff' || stroke === '#FFFFFF' ? '#1e40af' : stroke;
-  const displayStroke = isSelected ? '#3b82f6' : isHovered ? '#60a5fa' : visibleStroke;
+  // Replace white strokes with black (editor uses only black and white)
+  const visibleStroke = stroke === '#ffffff' || stroke === '#FFFFFF' ? '#000000' : stroke;
+  const displayStroke = isSelected ? '#000000' : isHovered ? '#000000' : visibleStroke;
   const displayWidth = isSelected ? strokeWidth + 2 : isHovered ? strokeWidth + 1 : strokeWidth;
   const shadowBlur = isHovered && !isSelected ? 6 : 0;
 

@@ -10,7 +10,7 @@ import type { Concept } from '@/types/concept';
 import type { Player, Point, Action, RouteAction, BlockAction, ActionStyle } from '@/types/dsl';
 
 const DEFAULT_ACTION_STYLE: ActionStyle = {
-  stroke: '#1e40af', // Dark blue - visible on both light and dark backgrounds
+  stroke: '#000000', // Black - editor uses only black and white
   strokeWidth: 2,
   lineStyle: 'solid',
   endMarker: 'arrow',

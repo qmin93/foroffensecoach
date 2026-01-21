@@ -114,7 +114,7 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
               <path
                 d={pathD}
                 fill="none"
-                stroke="#3b82f6"
+                stroke="#000000"
                 strokeWidth={2}
                 strokeLinecap="round"
               />
@@ -124,7 +124,7 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                   cx={points[points.length - 1].x}
                   cy={points[points.length - 1].y}
                   r={3}
-                  fill="#3b82f6"
+                  fill="#000000"
                 />
               )}
             </g>
@@ -145,7 +145,7 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 y1={points[0].y}
                 x2={points[1].x}
                 y2={points[1].y}
-                stroke="#f97316"
+                stroke="#000000"
                 strokeWidth={2}
               />
               {/* T-block marker */}
@@ -154,7 +154,7 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 y1={points[1].y}
                 x2={points[1].x + 4}
                 y2={points[1].y}
-                stroke="#f97316"
+                stroke="#000000"
                 strokeWidth={2}
               />
             </g>
@@ -164,15 +164,12 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
         return null;
       })}
 
-      {/* Players */}
+      {/* Players - white fill with black border */}
       {players.map((player, i) => {
         if (player.role === 'BALL') return null;
 
         const pos = toSVG(player.alignment.x, player.alignment.y, width, height);
         const isOL = ['C', 'LG', 'RG', 'LT', 'RT'].includes(player.label || '');
-        const isSkill = ['WR', 'TE', 'RB', 'FB', 'QB'].includes(player.role || '');
-
-        const fill = isOL ? '#6b7280' : isSkill ? '#ffffff' : '#9ca3af';
         const size = isOL ? 5 : 6;
 
         return (
@@ -183,8 +180,8 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 y={pos.y - size}
                 width={size * 2}
                 height={size * 2}
-                fill={fill}
-                stroke="#374151"
+                fill="#ffffff"
+                stroke="#000000"
                 strokeWidth={1}
               />
             ) : (
@@ -192,8 +189,8 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 cx={pos.x}
                 cy={pos.y}
                 r={size}
-                fill={fill}
-                stroke="#374151"
+                fill="#ffffff"
+                stroke="#000000"
                 strokeWidth={1}
               />
             )}
