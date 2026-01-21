@@ -137,18 +137,18 @@ export default function DashboardPage() {
 
       {/* Header */}
       <header className="border-b border-zinc-700 bg-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold hover:text-zinc-300 transition-colors">
-            ForOffenseCoach
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+          <Link href="/" className="text-lg sm:text-xl font-bold hover:text-zinc-300 transition-colors">
+            FOC
           </Link>
 
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-zinc-400">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <span className="text-xs sm:text-sm text-zinc-400 hidden sm:inline truncate max-w-[150px]">
               {profile?.display_name || profile?.email}
             </span>
             <button
               onClick={handleSignOut}
-              className="text-sm text-zinc-400 hover:text-white transition-colors"
+              className="text-xs sm:text-sm text-zinc-400 hover:text-white transition-colors"
             >
               Sign Out
             </button>
@@ -157,11 +157,11 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Workspace Info */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-2">{workspace?.name || 'My Workspace'}</h2>
-          <p className="text-zinc-400">
+        <div className="mb-4 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">{workspace?.name || 'My Workspace'}</h2>
+          <p className="text-sm sm:text-base text-zinc-400">
             Manage your playbooks and plays
           </p>
         </div>
@@ -169,19 +169,19 @@ export default function DashboardPage() {
         {/* Quick Start - Featured Button */}
         <button
           onClick={() => setShowQuickStart(true)}
-          className="w-full mb-6 p-6 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl text-left hover:from-green-500 hover:to-blue-500 transition-all shadow-lg shadow-green-600/20 group"
+          className="w-full mb-4 sm:mb-6 p-4 sm:p-6 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl text-left hover:from-green-500 hover:to-blue-500 transition-all shadow-lg shadow-green-600/20 group"
         >
-          <div className="flex items-center gap-4">
-            <div className="text-5xl">⚡</div>
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold text-white mb-1">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="text-3xl sm:text-5xl">⚡</div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">
                 Quick Start
               </h3>
-              <p className="text-white/80">
-                Select formations → Auto-generate 30 plays → Pick your favorites
+              <p className="text-sm sm:text-base text-white/80 truncate sm:whitespace-normal">
+                Select formations → Auto-generate plays
               </p>
             </div>
-            <div className="text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all">
+            <div className="text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all hidden sm:block">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -190,50 +190,50 @@ export default function DashboardPage() {
         </button>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-8">
           <button
             onClick={handleCreatePlay}
-            className="p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-green-500 transition-colors group"
+            className="p-4 sm:p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-green-500 transition-colors group"
           >
-            <div className="text-3xl mb-3">+</div>
-            <h3 className="text-lg font-medium mb-1 group-hover:text-green-400">
+            <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">+</div>
+            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-green-400">
               New Play
             </h3>
-            <p className="text-sm text-zinc-400">
+            <p className="text-xs sm:text-sm text-zinc-400">
               Create a new play in the editor
             </p>
           </button>
 
           <button
             onClick={() => setShowCreatePlaybook(true)}
-            className="p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-blue-500 transition-colors group"
+            className="p-4 sm:p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-blue-500 transition-colors group"
           >
-            <div className="text-3xl mb-3">📁</div>
-            <h3 className="text-lg font-medium mb-1 group-hover:text-blue-400">
+            <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">📁</div>
+            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-blue-400">
               New Playbook
             </h3>
-            <p className="text-sm text-zinc-400">
+            <p className="text-xs sm:text-sm text-zinc-400">
               Organize plays into a playbook
             </p>
           </button>
 
           <button
             onClick={() => router.push('/team-profile')}
-            className="p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-purple-500 transition-colors group"
+            className="p-4 sm:p-6 bg-zinc-800 border border-zinc-700 rounded-lg text-left hover:border-purple-500 transition-colors group"
           >
-            <div className="text-3xl mb-3">🏈</div>
-            <h3 className="text-lg font-medium mb-1 group-hover:text-purple-400">
+            <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">🏈</div>
+            <h3 className="text-base sm:text-lg font-medium mb-0.5 sm:mb-1 group-hover:text-purple-400">
               Team Profile
             </h3>
-            <p className="text-sm text-zinc-400">
-              Set up roster and get formation recommendations
+            <p className="text-xs sm:text-sm text-zinc-400">
+              Set up roster and get recommendations
             </p>
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-zinc-700 mb-6">
-          <nav className="flex gap-8">
+        <div className="border-b border-zinc-700 mb-4 sm:mb-6 overflow-x-auto">
+          <nav className="flex gap-4 sm:gap-8 min-w-max">
             <button
               onClick={() => setActiveTab('plays')}
               className={`pb-3 px-1 border-b-2 text-sm font-medium transition-colors ${

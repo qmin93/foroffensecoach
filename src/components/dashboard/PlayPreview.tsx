@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react';
 import { Tables } from '@/types/database';
-import type { Player, Action, RouteAction, BlockAction } from '@/types/dsl';
+import type { Player, Action, RouteAction, BlockAction, PlayField, ActionStyle, PlayerAppearance } from '@/types/dsl';
+import { DEFAULT_ACTION_STYLE, DEFAULT_PLAYER_APPEARANCE, DEFAULT_PLAY_FIELD } from '@/types/dsl';
 
 type PlayRow = Tables<'plays'>;
 
@@ -24,30 +25,92 @@ function toSVG(x: number, y: number, width: number, height: number) {
   return { x: svgX, y: svgY };
 }
 
+// Render arrow marker at end of path
+function renderArrow(
+  endX: number,
+  endY: number,
+  prevX: number,
+  prevY: number,
+  stroke: string,
+  size: number = 6
+) {
+  const angle = Math.atan2(endY - prevY, endX - prevX);
+  const arrowAngle = Math.PI / 6; // 30 degrees
+
+  const x1 = endX - size * Math.cos(angle - arrowAngle);
+  const y1 = endY - size * Math.sin(angle - arrowAngle);
+  const x2 = endX - size * Math.cos(angle + arrowAngle);
+  const y2 = endY - size * Math.sin(angle + arrowAngle);
+
+  return (
+    <polygon
+      points={`${endX},${endY} ${x1},${y1} ${x2},${y2}`}
+      fill={stroke}
+    />
+  );
+}
+
+// Render T-block marker
+function renderTBlock(
+  endX: number,
+  endY: number,
+  prevX: number,
+  prevY: number,
+  stroke: string,
+  size: number = 4
+) {
+  const angle = Math.atan2(endY - prevY, endX - prevX);
+  // Perpendicular angle for the T bar
+  const perpAngle = angle + Math.PI / 2;
+
+  const x1 = endX + size * Math.cos(perpAngle);
+  const y1 = endY + size * Math.sin(perpAngle);
+  const x2 = endX - size * Math.cos(perpAngle);
+  const y2 = endY - size * Math.sin(perpAngle);
+
+  return (
+    <line
+      x1={x1}
+      y1={y1}
+      x2={x2}
+      y2={y2}
+      stroke={stroke}
+      strokeWidth={2}
+    />
+  );
+}
+
+// Render circle marker
+function renderCircle(endX: number, endY: number, stroke: string, size: number = 3) {
+  return (
+    <circle
+      cx={endX}
+      cy={endY}
+      r={size}
+      fill={stroke}
+    />
+  );
+}
+
 export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProps) {
-  const { players, actions, hasData } = useMemo(() => {
+  const { players, actions, field, hasData } = useMemo(() => {
     try {
       const roster = play.roster as { players?: Player[] } | null;
       const actionsData = play.actions as Action[] | null;
+      const fieldData = play.field as PlayField | null;
 
       const players = roster?.players || [];
       const actions = actionsData || [];
-
-      // Debug logging
-      console.log('PlayPreview data:', {
-        playName: play.name,
-        playersCount: players.length,
-        actionsCount: actions.length,
-        firstAction: actions[0],
-      });
+      const field = { ...DEFAULT_PLAY_FIELD, ...fieldData };
 
       return {
         players,
         actions,
+        field,
         hasData: players.length > 0,
       };
     } catch {
-      return { players: [], actions: [], hasData: false };
+      return { players: [], actions: [], field: DEFAULT_PLAY_FIELD, hasData: false };
     }
   }, [play]);
 
@@ -61,72 +124,106 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
     );
   }
 
-  // Find player by ID for route rendering
-  const playerMap = new Map(players.map(p => [p.id, p]));
+  // Calculate min distance to prevent overlap
+  let minDistance = Infinity;
+  for (let i = 0; i < players.length; i++) {
+    for (let j = i + 1; j < players.length; j++) {
+      const p1 = toSVG(players[i].alignment.x, players[i].alignment.y, width, height);
+      const p2 = toSVG(players[j].alignment.x, players[j].alignment.y, width, height);
+      const dist = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+      if (dist < minDistance) minDistance = dist;
+    }
+  }
+  const maxSize = Math.max(4, (minDistance / 2) - 1);
+  const baseSize = 6;
+  const size = Math.min(baseSize, maxSize);
+
+  // Lighten line color for yard lines
+  const lightenColor = (color: string, amount: number = 0.3): string => {
+    if (color.startsWith('#')) {
+      const hex = color.slice(1);
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      const newR = Math.min(255, Math.floor(r + (255 - r) * amount));
+      const newG = Math.min(255, Math.floor(g + (255 - g) * amount));
+      const newB = Math.min(255, Math.floor(b + (255 - b) * amount));
+      return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    }
+    return color;
+  };
 
   return (
     <svg
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className="w-full h-full bg-green-900/30"
+      className="w-full h-full"
     >
-      {/* Field background */}
-      <rect x={0} y={0} width={width} height={height} fill="#1a2f1a" />
+      {/* Field background - uses play's field settings */}
+      <rect x={0} y={0} width={width} height={height} fill={field.backgroundColor} />
 
-      {/* Yard lines */}
-      {[0.2, 0.4, 0.6, 0.8].map((y, i) => (
+      {/* Yard lines - uses lightened line color */}
+      {field.showYardLines && [0.2, 0.4, 0.6, 0.8].map((y, i) => (
         <line
           key={i}
           x1={0}
           y1={y * height}
           x2={width}
           y2={y * height}
-          stroke="#2d4a2d"
+          stroke={lightenColor(field.lineColor, 0.5)}
           strokeWidth={1}
+          opacity={0.5}
         />
       ))}
 
       {/* LOS - Line of Scrimmage at y=0 which maps to height * 0.6 */}
-      <line
-        x1={0}
-        y1={height * 0.6}
-        x2={width}
-        y2={height * 0.6}
-        stroke="#4a7a4a"
-        strokeWidth={2}
-      />
+      {field.showYardLines && (
+        <line
+          x1={0}
+          y1={height * 0.6}
+          x2={width}
+          y2={height * 0.6}
+          stroke={field.lineColor}
+          strokeWidth={1}
+          opacity={0.7}
+        />
+      )}
 
-      {/* Routes and Blocks */}
+      {/* Routes and Blocks - uses action's style settings */}
       {actions.map((action, i) => {
         if (action.actionType === 'route') {
           const routeAction = action as RouteAction;
           const controlPoints = routeAction.route?.controlPoints || [];
           if (controlPoints.length < 2) return null;
 
+          const style: ActionStyle = { ...DEFAULT_ACTION_STYLE, ...routeAction.style };
+          const stroke = style.stroke || '#000000';
+          const lineStyle = style.lineStyle || 'solid';
+          const endMarker = style.endMarker || 'arrow';
+
           const points = controlPoints.map(p => toSVG(p.x, p.y, width, height));
           const pathD = points.length === 2
             ? `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`
             : `M ${points[0].x} ${points[0].y} ${points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ')}`;
+
+          const lastPoint = points[points.length - 1];
+          const prevPoint = points[points.length - 2];
 
           return (
             <g key={`route-${i}`}>
               <path
                 d={pathD}
                 fill="none"
-                stroke="#000000"
+                stroke={stroke}
                 strokeWidth={2}
                 strokeLinecap="round"
+                strokeDasharray={lineStyle === 'dashed' ? '4,2' : lineStyle === 'dotted' ? '1,2' : undefined}
               />
-              {/* Arrow head */}
-              {points.length >= 2 && (
-                <circle
-                  cx={points[points.length - 1].x}
-                  cy={points[points.length - 1].y}
-                  r={3}
-                  fill="#000000"
-                />
-              )}
+              {/* End marker based on style */}
+              {endMarker === 'arrow' && renderArrow(lastPoint.x, lastPoint.y, prevPoint.x, prevPoint.y, stroke)}
+              {endMarker === 't_block' && renderTBlock(lastPoint.x, lastPoint.y, prevPoint.x, prevPoint.y, stroke)}
+              {endMarker === 'circle' && renderCircle(lastPoint.x, lastPoint.y, stroke)}
             </g>
           );
         }
@@ -136,7 +233,13 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
           const pathPoints = blockAction.block?.pathPoints || [];
           if (pathPoints.length < 2) return null;
 
+          const style: ActionStyle = { ...DEFAULT_ACTION_STYLE, ...blockAction.style };
+          const stroke = style.stroke || '#000000';
+          const endMarker = style.endMarker || 't_block';
+
           const points = pathPoints.map(p => toSVG(p.x, p.y, width, height));
+          const lastPoint = points[points.length - 1];
+          const prevPoint = points[points.length - 2];
 
           return (
             <g key={`block-${i}`}>
@@ -145,18 +248,13 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 y1={points[0].y}
                 x2={points[1].x}
                 y2={points[1].y}
-                stroke="#000000"
+                stroke={stroke}
                 strokeWidth={2}
               />
-              {/* T-block marker */}
-              <line
-                x1={points[1].x - 4}
-                y1={points[1].y}
-                x2={points[1].x + 4}
-                y2={points[1].y}
-                stroke="#000000"
-                strokeWidth={2}
-              />
+              {/* End marker based on style */}
+              {endMarker === 't_block' && renderTBlock(lastPoint.x, lastPoint.y, prevPoint.x, prevPoint.y, stroke)}
+              {endMarker === 'arrow' && renderArrow(lastPoint.x, lastPoint.y, prevPoint.x, prevPoint.y, stroke)}
+              {endMarker === 'circle' && renderCircle(lastPoint.x, lastPoint.y, stroke)}
             </g>
           );
         }
@@ -164,33 +262,51 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
         return null;
       })}
 
-      {/* Players - white fill with black border */}
+      {/* Players - uses player's appearance settings */}
       {players.map((player, i) => {
         if (player.role === 'BALL') return null;
 
         const pos = toSVG(player.alignment.x, player.alignment.y, width, height);
+        const appearance: PlayerAppearance = { ...DEFAULT_PLAYER_APPEARANCE, ...player.appearance };
+        const fill = appearance.fill || '#ffffff';
+        const stroke = appearance.stroke || '#000000';
+        const shape = appearance.shape || 'circle';
         const isOL = ['C', 'LG', 'RG', 'LT', 'RT'].includes(player.label || '');
-        const size = isOL ? 5 : 6;
+        const playerSize = isOL ? size * 0.9 : size;
 
         return (
           <g key={player.id || i}>
-            {isOL ? (
+            {(shape === 'square' || isOL) ? (
               <rect
-                x={pos.x - size}
-                y={pos.y - size}
-                width={size * 2}
-                height={size * 2}
-                fill="#ffffff"
-                stroke="#000000"
+                x={pos.x - playerSize}
+                y={pos.y - playerSize}
+                width={playerSize * 2}
+                height={playerSize * 2}
+                fill={fill}
+                stroke={stroke}
+                strokeWidth={1}
+              />
+            ) : shape === 'triangle' ? (
+              <polygon
+                points={`${pos.x},${pos.y - playerSize} ${pos.x - playerSize},${pos.y + playerSize} ${pos.x + playerSize},${pos.y + playerSize}`}
+                fill={fill}
+                stroke={stroke}
+                strokeWidth={1}
+              />
+            ) : shape === 'diamond' ? (
+              <polygon
+                points={`${pos.x},${pos.y - playerSize} ${pos.x + playerSize},${pos.y} ${pos.x},${pos.y + playerSize} ${pos.x - playerSize},${pos.y}`}
+                fill={fill}
+                stroke={stroke}
                 strokeWidth={1}
               />
             ) : (
               <circle
                 cx={pos.x}
                 cy={pos.y}
-                r={size}
-                fill="#ffffff"
-                stroke="#000000"
+                r={playerSize}
+                fill={fill}
+                stroke={stroke}
                 strokeWidth={1}
               />
             )}

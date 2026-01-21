@@ -10,6 +10,7 @@ interface PlayerNodeProps {
   player: Player;
   stageWidth: number;
   stageHeight: number;
+  maxRadius?: number;
   isSelected: boolean;
   isHovered?: boolean;
   onSelect?: (playerId: string, shiftKey: boolean) => void;
@@ -24,6 +25,7 @@ export function PlayerNode({
   player,
   stageWidth,
   stageHeight,
+  maxRadius = 30,
   isSelected,
   isHovered = false,
   onSelect,
@@ -49,8 +51,9 @@ export function PlayerNode({
 
   // Responsive sizing: scale radius and font based on stage width
   // Desktop (~1200px): radius ~30px, Mobile (~400px): radius ~12px
+  // Also cap at maxRadius to prevent overlap
   const baseRadius = Math.max(12, Math.min(30, stageWidth * 0.025));
-  const radius = baseRadius;
+  const radius = Math.min(baseRadius, maxRadius);
   const responsiveLabelFontSize = Math.max(8, Math.min(14, stageWidth * 0.012));
 
   // Check if this player is the drawing source

@@ -1,9 +1,10 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Layer } from 'react-konva';
 import { useEditorStore } from '@/store/editorStore';
 import { PlayerNode } from './PlayerNode';
-import { toNormalized } from '@/utils/coordinates';
+import { toNormalized, toPixel } from '@/utils/coordinates';
 import { Player } from '@/types/dsl';
 
 interface PlayerLayerProps {
@@ -11,6 +12,30 @@ interface PlayerLayerProps {
   height: number;
   players?: Player[];
   isReadOnly?: boolean;
+}
+
+// Calculate maximum radius that prevents overlap between players
+function calculateMaxRadius(players: Player[], width: number, height: number): number {
+  if (players.length < 2) return 30; // Default max if only 1 player
+
+  let minDistance = Infinity;
+
+  // Find minimum distance between any two players
+  for (let i = 0; i < players.length; i++) {
+    for (let j = i + 1; j < players.length; j++) {
+      const p1 = toPixel(players[i].alignment, width, height);
+      const p2 = toPixel(players[j].alignment, width, height);
+      const dist = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+      if (dist < minDistance) {
+        minDistance = dist;
+      }
+    }
+  }
+
+  // Max radius is half the minimum distance minus some padding
+  // This ensures no overlap (each player takes half the distance)
+  const maxRadius = Math.max(8, (minDistance / 2) - 2);
+  return maxRadius;
 }
 
 export function PlayerLayer({ width, height, players: propPlayers, isReadOnly = false }: PlayerLayerProps) {
@@ -26,6 +51,11 @@ export function PlayerLayer({ width, height, players: propPlayers, isReadOnly = 
   const startDrawingFromPlayer = useEditorStore((state) => state.startDrawingFromPlayer);
 
   const players = propPlayers ?? storePlayers;
+
+  // Calculate max radius to prevent overlap
+  const maxRadius = useMemo(() => {
+    return calculateMaxRadius(players, width, height);
+  }, [players, width, height]);
 
   const handleDragEnd = (playerId: string, pixelX: number, pixelY: number) => {
     const normalized = toNormalized({ x: pixelX, y: pixelY }, width, height);
@@ -65,6 +95,7 @@ export function PlayerLayer({ width, height, players: propPlayers, isReadOnly = 
           player={player}
           stageWidth={width}
           stageHeight={height}
+          maxRadius={maxRadius}
           isSelected={!isReadOnly && selectedPlayerIds.includes(player.id)}
           isHovered={!isReadOnly && hoveredPlayerId === player.id}
           onSelect={isReadOnly ? undefined : handlePlayerClick}
