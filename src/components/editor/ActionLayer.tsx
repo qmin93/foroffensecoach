@@ -731,6 +731,7 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
   const drawingControlPoint = useEditorStore((state) => state.drawingControlPoint);
   const drawingConfig = useEditorStore((state) => state.drawingConfig);
   const previewPoint = useEditorStore((state) => state.previewPoint);
+  const angularPoints = useEditorStore((state) => state.angularPoints);
 
   const handleSelect = (actionId: string, shiftKey: boolean) => {
     if (isReadOnly) return;
@@ -844,7 +845,74 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
 
   // Render drawing preview with rubber band effect
   const renderDrawingPreview = () => {
-    if (drawingPhase === 'idle' || !drawingStartPoint) return null;
+    if (drawingPhase === 'idle') return null;
+
+    // Handle angular drawing preview
+    if (drawingPhase === 'angular_drawing' && angularPoints.length > 0) {
+      const previewPixel = previewPoint ? toPixel(previewPoint, width, height) : null;
+
+      // Convert all angular points to pixels
+      const angularPixels = angularPoints.map(p => toPixel(p, width, height));
+
+      // Build points array for existing segments
+      const existingPoints: number[] = [];
+      angularPixels.forEach(p => {
+        existingPoints.push(p.x, p.y);
+      });
+
+      // Add preview point for rubber band effect
+      const previewPoints = previewPixel
+        ? [...existingPoints, previewPixel.x, previewPixel.y]
+        : existingPoints;
+
+      return (
+        <>
+          {/* Existing segments (solid) */}
+          {angularPoints.length >= 2 && (
+            <LineWithMarker
+              points={existingPoints}
+              stroke="#3b82f6"
+              strokeWidth={2}
+              dash={getDash(drawingConfig.lineStyle)}
+              tension={0}
+              endMarker="none"
+              isSelected={false}
+              opacity={1}
+            />
+          )}
+          {/* Preview segment (semi-transparent) */}
+          {previewPixel && angularPixels.length > 0 && (
+            <Line
+              points={[
+                angularPixels[angularPixels.length - 1].x,
+                angularPixels[angularPixels.length - 1].y,
+                previewPixel.x,
+                previewPixel.y,
+              ]}
+              stroke="#3b82f6"
+              strokeWidth={2}
+              dash={getDash(drawingConfig.lineStyle)}
+              opacity={0.5}
+            />
+          )}
+          {/* Show point markers for all angular points */}
+          {angularPixels.map((p, i) => (
+            <Circle
+              key={i}
+              x={p.x}
+              y={p.y}
+              radius={i === 0 ? 6 : 4}
+              fill={i === 0 ? '#22c55e' : '#3b82f6'}
+              stroke="#ffffff"
+              strokeWidth={2}
+            />
+          ))}
+        </>
+      );
+    }
+
+    // Original straight/curved preview logic
+    if (!drawingStartPoint) return null;
 
     const startPixel = toPixel(drawingStartPoint, width, height);
     const endPixel = drawingEndPoint ? toPixel(drawingEndPoint, width, height) : null;

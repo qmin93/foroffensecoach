@@ -84,6 +84,9 @@ export function PlayEditor() {
   const setPreviewPoint = useEditorStore((state) => state.setPreviewPoint);
   const confirmDrawing = useEditorStore((state) => state.confirmDrawing);
   const cancelDrawing = useEditorStore((state) => state.cancelDrawing);
+  const addAngularPoint = useEditorStore((state) => state.addAngularPoint);
+  const confirmAngularDrawing = useEditorStore((state) => state.confirmAngularDrawing);
+  const angularPoints = useEditorStore((state) => state.angularPoints);
   const clearSelection = useEditorStore((state) => state.clearSelection);
   const setStageSize = useEditorStore((state) => state.setStageSize);
   const stageWidth = useEditorStore((state) => state.stageWidth);
@@ -162,6 +165,9 @@ export function PlayEditor() {
         } else if (drawingPhase === 'adjusting_curve') {
           // Confirm curved line
           confirmDrawing();
+        } else if (drawingPhase === 'angular_drawing') {
+          // Add point to angular path (single click)
+          addAngularPoint(normalized);
         }
         return;
       }
@@ -171,7 +177,7 @@ export function PlayEditor() {
         clearSelection();
       }
     },
-    [mode, drawingPhase, stageWidth, stageHeight, setDrawingEndPoint, confirmDrawing, clearSelection]
+    [mode, drawingPhase, stageWidth, stageHeight, setDrawingEndPoint, confirmDrawing, clearSelection, addAngularPoint]
   );
 
   // Handle mouse move for drawing preview and control point adjustment
@@ -201,6 +207,10 @@ export function PlayEditor() {
         else if (drawingPhase === 'adjusting_curve') {
           setDrawingControlPoint(normalized);
         }
+        // Update preview point for angular drawing (shows next segment)
+        else if (drawingPhase === 'angular_drawing') {
+          setPreviewPoint(normalized);
+        }
       }
     },
     [mode, drawingPhase, stageWidth, stageHeight, setDrawingControlPoint, setPreviewPoint, editingActionId, updateEditingPoint]
@@ -212,6 +222,19 @@ export function PlayEditor() {
       finishEditingAction();
     }
   }, [editingActionId, finishEditingAction]);
+
+  // Handle double-click for confirming angular drawing
+  const handleDoubleClick = useCallback(
+    (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+      if (mode === 'draw' && drawingPhase === 'angular_drawing') {
+        if ('preventDefault' in e.evt) {
+          e.evt.preventDefault();
+        }
+        confirmAngularDrawing();
+      }
+    },
+    [mode, drawingPhase, confirmAngularDrawing]
+  );
 
   // Handle right-click for context menu
   const handleContextMenu = useCallback(
@@ -270,6 +293,13 @@ export function PlayEditor() {
       }
 
       const store = useEditorStore.getState();
+
+      // Enter to confirm angular drawing
+      if (e.key === 'Enter' && drawingPhase === 'angular_drawing') {
+        e.preventDefault();
+        confirmAngularDrawing();
+        return;
+      }
 
       // Escape to cancel drawing or deselect
       if (e.key === 'Escape') {
@@ -358,7 +388,7 @@ export function PlayEditor() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [drawingPhase, cancelDrawing, clearSelection, editingActionId, finishEditingAction]);
+  }, [drawingPhase, cancelDrawing, clearSelection, editingActionId, finishEditingAction, confirmAngularDrawing]);
 
   // Export function
   const handleExport = useCallback(() => {
@@ -667,9 +697,11 @@ export function PlayEditor() {
             width={stageWidth}
             height={stageHeight}
             onClick={handleStageClick}
+            onDblClick={handleDoubleClick}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onTap={handleStageClick}
+            onDblTap={handleDoubleClick}
             onTouchEnd={handleMouseUp}
             onContextMenu={handleContextMenu}
           >

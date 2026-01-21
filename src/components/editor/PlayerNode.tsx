@@ -25,7 +25,7 @@ export function PlayerNode({
   player,
   stageWidth,
   stageHeight,
-  maxRadius = 30,
+  maxRadius = 60,
   isSelected,
   isHovered = false,
   onSelect,
@@ -53,14 +53,14 @@ export function PlayerNode({
   const isBall = player.role === 'BALL';
 
   // Responsive sizing: scale radius and font based on stage width
-  // Desktop (~1200px): radius ~30px, Mobile (~400px): radius ~12px
+  // Desktop (~1200px): radius ~60px, Mobile (~400px): radius ~24px
   // Also cap at maxRadius to prevent overlap
   // EXCEPTION: BALL uses fixed size from appearance.radius (default 10)
-  const baseRadius = Math.max(12, Math.min(30, stageWidth * 0.025));
+  const baseRadius = Math.max(24, Math.min(60, stageWidth * 0.05));
   const radius = isBall
     ? (appearance.radius || 10) // BALL uses its own fixed size
     : Math.min(baseRadius, maxRadius);
-  const responsiveLabelFontSize = Math.max(8, Math.min(14, stageWidth * 0.012));
+  const responsiveLabelFontSize = Math.max(16, Math.min(28, stageWidth * 0.024));
 
   // Check if this player is the drawing source
   const isDrawingSource = drawingFromPlayerId === player.id;

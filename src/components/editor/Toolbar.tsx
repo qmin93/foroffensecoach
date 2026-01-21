@@ -284,7 +284,7 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
                 onValueChange={(value) =>
                   value && setDrawingConfig({ lineType: value as DrawLineType })
                 }
-                className="justify-start"
+                className="justify-start flex-wrap"
               >
                 <ToggleGroupItem
                   value="straight"
@@ -297,6 +297,13 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
                   className="data-[state=on]:bg-green-600 data-[state=on]:text-white text-xs"
                 >
                   Curved
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="angular"
+                  className="data-[state=on]:bg-green-600 data-[state=on]:text-white text-xs"
+                  title="Click to add points, double-click to finish"
+                >
+                  Angular
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
@@ -357,6 +364,7 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
                 {drawingPhase === 'start_selected' && 'Click to set end point'}
                 {drawingPhase === 'end_selected' && 'Click to confirm or ESC to cancel'}
                 {drawingPhase === 'adjusting_curve' && 'Drag control point, then click to confirm'}
+                {drawingPhase === 'angular_drawing' && 'Click to add points, double-click or Enter to finish'}
               </div>
             )}
           </CardContent>

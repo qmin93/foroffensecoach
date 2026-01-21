@@ -144,6 +144,22 @@ export async function deletePlay(playId: string): Promise<void> {
 }
 
 /**
+ * Delete all plays in a workspace
+ */
+export async function deleteAllPlays(workspaceId: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('plays')
+    .delete()
+    .eq('workspace_id', workspaceId);
+
+  if (error) {
+    console.error('Error deleting all plays:', error);
+    throw error;
+  }
+}
+
+/**
  * Duplicate a play
  */
 export async function duplicatePlay(

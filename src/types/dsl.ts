@@ -26,7 +26,7 @@ export type LineStyle = 'solid' | 'dashed' | 'dotted';
 export type PathType = 'straight' | 'quadratic' | 'bezier' | 'tension';
 export type EndMarker = 'arrow' | 'none' | 'circle' | 't_block';
 export type EditorMode = 'select' | 'draw' | 'text';
-export type DrawLineType = 'straight' | 'curved';
+export type DrawLineType = 'straight' | 'curved' | 'angular';
 
 // Drawing configuration for unified draw mode
 export interface DrawingConfig {
@@ -36,7 +36,8 @@ export interface DrawingConfig {
 }
 
 // Drawing state phases
-export type DrawingPhase = 'idle' | 'start_selected' | 'end_selected' | 'adjusting_curve';
+// angular_drawing: multi-point drawing mode for angular routes (click to add points, double-click or Enter to finish)
+export type DrawingPhase = 'idle' | 'start_selected' | 'end_selected' | 'adjusting_curve' | 'angular_drawing';
 
 // ============================================
 // Player Types

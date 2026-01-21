@@ -48,6 +48,7 @@ interface EditorState {
   drawingEndPoint: Point | null;
   drawingControlPoint: Point | null; // For curved lines
   previewPoint: Point | null; // For rubber band effect
+  angularPoints: Point[]; // For angular/polyline drawing (stores intermediate points)
 
   // Editing state (for modifying existing lines)
   editingActionId: string | null;
@@ -110,6 +111,10 @@ interface EditorActions {
   setPreviewPoint: (point: Point | null) => void;
   confirmDrawing: () => void;
   cancelDrawing: () => void;
+
+  // Angular drawing (multi-point polyline)
+  addAngularPoint: (point: Point) => void;
+  confirmAngularDrawing: () => void;
 
   // Editing existing lines
   startEditingAction: (actionId: string, pointType: 'start' | 'end' | 'control') => void;
@@ -1122,6 +1127,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     drawingEndPoint: null,
     drawingControlPoint: null,
     previewPoint: null,
+    angularPoints: [],
     editingActionId: null,
     editingPointType: null,
     history: [],
@@ -1428,11 +1434,20 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     startDrawingFromPlayer: (playerId) => set((state) => {
       const player = state.play.roster.players.find(p => p.id === playerId);
       if (player && state.mode === 'draw') {
-        state.drawingPhase = 'start_selected';
+        const startPoint = { x: player.alignment.x, y: player.alignment.y };
         state.drawingFromPlayerId = playerId;
-        state.drawingStartPoint = { x: player.alignment.x, y: player.alignment.y };
+        state.drawingStartPoint = startPoint;
         state.drawingEndPoint = null;
         state.drawingControlPoint = null;
+        state.angularPoints = [];
+
+        // For angular mode, start with the initial point and enter angular_drawing phase
+        if (state.drawingConfig.lineType === 'angular') {
+          state.angularPoints = [startPoint];
+          state.drawingPhase = 'angular_drawing';
+        } else {
+          state.drawingPhase = 'start_selected';
+        }
       }
     }),
 
@@ -1444,7 +1459,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
         if (state.drawingConfig.lineType === 'straight') {
           // Will confirm on next click
           state.drawingPhase = 'end_selected';
-        } else {
+        } else if (state.drawingConfig.lineType === 'curved') {
           // For curved lines, set initial control point at midpoint
           if (state.drawingStartPoint) {
             state.drawingControlPoint = {
@@ -1496,7 +1511,65 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       state.drawingEndPoint = null;
       state.drawingControlPoint = null;
       state.previewPoint = null;
+      state.angularPoints = [];
     }),
+
+    // Angular drawing (multi-point polyline)
+    addAngularPoint: (point) => set((state) => {
+      if (state.drawingPhase === 'angular_drawing') {
+        state.angularPoints.push(point);
+      }
+    }),
+
+    confirmAngularDrawing: () => {
+      const state = get();
+      const { drawingFromPlayerId, angularPoints, drawingConfig } = state;
+
+      // Need at least 2 points (start + one more)
+      if (drawingFromPlayerId && angularPoints.length >= 2) {
+        get().saveToHistory();
+
+        // Create route with all angular points (pathType: straight, tension: 0 for sharp angles)
+        const route: RouteAction = {
+          id: uuidv4(),
+          actionType: 'route',
+          fromPlayerId: drawingFromPlayerId,
+          route: {
+            pattern: 'custom',
+            controlPoints: [...angularPoints],
+            pathType: 'straight', // straight segments with no smoothing
+            tension: 0,
+          },
+          style: {
+            stroke: '#000000',
+            strokeWidth: 2,
+            lineStyle: drawingConfig.lineStyle,
+            endMarker: drawingConfig.endMarker,
+          },
+        };
+
+        set((state) => {
+          state.play.actions.push(route);
+          state.play.updatedAt = new Date().toISOString();
+          state.drawingPhase = 'idle';
+          state.drawingFromPlayerId = null;
+          state.drawingStartPoint = null;
+          state.drawingEndPoint = null;
+          state.drawingControlPoint = null;
+          state.previewPoint = null;
+          state.angularPoints = [];
+        });
+      } else {
+        // Cancel if not enough points
+        set((state) => {
+          state.drawingPhase = 'idle';
+          state.drawingFromPlayerId = null;
+          state.drawingStartPoint = null;
+          state.angularPoints = [];
+          state.previewPoint = null;
+        });
+      }
+    },
 
     // Editing existing lines
     startEditingAction: (actionId, pointType) => set((state) => {
