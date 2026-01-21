@@ -346,3 +346,13 @@ Before modifying player colors/styles:
 1. Check if the element has special requirements (BALL, highlights, etc.)
 2. Preserve exception handling for special elements
 3. Add comments for non-obvious exceptions
+
+### Vercel 빌드 주의사항 (2026-01-21 추가)
+- **Monorepo 구조**: Root에 `package-lock.json`과 `editor/package-lock.json` 두 개 존재
+- **Turbopack root 필수**: `next.config.ts`에 `turbopack.root: __dirname` 설정 필수
+  - 미설정 시 Vercel에서 workspace root를 잘못 추론하여 `@/` 경로 모듈 못 찾음
+  - 로컬 빌드는 성공하지만 Vercel 빌드만 실패하는 증상 발생
+- **배포 전 체크리스트**:
+  1. `cd editor && npm run build` 로컬 빌드 성공 확인
+  2. TypeScript 오류 없는지 확인
+  3. 새 파일 추가 시 git add 확인
