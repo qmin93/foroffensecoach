@@ -9,6 +9,9 @@ import { PlaysGrid } from '@/components/dashboard/PlaysGrid';
 import { PlaybooksGrid } from '@/components/dashboard/PlaybooksGrid';
 import { CreatePlaybookModal } from '@/components/dashboard/CreatePlaybookModal';
 import { FormationRecommendPanel } from '@/components/recommendation';
+import { type GeneratedPlay, convertGeneratedPlayToPlayDSL } from '@/lib/playbook-generator';
+import { createPlay } from '@/lib/api/plays';
+import { addPlayToPlaybook } from '@/lib/api/playbooks';
 
 type TabType = 'plays' | 'playbooks' | 'formations';
 
@@ -51,9 +54,52 @@ export default function DashboardPage() {
     router.push(`/playbook/${playbookId}`);
   };
 
-  const handleCreatePlaybook = async (name: string, tags: string[]) => {
+  const handleCreatePlaybook = async (
+    name: string,
+    tags: string[],
+    generatedPlays: GeneratedPlay[],
+    onProgress?: (progress: { current: number; total: number; currentPlayName: string }) => void
+  ) => {
     if (!workspace || !user) return;
-    await createPlaybook(workspace.id, user.id, name, tags);
+
+    // 1. Create the playbook
+    const playbook = await createPlaybook(workspace.id, user.id, name, tags);
+
+    // 2. Create each generated play and add to playbook
+    const selectedPlays = generatedPlays.filter(p => p.selected);
+    const total = selectedPlays.length;
+
+    for (let i = 0; i < selectedPlays.length; i++) {
+      const generatedPlay = selectedPlays[i];
+
+      // Report progress
+      onProgress?.({
+        current: i + 1,
+        total,
+        currentPlayName: generatedPlay.name,
+      });
+
+      try {
+        // Convert generated play to DSL format
+        const playDSL = convertGeneratedPlayToPlayDSL(generatedPlay);
+
+        // Create the play in the database
+        const createdPlay = await createPlay(
+          workspace.id,
+          user.id,
+          playDSL as any // Type coercion needed for partial Play type
+        );
+
+        // Add the play to the playbook
+        await addPlayToPlaybook(createdPlay.id, playbook.id, user.id);
+      } catch (err) {
+        console.error('Failed to create play:', generatedPlay.name, err);
+        // Continue with other plays even if one fails
+      }
+    }
+
+    // 3. Navigate to the new playbook
+    router.push(`/playbook/${playbook.id}`);
   };
 
   if (isLoading) {

@@ -1,5 +1,5 @@
 /**
- * Run Concepts (20개) for ForOffenseCoach
+ * Run Concepts (45개) for ForOffenseCoach
  *
  * Categories:
  * - Inside Zone (3): Inside Zone, Split Zone, Duo
@@ -7,6 +7,13 @@
  * - Outside (5): Outside Zone, Stretch, Toss, Sweep, Buck Sweep
  * - Counter (2): GT Counter, OH Counter
  * - Special (5): Wham, Pin-Pull, QB Power, Read Option, RPO Zone
+ *
+ * NEW Categories (25개):
+ * - Zone Additional (5): Wide Zone, Mid Zone, Zone Read Give, Zone Arc, Split Zone Weak
+ * - Gap/Power Additional (8): Dart, Down G, Lead Iso, Insert, Power Read, FB Dive, Draw, Lead Draw
+ * - Outside Additional (6): Jet Sweep, Speed Option, Rocket Toss, Pitch, End Around, Fly Sweep
+ * - Misdirection (4): Counter Iso, Reverse, Bootleg, Waggle
+ * - Option (2): Triple Option, Midline Option
  */
 
 import type { Concept } from '@/types/concept';
@@ -1811,6 +1818,1991 @@ export const RUN_CONCEPTS: Concept[] = [
           drill: {
             name: 'RPO Decision Drill',
             purpose: 'Quick pre-snap to post-snap read',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  // ============================================
+  // ZONE - ADDITIONAL (5)
+  // ============================================
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_wide_zone',
+    name: 'Wide Zone',
+    conceptType: 'run',
+    summary: 'Wide stretch concept attacking the perimeter',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['2x2', 'ace', 'pistol'],
+      personnelHints: ['11', '12'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'REACH_TE',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'reach', target: 'EMOL' },
+          notes: 'Reach EMOL, get to edge',
+        },
+        {
+          roleName: 'REACH_PST',
+          appliesTo: ['RT'],
+          defaultBlock: { scheme: 'reach', target: 'DE' },
+          notes: 'Reach DE',
+        },
+        {
+          roleName: 'REACH_PSG',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'reach', target: '3T' },
+          notes: 'Reach 3T',
+        },
+        {
+          roleName: 'REACH_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'reach', target: 'NT' },
+          notes: 'Reach NT',
+        },
+        {
+          roleName: 'ZONE_BSG',
+          appliesTo: ['LG'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step playside',
+        },
+        {
+          roleName: 'ZONE_BST',
+          appliesTo: ['LT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step, hinge if needed',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Aim wide, cut up at first crease',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'outside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_required',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_wide_zone_reach',
+          name: 'Reach block execution',
+          drill: {
+            name: 'Wide Zone Reach Drill',
+            purpose: 'Get width on reach steps to seal defenders',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_mid_zone',
+    name: 'Mid Zone',
+    conceptType: 'run',
+    summary: 'Zone concept between inside and outside zone',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['2x2', 'ace', 'pistol'],
+      personnelHints: ['11', '12'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'ZONE_PST',
+          appliesTo: ['RT'],
+          defaultBlock: { scheme: 'zone_step', target: 'DE' },
+          notes: 'Zone step, combo to Sam',
+        },
+        {
+          roleName: 'ZONE_PSG',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'combo', target: '3T' },
+          notes: 'Combo to Mike',
+        },
+        {
+          roleName: 'ZONE_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'combo', target: 'NT' },
+          notes: 'Combo to backside',
+        },
+        {
+          roleName: 'ZONE_BSG',
+          appliesTo: ['LG'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step',
+        },
+        {
+          roleName: 'ZONE_BST',
+          appliesTo: ['LT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Aim B-gap, cut to daylight',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'inside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['7'],
+        surfaceNeeds: 'te_optional',
+        aim: 'b_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_mid_zone_track',
+          name: 'RB aiming point',
+          drill: {
+            name: 'Mid Zone Track Drill',
+            purpose: 'RB aims B-gap, presses LOS',
+            phase: 'indy',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_zone_read_give',
+    name: 'Zone Read Give',
+    conceptType: 'run',
+    summary: 'Zone read with automatic give to RB',
+    badges: ['option', 'spread'],
+    requirements: {
+      preferredStructures: ['pistol', '2x2'],
+      personnelHints: ['10', '11'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'ZONE_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone blocking, leave DE unblocked',
+        },
+        {
+          roleName: 'GIVE',
+          appliesTo: ['QB'],
+          notes: 'Auto give regardless of DE',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Inside zone path',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'inside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6', '7'],
+        surfaceNeeds: 'te_optional',
+        aim: 'a_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_zone_give_mesh',
+          name: 'Quick mesh point',
+          drill: {
+            name: 'Auto Give Drill',
+            purpose: 'Fast clean handoff',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_zone_arc',
+    name: 'Zone Arc',
+    conceptType: 'run',
+    summary: 'Inside zone with TE arc block on LB',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['ace', '2x2'],
+      personnelHints: ['12'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'ARC',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'arc', target: 'PSLB' },
+          notes: 'Arc release to LB',
+        },
+        {
+          roleName: 'ZONE_PST',
+          appliesTo: ['RT'],
+          defaultBlock: { scheme: 'reach', target: 'DE' },
+          notes: 'Reach DE',
+        },
+        {
+          roleName: 'ZONE_PSG',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'zone_step', target: '3T' },
+          notes: 'Zone step, climb',
+        },
+        {
+          roleName: 'ZONE_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'combo', target: 'NT' },
+          notes: 'Combo to backside',
+        },
+        {
+          roleName: 'ZONE_BSG',
+          appliesTo: ['LG'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step',
+        },
+        {
+          roleName: 'ZONE_BST',
+          appliesTo: ['LT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Aim A-gap, cut back if needed',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'inside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['7'],
+        surfaceNeeds: 'te_required',
+        aim: 'a_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_zone_arc_release',
+          name: 'TE arc release',
+          drill: {
+            name: 'Arc Release Drill',
+            purpose: 'TE releases inside, arc to LB',
+            phase: 'indy',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_split_zone_weak',
+    name: 'Split Zone Weak',
+    conceptType: 'run',
+    summary: 'Split zone to the weak side',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['ace', '2x2', 'I'],
+      personnelHints: ['12', '21'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'KICK',
+          appliesTo: ['Y', 'H', 'FB'],
+          defaultBlock: { scheme: 'kick', target: 'BSDE' },
+          notes: 'Kick backside DE',
+        },
+        {
+          roleName: 'ZONE_PST',
+          appliesTo: ['LT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step weak side',
+        },
+        {
+          roleName: 'ZONE_PSG',
+          appliesTo: ['LG'],
+          defaultBlock: { scheme: 'combo' },
+          notes: 'Combo to LB',
+        },
+        {
+          roleName: 'ZONE_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone to weak',
+        },
+        {
+          roleName: 'ZONE_BSG',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step',
+        },
+        {
+          roleName: 'ZONE_BST',
+          appliesTo: ['RT'],
+          defaultBlock: { scheme: 'reach' },
+          notes: 'Reach DE',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Aim weak A, cutback lane from H kick',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'weak',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'inside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['strong', 'weak'],
+        bestWhenBox: ['7', '8'],
+        surfaceNeeds: 'te_required',
+        aim: 'a_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_split_weak_kick',
+          name: 'H-back kick weak side',
+          drill: {
+            name: 'Weak Split Drill',
+            purpose: 'H kick on backside DE',
+            phase: 'indy',
+          },
+        },
+      ],
+    },
+  },
+
+  // ============================================
+  // GAP/POWER - ADDITIONAL (8)
+  // ============================================
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_dart',
+    name: 'Dart',
+    conceptType: 'run',
+    summary: 'Tackle pull for quick hitting gap scheme',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['ace', 'pistol', '2x2'],
+      personnelHints: ['11', '12'],
+      needsTE: true,
+      needsPuller: 'T',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'PULL',
+          appliesTo: ['RT'],
+          defaultBlock: { scheme: 'pull_lead', target: 'PSLB' },
+          notes: 'Tackle pulls for LB',
+        },
+        {
+          roleName: 'DOWN_TE',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'down', target: 'DE' },
+          notes: 'Down block DE',
+        },
+        {
+          roleName: 'DOWN_PSG',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'down', target: '3T' },
+          notes: 'Down block DT',
+        },
+        {
+          roleName: 'DOWN_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'down', target: 'NT' },
+          notes: 'Back block',
+        },
+        {
+          roleName: 'HINGE',
+          appliesTo: ['LG', 'LT'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Hinge protect',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Quick hit off tackle butt',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'gap',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['strong', 'both'],
+        bestWhenBox: ['7'],
+        surfaceNeeds: 'te_required',
+        aim: 'b_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_dart_pull',
+          name: 'Tackle pull path',
+          drill: {
+            name: 'Dart Pull Drill',
+            purpose: 'Quick flat pull to playside LB',
+            phase: 'indy',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_down_g',
+    name: 'Down G',
+    conceptType: 'run',
+    summary: 'Down blocking with guard pulling for LB',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['ace', 'I', '2x2'],
+      personnelHints: ['12', '21'],
+      needsTE: true,
+      needsPuller: 'G',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'DOWN_TE',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'down', target: 'DE' },
+          notes: 'Down block DE',
+        },
+        {
+          roleName: 'DOWN_PST',
+          appliesTo: ['RT'],
+          defaultBlock: { scheme: 'down', target: '3T' },
+          notes: 'Down block DT',
+        },
+        {
+          roleName: 'PULL',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'pull_lead', target: 'PSLB' },
+          notes: 'Pull through for LB',
+        },
+        {
+          roleName: 'DOWN_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'down', target: 'NT' },
+          notes: 'Back block',
+        },
+        {
+          roleName: 'HINGE',
+          appliesTo: ['LG', 'LT'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Hinge protect',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Aim inside TE leg, follow puller',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'gap',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['7'],
+        surfaceNeeds: 'te_required',
+        aim: 'b_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_down_g_down',
+          name: 'Down blocks at POA',
+          drill: {
+            name: 'Down Block Drill',
+            purpose: 'Seal inside defenders at POA',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_lead_iso',
+    name: 'Lead Iso',
+    conceptType: 'run',
+    summary: 'Iso with additional lead blocker',
+    badges: ['nfl_style', 'pro_style'],
+    requirements: {
+      preferredStructures: ['I', 'ace'],
+      personnelHints: ['21', '22'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '8_risky',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'LEAD_FB',
+          appliesTo: ['FB'],
+          defaultBlock: { scheme: 'kick', target: 'MLB' },
+          notes: 'FB leads on Mike',
+        },
+        {
+          roleName: 'LEAD_TE',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'arc', target: 'PSLB' },
+          notes: 'TE arcs to Sam',
+        },
+        {
+          roleName: 'COMBO_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'combo', target: 'NT' },
+          notes: 'Combo to backside',
+        },
+        {
+          roleName: 'COMBO_PSG',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'combo', target: '3T' },
+          notes: 'Combo to Will',
+        },
+        {
+          roleName: 'DOWN',
+          appliesTo: ['RT', 'LT', 'LG'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Down block',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Follow FB through A-gap',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'gap',
+        bestVsFront: ['odd', 'even'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['7', '8'],
+        surfaceNeeds: 'te_required',
+        aim: 'a_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_lead_iso_double',
+          name: 'Double lead blocks',
+          drill: {
+            name: 'Lead Iso Drill',
+            purpose: 'FB and TE clear LBs',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_insert',
+    name: 'Insert',
+    conceptType: 'run',
+    summary: 'Zone scheme with TE inserting for LB',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['ace', '2x2'],
+      personnelHints: ['12'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'INSERT',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'kick', target: 'PSLB' },
+          notes: 'TE inserts for LB',
+        },
+        {
+          roleName: 'ZONE_PST',
+          appliesTo: ['RT'],
+          defaultBlock: { scheme: 'reach', target: 'DE' },
+          notes: 'Reach DE',
+        },
+        {
+          roleName: 'ZONE_PSG',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'zone_step', target: '3T' },
+          notes: 'Zone step',
+        },
+        {
+          roleName: 'ZONE_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'combo', target: 'NT' },
+          notes: 'Combo to backside',
+        },
+        {
+          roleName: 'ZONE_BSG',
+          appliesTo: ['LG'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step',
+        },
+        {
+          roleName: 'ZONE_BST',
+          appliesTo: ['LT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone step',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['RB'],
+          notes: 'Aim B-gap, follow TE insert',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'inside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['7'],
+        surfaceNeeds: 'te_required',
+        aim: 'b_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_insert_timing',
+          name: 'TE insert timing',
+          drill: {
+            name: 'Insert Timing Drill',
+            purpose: 'TE releases for LB at right time',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_power_read',
+    name: 'Power Read',
+    conceptType: 'run',
+    summary: 'Power blocking with QB reading the backside',
+    badges: ['option', 'spread'],
+    requirements: {
+      preferredStructures: ['pistol', '2x2'],
+      personnelHints: ['11', '12'],
+      needsTE: true,
+      needsPuller: 'G',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'KICK',
+          appliesTo: ['H'],
+          defaultBlock: { scheme: 'kick', target: 'EMOL' },
+          notes: 'Kick EMOL',
+        },
+        {
+          roleName: 'PULL',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'pull_lead', target: 'PSLB' },
+          notes: 'Pull and lead',
+        },
+        {
+          roleName: 'DOWN',
+          appliesTo: ['Y', 'RT', 'C', 'LG', 'LT'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Down blocking',
+        },
+        {
+          roleName: 'MESH',
+          appliesTo: ['RB'],
+          notes: 'Sweep path, wait for mesh',
+        },
+        {
+          roleName: 'READ',
+          appliesTo: ['QB'],
+          notes: 'Read backside DE: give or keep',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'option',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['7'],
+        surfaceNeeds: 'te_required',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_power_read_mesh',
+          name: 'Power read mesh',
+          drill: {
+            name: 'Power Read Drill',
+            purpose: 'QB reads DE, RB runs sweep track',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_fb_dive',
+    name: 'FB Dive',
+    conceptType: 'run',
+    summary: 'Quick hitting fullback dive',
+    badges: ['pro_style'],
+    requirements: {
+      preferredStructures: ['I', 'ace'],
+      personnelHints: ['21', '22'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'COMBO_C',
+          appliesTo: ['C'],
+          defaultBlock: { scheme: 'combo', target: 'NT' },
+          notes: 'Combo to backside LB',
+        },
+        {
+          roleName: 'COMBO_PSG',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'combo', target: '3T' },
+          notes: 'Combo to Mike',
+        },
+        {
+          roleName: 'DOWN_PST',
+          appliesTo: ['RT'],
+          defaultBlock: { scheme: 'reach', target: 'DE' },
+          notes: 'Reach DE',
+        },
+        {
+          roleName: 'DOWN_BSG',
+          appliesTo: ['LG'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Back block',
+        },
+        {
+          roleName: 'DOWN_BST',
+          appliesTo: ['LT'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Back block',
+        },
+        {
+          roleName: 'AIMING',
+          appliesTo: ['FB'],
+          notes: 'Quick hit A-gap',
+        },
+        {
+          roleName: 'FAKE',
+          appliesTo: ['RB'],
+          notes: 'Fake sweep action',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'gap',
+        bestVsFront: ['odd', 'even'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6', '7'],
+        surfaceNeeds: 'te_optional',
+        aim: 'a_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_fb_dive_quick',
+          name: 'FB quick hit',
+          drill: {
+            name: 'FB Dive Drill',
+            purpose: 'Quick downhill FB run',
+            phase: 'indy',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_draw',
+    name: 'Draw',
+    conceptType: 'run',
+    summary: 'Play-action draw with pass protection look',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['2x2', 'ace', 'pistol'],
+      personnelHints: ['11', '12'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'DRAW_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'pass_set' },
+          notes: 'Pass set, then block man',
+        },
+        {
+          roleName: 'FAKE',
+          appliesTo: ['QB'],
+          notes: 'Pass fake, hand off on delay',
+        },
+        {
+          roleName: 'DRAW',
+          appliesTo: ['RB'],
+          notes: 'Pass protect look, receive handoff',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'special',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_optional',
+        aim: 'a_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_draw_sell',
+          name: 'Draw fake sell',
+          drill: {
+            name: 'Draw Fake Drill',
+            purpose: 'OL sells pass, RB delays',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_lead_draw',
+    name: 'Lead Draw',
+    conceptType: 'run',
+    summary: 'Draw play with lead blocker',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['I', 'ace'],
+      personnelHints: ['21', '22'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'DRAW_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'pass_set' },
+          notes: 'Pass set, block on cue',
+        },
+        {
+          roleName: 'LEAD',
+          appliesTo: ['FB'],
+          defaultBlock: { scheme: 'kick', target: 'MLB' },
+          notes: 'Lead for Mike LB',
+        },
+        {
+          roleName: 'FAKE',
+          appliesTo: ['QB'],
+          notes: 'Pass fake, hand off',
+        },
+        {
+          roleName: 'DRAW',
+          appliesTo: ['RB'],
+          notes: 'Delay, follow FB',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'special',
+        bestVsFront: ['odd', 'even'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_optional',
+        aim: 'a_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_lead_draw_timing',
+          name: 'Lead draw timing',
+          drill: {
+            name: 'Lead Draw Drill',
+            purpose: 'FB delays, leads through hole',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  // ============================================
+  // OUTSIDE - ADDITIONAL (6)
+  // ============================================
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_jet_sweep',
+    name: 'Jet Sweep',
+    conceptType: 'run',
+    summary: 'Jet motion sweep to the perimeter',
+    badges: ['spread', 'nfl_style'],
+    requirements: {
+      preferredStructures: ['2x2', '3x1', 'pistol'],
+      personnelHints: ['10', '11'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'JET',
+          appliesTo: ['H', 'Y'],
+          defaultMotion: { pattern: 'jet', direction: 'across' },
+          notes: 'Jet motion, receive handoff',
+        },
+        {
+          roleName: 'ZONE_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'reach' },
+          notes: 'Reach block playside',
+        },
+        {
+          roleName: 'STALK',
+          appliesTo: ['Z', 'X'],
+          defaultBlock: { scheme: 'stalk' },
+          notes: 'Stalk block DBs',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'outside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_optional',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_jet_timing',
+          name: 'Jet motion timing',
+          drill: {
+            name: 'Jet Sweep Drill',
+            purpose: 'Time motion with snap',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_speed_option',
+    name: 'Speed Option',
+    conceptType: 'run',
+    summary: 'Quick option play to the perimeter',
+    badges: ['option'],
+    requirements: {
+      preferredStructures: ['pistol', '2x2'],
+      personnelHints: ['10', '11'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'ZONE_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone playside',
+        },
+        {
+          roleName: 'PITCH',
+          appliesTo: ['RB'],
+          notes: 'Pitch relationship with QB',
+        },
+        {
+          roleName: 'READ',
+          appliesTo: ['QB'],
+          notes: 'Option the DE/OLB',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'option',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6', '7'],
+        surfaceNeeds: 'te_optional',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_speed_option_pitch',
+          name: 'Pitch relationship',
+          drill: {
+            name: 'Speed Option Drill',
+            purpose: 'QB-RB pitch timing and depth',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_rocket_toss',
+    name: 'Rocket Toss',
+    conceptType: 'run',
+    summary: 'Quick toss with jet motion fake',
+    badges: ['spread', 'nfl_style'],
+    requirements: {
+      preferredStructures: ['2x2', '3x1'],
+      personnelHints: ['10', '11'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'ROCKET',
+          appliesTo: ['RB'],
+          notes: 'Catch toss, get to edge',
+        },
+        {
+          roleName: 'FAKE',
+          appliesTo: ['H'],
+          defaultMotion: { pattern: 'jet', direction: 'across' },
+          notes: 'Jet fake opposite',
+        },
+        {
+          roleName: 'REACH_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'reach' },
+          notes: 'Reach block',
+        },
+        {
+          roleName: 'STALK',
+          appliesTo: ['Z', 'X'],
+          defaultBlock: { scheme: 'stalk' },
+          notes: 'Stalk block',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'outside_zone',
+        bestVsFront: ['even'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_optional',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_rocket_toss_timing',
+          name: 'Toss timing',
+          drill: {
+            name: 'Rocket Toss Drill',
+            purpose: 'Quick soft toss to RB',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_pitch',
+    name: 'Pitch',
+    conceptType: 'run',
+    summary: 'Quick pitch play to the outside',
+    badges: ['option', 'nfl_style'],
+    requirements: {
+      preferredStructures: ['I', 'ace', 'pistol'],
+      personnelHints: ['11', '12', '21'],
+      needsTE: true,
+      needsPuller: 'G',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'PULL',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'pull_lead', target: 'Force' },
+          notes: 'Pull and lead',
+        },
+        {
+          roleName: 'REACH_TE',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'reach', target: 'DE' },
+          notes: 'Reach DE',
+        },
+        {
+          roleName: 'KICK',
+          appliesTo: ['FB'],
+          defaultBlock: { scheme: 'kick', target: 'OLB' },
+          notes: 'Kick OLB',
+        },
+        {
+          roleName: 'HINGE',
+          appliesTo: ['C', 'LG', 'LT'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Hinge protect',
+        },
+        {
+          roleName: 'PITCH',
+          appliesTo: ['RB'],
+          notes: 'Catch pitch, turn corner',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'outside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_required',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_pitch_exchange',
+          name: 'Pitch exchange',
+          drill: {
+            name: 'Pitch Drill',
+            purpose: 'Quick accurate pitch',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_end_around',
+    name: 'End Around',
+    conceptType: 'run',
+    summary: 'WR end around reverse',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['2x2', '3x1'],
+      personnelHints: ['10', '11'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'END_AROUND',
+          appliesTo: ['Z', 'H'],
+          defaultMotion: { pattern: 'jet', direction: 'across' },
+          notes: 'Motion, receive handoff',
+        },
+        {
+          roleName: 'FAKE',
+          appliesTo: ['RB'],
+          notes: 'Fake dive',
+        },
+        {
+          roleName: 'ZONE_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'reach' },
+          notes: 'Reach playside',
+        },
+        {
+          roleName: 'STALK',
+          appliesTo: ['X'],
+          defaultBlock: { scheme: 'stalk' },
+          notes: 'Stalk block',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'special',
+        bestVsFront: ['even'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_optional',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_end_around_timing',
+          name: 'End around timing',
+          drill: {
+            name: 'End Around Drill',
+            purpose: 'WR motion timing with handoff',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_fly_sweep',
+    name: 'Fly Sweep',
+    conceptType: 'run',
+    summary: 'Fly motion sweep',
+    badges: ['spread'],
+    requirements: {
+      preferredStructures: ['2x2', '3x1', 'pistol'],
+      personnelHints: ['10', '11'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'FLY',
+          appliesTo: ['H', 'Y'],
+          defaultMotion: { pattern: 'jet', direction: 'across' },
+          notes: 'Fly motion, receive handoff',
+        },
+        {
+          roleName: 'REACH_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'reach' },
+          notes: 'Reach block',
+        },
+        {
+          roleName: 'STALK',
+          appliesTo: ['Z', 'X'],
+          defaultBlock: { scheme: 'stalk' },
+          notes: 'Stalk block',
+        },
+        {
+          roleName: 'FAKE',
+          appliesTo: ['RB'],
+          notes: 'Fake opposite',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'outside_zone',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_optional',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_fly_timing',
+          name: 'Fly motion timing',
+          drill: {
+            name: 'Fly Sweep Drill',
+            purpose: 'Time motion at full speed',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  // ============================================
+  // MISDIRECTION - ADDITIONAL (4)
+  // ============================================
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_counter_iso',
+    name: 'Counter Iso',
+    conceptType: 'run',
+    summary: 'Counter action with FB leading through',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['I', 'ace'],
+      personnelHints: ['21', '22'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'LEAD',
+          appliesTo: ['FB'],
+          defaultBlock: { scheme: 'kick', target: 'PSLB' },
+          notes: 'Counter action, lead for LB',
+        },
+        {
+          roleName: 'DOWN_TE',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'down', target: 'DE' },
+          notes: 'Down block',
+        },
+        {
+          roleName: 'DOWN_OL',
+          appliesTo: ['RT', 'RG', 'C'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Down block',
+        },
+        {
+          roleName: 'HINGE',
+          appliesTo: ['LG', 'LT'],
+          defaultBlock: { scheme: 'down' },
+          notes: 'Hinge protect',
+        },
+        {
+          roleName: 'COUNTER',
+          appliesTo: ['RB'],
+          notes: 'Counter step, follow FB',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'counter',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['7'],
+        surfaceNeeds: 'te_required',
+        aim: 'b_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_counter_iso_fake',
+          name: 'Counter step fake',
+          drill: {
+            name: 'Counter Iso Drill',
+            purpose: 'Sell backside, redirect playside',
+            phase: 'group',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_reverse',
+    name: 'Reverse',
+    conceptType: 'run',
+    summary: 'Traditional reverse play',
+    badges: ['nfl_style'],
+    requirements: {
+      preferredStructures: ['2x2', '3x1', 'ace'],
+      personnelHints: ['11', '12'],
+      needsTE: false,
+      needsPuller: 'none',
+      boxTolerance: '6_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'REVERSE',
+          appliesTo: ['X', 'Z'],
+          notes: 'Receive reverse handoff',
+        },
+        {
+          roleName: 'FAKE',
+          appliesTo: ['RB'],
+          notes: 'Fake sweep, hand off to WR',
+        },
+        {
+          roleName: 'ZONE_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone away from reverse',
+        },
+        {
+          roleName: 'STALK',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'stalk' },
+          notes: 'Block on perimeter',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'weak',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'special',
+        bestVsFront: ['even'],
+        bestVs3T: ['weak', 'none'],
+        bestWhenBox: ['6'],
+        surfaceNeeds: 'te_optional',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_reverse_exchange',
+          name: 'Reverse handoff',
+          drill: {
+            name: 'Reverse Drill',
+            purpose: 'Clean RB to WR exchange',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_bootleg',
+    name: 'Bootleg',
+    conceptType: 'run',
+    summary: 'Naked bootleg with QB run option',
+    badges: ['nfl_style', 'west_coast'],
+    requirements: {
+      preferredStructures: ['ace', 'I', '2x2'],
+      personnelHints: ['12', '21'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'FAKE',
+          appliesTo: ['RB'],
+          notes: 'Fake run opposite',
+        },
+        {
+          roleName: 'ZONE_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone away, sell run',
+        },
+        {
+          roleName: 'FLAT',
+          appliesTo: ['Y'],
+          defaultRoute: { pattern: 'flat', depth: 5 },
+          notes: 'Drag to flat',
+        },
+        {
+          roleName: 'CORNER',
+          appliesTo: ['Z'],
+          defaultRoute: { pattern: 'corner', depth: 15 },
+          notes: 'Corner route option',
+        },
+        {
+          roleName: 'BOOT',
+          appliesTo: ['QB'],
+          notes: 'Boot away, run or pass',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'weak',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'special',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['strong', 'both'],
+        bestWhenBox: ['7', '8'],
+        surfaceNeeds: 'te_required',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_bootleg_sell',
+          name: 'Run fake sell',
+          drill: {
+            name: 'Bootleg Drill',
+            purpose: 'OL sells run, QB boots out',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_waggle',
+    name: 'Waggle',
+    conceptType: 'run',
+    summary: 'Waggle with pulling guard for protection',
+    badges: ['nfl_style', 'west_coast'],
+    requirements: {
+      preferredStructures: ['ace', 'I', '2x2'],
+      personnelHints: ['12', '21'],
+      needsTE: true,
+      needsPuller: 'G',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'PULL',
+          appliesTo: ['RG'],
+          defaultBlock: { scheme: 'pull_lead', target: 'EMOL' },
+          notes: 'Pull and protect QB',
+        },
+        {
+          roleName: 'FAKE',
+          appliesTo: ['RB'],
+          notes: 'Fake run opposite',
+        },
+        {
+          roleName: 'ZONE_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RT'],
+          defaultBlock: { scheme: 'zone_step' },
+          notes: 'Zone away, sell run',
+        },
+        {
+          roleName: 'FLAT',
+          appliesTo: ['Y'],
+          defaultRoute: { pattern: 'flat', depth: 5 },
+          notes: 'Drag to flat',
+        },
+        {
+          roleName: 'DIG',
+          appliesTo: ['Z'],
+          defaultRoute: { pattern: 'dig', depth: 12 },
+          notes: 'Dig route option',
+        },
+        {
+          roleName: 'WAGGLE',
+          appliesTo: ['QB'],
+          notes: 'Waggle out, run or pass',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'weak',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'special',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['strong', 'both'],
+        bestWhenBox: ['7', '8'],
+        surfaceNeeds: 'te_required',
+        aim: 'edge',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_waggle_pull',
+          name: 'Guard pull protection',
+          drill: {
+            name: 'Waggle Drill',
+            purpose: 'G pulls for QB protection on rollout',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  // ============================================
+  // OPTION - ADDITIONAL (2)
+  // ============================================
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_triple_option',
+    name: 'Triple Option',
+    conceptType: 'run',
+    summary: 'Classic triple option with dive, keep, pitch',
+    badges: ['option'],
+    requirements: {
+      preferredStructures: ['I', 'wishbone', 'flexbone'],
+      personnelHints: ['21', '22'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '8_risky',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'VEER_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG'],
+          defaultBlock: { scheme: 'veer' },
+          notes: 'Veer release, leave DE/OLB unblocked',
+        },
+        {
+          roleName: 'ARC',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'arc', target: 'S' },
+          notes: 'Arc to safety',
+        },
+        {
+          roleName: 'DIVE',
+          appliesTo: ['FB'],
+          notes: 'Dive back for mesh',
+        },
+        {
+          roleName: 'PITCH',
+          appliesTo: ['RB'],
+          notes: 'Pitch relationship',
+        },
+        {
+          roleName: 'READ',
+          appliesTo: ['QB'],
+          notes: 'Read DE (give/keep), read OLB (keep/pitch)',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'option',
+        bestVsFront: ['even', 'odd'],
+        bestVs3T: ['weak', 'both'],
+        bestWhenBox: ['7', '8'],
+        surfaceNeeds: 'te_required',
+        aim: 'multiple',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_triple_mesh',
+          name: 'Triple option mesh',
+          drill: {
+            name: 'Triple Option Drill',
+            purpose: 'QB reads DE/OLB sequentially',
+            phase: 'team',
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    schemaVersion: '1.0',
+    type: 'concept',
+    id: 'run_midline_option',
+    name: 'Midline Option',
+    conceptType: 'run',
+    summary: 'Midline option reading 3-tech or nose',
+    badges: ['option'],
+    requirements: {
+      preferredStructures: ['I', 'pistol', 'ace'],
+      personnelHints: ['12', '21'],
+      needsTE: true,
+      needsPuller: 'none',
+      boxTolerance: '7_ok',
+    },
+    template: {
+      roles: [
+        {
+          roleName: 'VEER_OL',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          defaultBlock: { scheme: 'veer' },
+          notes: 'Veer release, leave read key unblocked',
+        },
+        {
+          roleName: 'ARC',
+          appliesTo: ['Y'],
+          defaultBlock: { scheme: 'arc', target: 'PSLB' },
+          notes: 'Arc to LB',
+        },
+        {
+          roleName: 'DIVE',
+          appliesTo: ['FB', 'RB'],
+          notes: 'Dive path for mesh',
+        },
+        {
+          roleName: 'READ',
+          appliesTo: ['QB'],
+          notes: 'Read 3-tech or nose: give or keep',
+        },
+      ],
+      buildPolicy: {
+        placementStrategy: 'relative_to_alignment',
+        defaultSide: 'strength',
+        conflictPolicy: 'add_layer',
+        runLandmarks: true,
+      },
+    },
+    suggestionHints: {
+      runHints: {
+        category: 'option',
+        bestVsFront: ['even', 'over'],
+        bestVs3T: ['strong', 'both'],
+        bestWhenBox: ['7'],
+        surfaceNeeds: 'te_required',
+        aim: 'a_gap',
+      },
+    },
+    installFocus: {
+      failurePoints: [
+        {
+          id: 'fp_midline_read',
+          name: 'Midline read key',
+          drill: {
+            name: 'Midline Drill',
+            purpose: 'QB reads DT, give or keep',
             phase: 'group',
           },
         },

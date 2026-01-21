@@ -23,16 +23,27 @@ export type RoutePattern =
   | 'slant'
   | 'arrow'
   | 'flat'
+  | 'quick_slant'
+  | 'hank'
   // Intermediate
   | 'curl'
   | 'dig'
   | 'out'
+  | 'in'
   | 'cross'
   | 'shallow'
   | 'whip'
   | 'over'
   | 'stick'
   | 'snag'
+  | 'drive'
+  | 'bench'
+  | 'out_and_up'
+  | 'out_up'
+  | 'texas'
+  | 'china'
+  | 'divide'
+  | 'scissor'
   // Deep
   | 'go'
   | 'post'
@@ -41,12 +52,23 @@ export type RoutePattern =
   | 'seam'
   | 'wheel'
   | 'return'
+  | 'comeback'
+  | 'skinny_post'
+  | 'follow'
+  | 'dragon'
   // Special
   | 'pivot'
   | 'bubble'
   | 'tunnel'
   | 'angle'
   | 'swing'
+  | 'delay'
+  | 'screen'
+  | 'slip'
+  | 'check_release'
+  | 'draw'
+  | 'flare'
+  | 'option'
   | 'custom';
 
 export type BlockScheme =
@@ -71,11 +93,27 @@ export type BlockScheme =
   | 'sift'
   | 'seal'
   | 'log'
-  | 'cut';
+  | 'cut'
+  // Perimeter
+  | 'crack'
+  | 'stalk'
+  | 'lead'
+  | 'iso'
+  | 'insert'
+  // Pass Protection
+  | 'pass_set'
+  | 'slide'
+  | 'hinge'
+  | 'fan'
+  // Option
+  | 'veer'
+  | 'midline'
+  | 'load'
+  | 'speed';
 
 export type MotionType = 'jet' | 'orbit' | 'return' | 'shift' | 'short' | 'custom';
 
-export type PreferredStructure = '2x2' | '3x1' | 'bunch' | 'stack' | 'trips' | 'twins' | 'ace' | 'I' | 'pistol' | 'empty';
+export type PreferredStructure = '2x2' | '3x1' | 'bunch' | 'stack' | 'trips' | 'twins' | 'ace' | 'I' | 'pistol' | 'empty' | 'wishbone' | 'flexbone' | 'veer' | 'wildcat' | 'pro' | 'singleback' | 'shotgun' | 'spread';
 
 export type Personnel = '10' | '11' | '12' | '13' | '20' | '21' | '22' | '23';
 
@@ -89,7 +127,7 @@ export type ThreeTechPosition = 'strong' | 'weak' | 'none' | 'both';
 
 export type DrillPhase = 'indy' | 'group' | 'team';
 
-export type CoverageStress = 'horizontal' | 'vertical' | 'flat_conflict' | 'mof' | 'boundary';
+export type CoverageStress = 'horizontal' | 'vertical' | 'flat_conflict' | 'mof' | 'boundary' | 'seam' | 'levels' | 'deep_middle' | 'sideline' | 'wheel' | 'corner' | 'flood' | 'high_low' | 'triangle';
 
 // ============================================
 // Video Reference (for Install Focus)
@@ -141,8 +179,10 @@ export interface BlockAssignment {
 }
 
 export interface MotionAssignment {
-  motionType: MotionType;
-  timing: 'pre_snap' | 'post_snap';
+  motionType?: MotionType;
+  pattern?: MotionType | string;
+  direction?: 'across' | 'towards' | 'away' | 'return';
+  timing?: 'pre_snap' | 'post_snap';
 }
 
 export interface TemplateRole {
@@ -156,7 +196,7 @@ export interface TemplateRole {
 
 export interface BuildPolicy {
   placementStrategy: 'relative_to_alignment' | 'absolute_template' | 'hybrid';
-  defaultSide: 'strength' | 'boundary' | 'field' | 'left' | 'right';
+  defaultSide: 'strength' | 'boundary' | 'field' | 'left' | 'right' | 'weak';
   conflictPolicy?: 'add_layer' | 'replace_actions';
   routeDepthScale?: number;
   runLandmarks?: boolean;
@@ -269,6 +309,8 @@ export interface FormationContext {
   personnel?: Personnel;
   receiverCount: number;
   hasTightEnd: boolean;
+  hasFullback?: boolean;
+  strengthSide?: 'left' | 'right';
   strength?: 'left' | 'right';
 }
 
