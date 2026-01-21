@@ -347,8 +347,8 @@ export function buildConceptActions(
 
     for (const player of matchingPlayers) {
       if (assignedPlayerIds.has(player.id)) continue;
-      // EXCEPTION: Never assign actions to the BALL
-      if (player.role === 'BALL') continue;
+      // EXCEPTION: Never assign actions to the BALL or QB
+      if (player.role === 'BALL' || player.role === 'QB') continue;
 
       const startPoint: Point = { x: player.alignment.x, y: player.alignment.y };
 

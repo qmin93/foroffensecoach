@@ -521,7 +521,7 @@ export const PASS_CONCEPTS: Concept[] = [
         {
           roleName: 'OVER',
           appliesTo: ['X'],
-          defaultRoute: { pattern: 'over', depth: 18, direction: 'inside' },
+          defaultRoute: { pattern: 'cross', depth: 18, direction: 'inside' },
           notes: 'Deep over route',
         },
         {
@@ -3050,7 +3050,7 @@ export const PASS_CONCEPTS: Concept[] = [
         {
           roleName: 'SCREEN',
           appliesTo: ['RB'],
-          defaultRoute: { pattern: 'draw', depth: 0 },
+          defaultRoute: { pattern: 'screen', depth: 2 },
           notes: 'Fake draw, catch screen',
         },
         {

@@ -4,7 +4,7 @@ import { Layer, Arrow, Line, Shape, Circle, Text } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useEditorStore } from '@/store/editorStore';
 import { Action, RouteAction, BlockAction, MotionAction, LandmarkAction, TextAction, Point, EndMarker, Player } from '@/types/dsl';
-import { toPixel, pointsToPixelArray } from '@/utils/coordinates';
+import { toPixel, toNormalized, pointsToPixelArray, findClosestSegment } from '@/utils/coordinates';
 
 interface ActionLayerProps {
   width: number;
@@ -85,6 +85,7 @@ function LineWithMarker({
   isSelected,
   isHovered = false,
   onClick,
+  onDoubleClick,
   onMouseEnter,
   onMouseLeave,
   opacity = 1,
@@ -98,6 +99,7 @@ function LineWithMarker({
   isSelected: boolean;
   isHovered?: boolean;
   onClick?: (e: KonvaEventObject<MouseEvent | TouchEvent>) => void;
+  onDoubleClick?: (e: KonvaEventObject<MouseEvent | TouchEvent>) => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   opacity?: number;
@@ -134,6 +136,8 @@ function LineWithMarker({
         lineJoin="round"
         onClick={onClick}
         onTap={onClick}
+        onDblClick={onDoubleClick}
+        onDblTap={onDoubleClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         hitStrokeWidth={20}
@@ -157,6 +161,8 @@ function LineWithMarker({
         lineJoin="round"
         onClick={onClick}
         onTap={onClick}
+        onDblClick={onDoubleClick}
+        onDblTap={onDoubleClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         hitStrokeWidth={20}
@@ -191,6 +197,7 @@ function EditHandle({
   x,
   y,
   onMouseDown,
+  onDoubleClick,
   color = '#3b82f6',
   isActive = false,
   label,
@@ -198,6 +205,7 @@ function EditHandle({
   x: number;
   y: number;
   onMouseDown: (e: KonvaEventObject<MouseEvent | TouchEvent>) => void;
+  onDoubleClick?: (e: KonvaEventObject<MouseEvent | TouchEvent>) => void;
   color?: string;
   isActive?: boolean;
   label?: string;
@@ -212,6 +220,8 @@ function EditHandle({
         fill="transparent"
         onMouseDown={onMouseDown}
         onTouchStart={onMouseDown}
+        onDblClick={onDoubleClick}
+        onDblTap={onDoubleClick}
       />
       {/* Visible handle */}
       <Circle
@@ -226,6 +236,8 @@ function EditHandle({
         shadowOpacity={0.3}
         onMouseDown={onMouseDown}
         onTouchStart={onMouseDown}
+        onDblClick={onDoubleClick}
+        onDblTap={onDoubleClick}
       />
       {/* Label */}
       {label && (
@@ -254,7 +266,11 @@ function RouteShape({
   onMouseLeave,
   players,
   onEditStart,
+  onEditStartByIndex,
+  onInsertPoint,
+  onDeletePoint,
   editingPointType,
+  editingPointIndex,
   isEditing,
 }: {
   action: RouteAction;
@@ -267,7 +283,11 @@ function RouteShape({
   onMouseLeave?: () => void;
   players: Player[];
   onEditStart: (actionId: string, pointType: 'start' | 'end' | 'control') => void;
+  onEditStartByIndex: (actionId: string, pointIndex: number) => void;
+  onInsertPoint: (actionId: string, point: Point, afterIndex: number) => void;
+  onDeletePoint: (actionId: string, pointIndex: number) => void;
   editingPointType: 'start' | 'end' | 'control' | null;
+  editingPointIndex: number | null;
   isEditing: boolean;
 }) {
   const { route, style, fromPlayerId } = action;
@@ -290,16 +310,40 @@ function RouteShape({
     onSelect(action.id, shiftKey);
   };
 
+  // Double-click on route to add a new bend point
+  const handleDoubleClick = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    e.cancelBubble = true;
+    if (!isSelected) return;
+
+    // Get click position
+    const stage = e.target.getStage();
+    if (!stage) return;
+    const pointerPos = stage.getPointerPosition();
+    if (!pointerPos) return;
+
+    // Convert to normalized coordinates
+    const clickPoint = toNormalized(pointerPos, width, height);
+
+    // Find closest segment
+    const result = findClosestSegment(clickPoint, controlPoints);
+    if (!result) return;
+
+    // Only add point if click is close enough to the line (threshold in normalized coords)
+    const threshold = 0.05;
+    if (result.distance <= threshold) {
+      onInsertPoint(action.id, result.closestPoint, result.segmentIndex);
+    }
+  };
+
   const handleMouseEnter = () => {
     onMouseEnter?.(action.id);
   };
 
+  // Use tension=0 for multi-point angular routes, tension for curved
   const tension = route.pathType === 'tension' ? (route.tension || 0.3) : 0;
 
-  // Get pixel positions for edit handles
-  const startPixel = controlPoints.length > 0 ? toPixel(controlPoints[0], width, height) : null;
-  const endPixel = controlPoints.length > 1 ? toPixel(controlPoints[controlPoints.length - 1], width, height) : null;
-  const controlPixel = controlPoints.length > 2 ? toPixel(controlPoints[1], width, height) : null;
+  // Get pixel positions for all control points
+  const allPointPixels = controlPoints.map(p => toPixel(p, width, height));
 
   return (
     <>
@@ -313,57 +357,66 @@ function RouteShape({
         isSelected={isSelected}
         isHovered={isHovered}
         onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={onMouseLeave}
       />
-      {/* Edit handles and guide lines when selected */}
+      {/* Edit handles for ALL control points when selected */}
       {isSelected && (
         <>
-          {/* Guide lines for curved paths (show control point connections) */}
-          {controlPixel && startPixel && endPixel && (
-            <>
+          {/* Guide lines connecting all points */}
+          {controlPoints.length > 2 && allPointPixels.map((pixel, i) => {
+            if (i === 0) return null;
+            const prevPixel = allPointPixels[i - 1];
+            return (
               <Line
-                points={[startPixel.x, startPixel.y, controlPixel.x, controlPixel.y]}
+                key={`guide-${i}`}
+                points={[prevPixel.x, prevPixel.y, pixel.x, pixel.y]}
                 stroke="#94a3b8"
                 strokeWidth={1}
                 dash={[4, 4]}
+                opacity={0.5}
               />
-              <Line
-                points={[controlPixel.x, controlPixel.y, endPixel.x, endPixel.y]}
-                stroke="#94a3b8"
-                strokeWidth={1}
-                dash={[4, 4]}
+            );
+          })}
+          {/* Render handles for all points */}
+          {allPointPixels.map((pixel, index) => {
+            const isFirst = index === 0;
+            const isLast = index === controlPoints.length - 1;
+            // Skip first point (attached to player) - it can't be dragged separately
+            if (isFirst) return null;
+
+            const isActiveByIndex = isEditing && editingPointIndex === index;
+            const isActiveByType = isEditing && (
+              (editingPointType === 'end' && isLast) ||
+              (editingPointType === 'control' && index === 1 && !isLast)
+            );
+            const isActive = isActiveByIndex || isActiveByType;
+
+            // Color: green for end point, orange for middle points
+            const color = isLast ? '#22c55e' : '#f59e0b';
+            // Label only for end point
+            const label = isLast ? 'End' : undefined;
+
+            return (
+              <EditHandle
+                key={`handle-${index}`}
+                x={pixel.x}
+                y={pixel.y}
+                onMouseDown={(e) => {
+                  e.cancelBubble = true;
+                  onEditStartByIndex(action.id, index);
+                }}
+                onDoubleClick={!isFirst && !isLast ? (e) => {
+                  e.cancelBubble = true;
+                  onDeletePoint(action.id, index);
+                } : undefined}
+                color={color}
+                isActive={isActive}
+                label={label}
               />
-            </>
-          )}
-          {/* End point handle */}
-          {endPixel && (
-            <EditHandle
-              x={endPixel.x}
-              y={endPixel.y}
-              onMouseDown={(e) => {
-                e.cancelBubble = true;
-                onEditStart(action.id, 'end');
-              }}
-              color="#22c55e"
-              isActive={isEditing && editingPointType === 'end'}
-              label="End"
-            />
-          )}
-          {/* Control point handle (for curved lines) */}
-          {controlPixel && (
-            <EditHandle
-              x={controlPixel.x}
-              y={controlPixel.y}
-              onMouseDown={(e) => {
-                e.cancelBubble = true;
-                onEditStart(action.id, 'control');
-              }}
-              color="#f59e0b"
-              isActive={isEditing && editingPointType === 'control'}
-              label="Curve"
-            />
-          )}
+            );
+          })}
         </>
       )}
     </>
@@ -716,6 +769,9 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
   const selectAction = useEditorStore((state) => state.selectAction);
   const setHoveredAction = useEditorStore((state) => state.setHoveredAction);
   const startEditingAction = useEditorStore((state) => state.startEditingAction);
+  const startEditingPointByIndex = useEditorStore((state) => state.startEditingPointByIndex);
+  const insertRoutePoint = useEditorStore((state) => state.insertRoutePoint);
+  const deleteRoutePoint = useEditorStore((state) => state.deleteRoutePoint);
   const mode = useEditorStore((state) => state.mode);
 
   const actions = propActions ?? storeActions;
@@ -723,6 +779,7 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
   // Editing state
   const editingActionId = useEditorStore((state) => state.editingActionId);
   const editingPointType = useEditorStore((state) => state.editingPointType);
+  const editingPointIndex = useEditorStore((state) => state.editingPointIndex);
 
   // Drawing state
   const drawingPhase = useEditorStore((state) => state.drawingPhase);
@@ -758,6 +815,23 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
     }
   };
 
+  const handleEditStartByIndex = (actionId: string, pointIndex: number) => {
+    if (isReadOnly) return;
+    if (mode === 'select') {
+      startEditingPointByIndex(actionId, pointIndex);
+    }
+  };
+
+  const handleInsertPoint = (actionId: string, point: Point, afterIndex: number) => {
+    if (isReadOnly) return;
+    insertRoutePoint(actionId, point, afterIndex);
+  };
+
+  const handleDeletePoint = (actionId: string, pointIndex: number) => {
+    if (isReadOnly) return;
+    deleteRoutePoint(actionId, pointIndex);
+  };
+
   const renderAction = (action: Action) => {
     const isSelected = !isReadOnly && selectedActionIds.includes(action.id);
     const isHovered = !isReadOnly && hoveredActionId === action.id;
@@ -778,7 +852,11 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
             onMouseLeave={handleMouseLeave}
             players={players}
             onEditStart={handleEditStart}
+            onEditStartByIndex={handleEditStartByIndex}
+            onInsertPoint={handleInsertPoint}
+            onDeletePoint={handleDeletePoint}
             editingPointType={isEditing ? editingPointType : null}
+            editingPointIndex={isEditing ? editingPointIndex : null}
             isEditing={isEditing}
           />
         );

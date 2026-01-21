@@ -367,6 +367,11 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
                 {drawingPhase === 'angular_drawing' && 'Click to add points, double-click or Enter to finish'}
               </div>
             )}
+
+            {/* Route Editing Tip */}
+            <div className="text-xs bg-zinc-700/50 text-zinc-400 p-2 rounded mt-2">
+              <strong>Tip:</strong> Select a route, then double-click on it to add bend points. Double-click on a bend point to delete it.
+            </div>
           </CardContent>
         </Card>
       )}

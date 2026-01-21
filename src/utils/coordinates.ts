@@ -86,3 +86,71 @@ export function snapToGrid(
     y: Math.round(position.y / gridSizeY) * gridSizeY,
   };
 }
+
+/**
+ * Find the closest point on a line segment to a given point
+ * Returns the closest point and the parameter t (0-1) along the segment
+ */
+export function closestPointOnSegment(
+  point: Point,
+  segStart: Point,
+  segEnd: Point
+): { closest: Point; t: number; distance: number } {
+  const dx = segEnd.x - segStart.x;
+  const dy = segEnd.y - segStart.y;
+  const lengthSq = dx * dx + dy * dy;
+
+  if (lengthSq === 0) {
+    // Segment is a point
+    return {
+      closest: segStart,
+      t: 0,
+      distance: distance(point, segStart),
+    };
+  }
+
+  // Project point onto line and clamp to segment
+  let t = ((point.x - segStart.x) * dx + (point.y - segStart.y) * dy) / lengthSq;
+  t = Math.max(0, Math.min(1, t));
+
+  const closest: Point = {
+    x: segStart.x + t * dx,
+    y: segStart.y + t * dy,
+  };
+
+  return {
+    closest,
+    t,
+    distance: distance(point, closest),
+  };
+}
+
+/**
+ * Find which segment of a multi-point path is closest to a given point
+ * Returns the segment index (insert after this index) and the closest point on that segment
+ */
+export function findClosestSegment(
+  point: Point,
+  pathPoints: Point[]
+): { segmentIndex: number; closestPoint: Point; distance: number } | null {
+  if (pathPoints.length < 2) return null;
+
+  let minDistance = Infinity;
+  let bestSegmentIndex = 0;
+  let bestClosestPoint = pathPoints[0];
+
+  for (let i = 0; i < pathPoints.length - 1; i++) {
+    const result = closestPointOnSegment(point, pathPoints[i], pathPoints[i + 1]);
+    if (result.distance < minDistance) {
+      minDistance = result.distance;
+      bestSegmentIndex = i;
+      bestClosestPoint = result.closest;
+    }
+  }
+
+  return {
+    segmentIndex: bestSegmentIndex,
+    closestPoint: bestClosestPoint,
+    distance: minDistance,
+  };
+}

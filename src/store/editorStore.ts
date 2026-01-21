@@ -53,6 +53,7 @@ interface EditorState {
   // Editing state (for modifying existing lines)
   editingActionId: string | null;
   editingPointType: 'start' | 'end' | 'control' | null;
+  editingPointIndex: number | null; // For multi-point editing (index in controlPoints array)
 
   // History for undo/redo
   history: Play[];
@@ -118,9 +119,12 @@ interface EditorActions {
 
   // Editing existing lines
   startEditingAction: (actionId: string, pointType: 'start' | 'end' | 'control') => void;
+  startEditingPointByIndex: (actionId: string, pointIndex: number) => void;
   updateEditingPoint: (point: Point) => void;
   finishEditingAction: () => void;
   updateRouteControlPoints: (actionId: string, controlPoints: Point[]) => void;
+  insertRoutePoint: (actionId: string, point: Point, afterIndex: number) => void;
+  deleteRoutePoint: (actionId: string, pointIndex: number) => void;
 
   // Play operations
   setPlay: (play: Play) => void;
@@ -448,12 +452,12 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
       { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
-      { role: 'WR', label: 'X', x: 0.25, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.22, y: -0.07 },
-      { role: 'WR', label: 'Y', x: 0.28, y: -0.07 },
-      { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
+      { role: 'WR', label: 'X', x: 0.95, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.58, y: -0.15 },
+      { role: 'TE', label: 'Y', x: 0.25, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.22, y: -0.08 },
+      { role: 'WR', label: 'Z', x: 0.18, y: -0.03 },
     ],
   },
   twinsLeft: {
@@ -465,7 +469,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RG', label: 'RG', x: 0.55, y: -0.03 },
       { role: 'LT', label: 'LT', x: 0.40, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.60, y: -0.03 },
-      { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
+      { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'H', x: 0.15, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
@@ -1130,6 +1134,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     angularPoints: [],
     editingActionId: null,
     editingPointType: null,
+    editingPointIndex: null,
     history: [],
     historyIndex: -1,
     stageWidth: 800,
@@ -1180,6 +1185,9 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     clearSelection: () => set((state) => {
       state.selectedPlayerIds = [];
       state.selectedActionIds = [];
+      state.editingActionId = null;
+      state.editingPointType = null;
+      state.editingPointIndex = null;
     }),
 
     selectAll: () => set((state) => {
@@ -1578,8 +1586,10 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     }),
 
     updateEditingPoint: (point) => set((state) => {
-      const { editingActionId, editingPointType } = state;
-      if (!editingActionId || !editingPointType) return;
+      const { editingActionId, editingPointType, editingPointIndex } = state;
+      if (!editingActionId) return;
+      // Either pointType or pointIndex must be set
+      if (editingPointType === null && editingPointIndex === null) return;
 
       const action = state.play.actions.find(a => a.id === editingActionId);
       if (!action) return;
@@ -1589,7 +1599,10 @@ export const useEditorStore = create<EditorState & EditorActions>()(
         const routeAction = action as RouteAction;
         const points = [...routeAction.route.controlPoints];
 
-        if (editingPointType === 'start' && points.length >= 1) {
+        // If editing by index, update that specific point
+        if (editingPointIndex !== null && editingPointIndex >= 0 && editingPointIndex < points.length) {
+          points[editingPointIndex] = point;
+        } else if (editingPointType === 'start' && points.length >= 1) {
           points[0] = point;
         } else if (editingPointType === 'end' && points.length >= 2) {
           points[points.length - 1] = point;
@@ -1605,7 +1618,9 @@ export const useEditorStore = create<EditorState & EditorActions>()(
         const blockAction = action as BlockAction;
         const points = [...blockAction.block.pathPoints];
 
-        if (editingPointType === 'start' && points.length >= 1) {
+        if (editingPointIndex !== null && editingPointIndex >= 0 && editingPointIndex < points.length) {
+          points[editingPointIndex] = point;
+        } else if (editingPointType === 'start' && points.length >= 1) {
           points[0] = point;
         } else if (editingPointType === 'end' && points.length >= 2) {
           points[points.length - 1] = point;
@@ -1621,7 +1636,9 @@ export const useEditorStore = create<EditorState & EditorActions>()(
         const motionAction = action as MotionAction;
         const points = [...motionAction.motion.pathPoints];
 
-        if (editingPointType === 'start' && points.length >= 1) {
+        if (editingPointIndex !== null && editingPointIndex >= 0 && editingPointIndex < points.length) {
+          points[editingPointIndex] = point;
+        } else if (editingPointType === 'start' && points.length >= 1) {
           points[0] = point;
         } else if (editingPointType === 'end' && points.length >= 2) {
           points[points.length - 1] = point;
@@ -1650,6 +1667,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       }
       state.editingActionId = null;
       state.editingPointType = null;
+      state.editingPointIndex = null;
     }),
 
     updateRouteControlPoints: (actionId, controlPoints) => set((state) => {
@@ -1664,6 +1682,56 @@ export const useEditorStore = create<EditorState & EditorActions>()(
           state.play.updatedAt = new Date().toISOString();
         }
       }
+    }),
+
+    // Start editing a specific point by index (for multi-point routes)
+    startEditingPointByIndex: (actionId, pointIndex) => set((state) => {
+      state.editingActionId = actionId;
+      state.editingPointType = null;
+      state.editingPointIndex = pointIndex;
+    }),
+
+    // Insert a new point into a route after the specified index
+    insertRoutePoint: (actionId, point, afterIndex) => set((state) => {
+      get().saveToHistory();
+      const action = state.play.actions.find(a => a.id === actionId);
+      if (!action || action.actionType !== 'route') return;
+
+      const routeAction = action as RouteAction;
+      const points = [...routeAction.route.controlPoints];
+
+      // Insert the new point after the specified index
+      points.splice(afterIndex + 1, 0, point);
+
+      routeAction.route.controlPoints = points;
+      // Update path type for multi-point routes
+      routeAction.route.pathType = 'straight';
+      routeAction.route.tension = 0;
+      state.play.updatedAt = new Date().toISOString();
+    }),
+
+    // Delete a point from a route by index (min 2 points required)
+    deleteRoutePoint: (actionId, pointIndex) => set((state) => {
+      const action = state.play.actions.find(a => a.id === actionId);
+      if (!action || action.actionType !== 'route') return;
+
+      const routeAction = action as RouteAction;
+      const points = [...routeAction.route.controlPoints];
+
+      // Don't delete if only 2 points left (start and end)
+      if (points.length <= 2) return;
+
+      // Don't delete first (start) or last (end) points
+      if (pointIndex === 0 || pointIndex === points.length - 1) return;
+
+      get().saveToHistory();
+      points.splice(pointIndex, 1);
+
+      routeAction.route.controlPoints = points;
+      // Update path type based on remaining points
+      routeAction.route.pathType = points.length > 2 ? 'straight' : 'straight';
+      routeAction.route.tension = 0;
+      state.play.updatedAt = new Date().toISOString();
     }),
 
     // Play operations
