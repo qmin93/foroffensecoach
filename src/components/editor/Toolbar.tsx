@@ -4,6 +4,7 @@ import { useEditorStore, FORMATION_PRESETS } from '@/store/editorStore';
 import { useConceptStore } from '@/store/conceptStore';
 import { EditorMode, PlayerShape, EndMarker, DrawLineType, LineStyle } from '@/types/dsl';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -121,7 +122,10 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
   const loadFormation = useEditorStore((state) => state.loadFormation);
   const toggleConceptPanel = useConceptStore((state) => state.togglePanel);
   const isPanelOpen = useConceptStore((state) => state.isPanelOpen);
+  const conceptId = useEditorStore((state) => state.play.meta?.conceptId);
+  const applyConceptTemplate = useEditorStore((state) => state.applyConceptTemplate);
 
+  const router = useRouter();
   const [addPlayerOpen, setAddPlayerOpen] = useState(false);
 
   const selectedPlayer =
@@ -694,6 +698,26 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
             ⧉ Duplicate
           </Button>
         </div>
+        {/* Regenerate Routes from Concept */}
+        {conceptId && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (conceptId) {
+                const result = applyConceptTemplate(conceptId);
+                if (result.success) {
+                  alert(`Regenerated ${result.actionsCreated} actions`);
+                } else {
+                  alert(`Failed: ${result.message}`);
+                }
+              }
+            }}
+            className="w-full mt-2 bg-orange-600 hover:bg-orange-500 border-orange-500 text-white text-xs"
+          >
+            🔄 Regenerate Routes
+          </Button>
+        )}
       </div>
 
       <Separator className="bg-zinc-700" />
@@ -728,6 +752,18 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
           Delete Selected
         </Button>
       )}
+
+      <Separator className="bg-zinc-700" />
+
+      {/* Home Button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => router.push('/dashboard')}
+        className="w-full bg-zinc-700 hover:bg-zinc-600 border-zinc-600 text-white"
+      >
+        🏠 Dashboard
+      </Button>
     </div>
   );
 }

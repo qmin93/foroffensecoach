@@ -6,6 +6,9 @@ import { useEditorStore } from '@/store/editorStore';
 import { useAuthStore } from '@/store/authStore';
 import { getPlay, databaseToPlayFormat } from '@/lib/api/plays';
 import { PlayEditor } from '@/components/editor/PlayEditor';
+import { getConceptById } from '@/data/concepts';
+import { buildConceptActions } from '@/lib/concept-builder';
+import { DEFAULT_PLAY_FIELD } from '@/types/dsl';
 
 export default function EditorPage() {
   const params = useParams();
@@ -37,6 +40,47 @@ export default function EditorPage() {
         }
 
         const play = databaseToPlayFormat(dbPlay);
+
+        // Fix field settings for plays with old/missing field properties
+        if (!play.field || !play.field.showYardLines) {
+          play.field = { ...DEFAULT_PLAY_FIELD, ...play.field };
+        }
+
+        // Auto-regenerate routes if play has conceptId but no/empty actions
+        // This fixes plays created before the buildConceptActions fix
+        const conceptId = play.meta?.conceptId;
+        const actionsArray = Array.isArray(play.actions) ? play.actions : [];
+        const hasNoActions = actionsArray.length === 0;
+        const hasPlayers = play.roster?.players && play.roster.players.length > 0;
+
+        console.log('Play loaded from DB:', {
+          name: play.name,
+          conceptId,
+          hasNoActions,
+          actionsCount: play.actions?.length ?? 0,
+          playersCount: play.roster?.players?.length ?? 0,
+          firstAction: play.actions?.[0],
+          fieldSettings: play.field,
+        });
+
+        // Regenerate routes BEFORE setting play if needed
+        if (conceptId && hasNoActions && hasPlayers) {
+          console.log('Auto-regenerating routes for conceptId:', conceptId);
+          const concept = getConceptById(conceptId);
+
+          if (concept) {
+            try {
+              const result = buildConceptActions(concept, play.roster.players);
+              play.actions = result.actions;
+              console.log(`Regenerated ${result.actionsCreated} actions for play`);
+            } catch (err) {
+              console.error('Failed to regenerate routes:', err);
+            }
+          } else {
+            console.error('Concept not found:', conceptId);
+          }
+        }
+
         setPlay(play);
       } catch (err) {
         console.error('Failed to load play:', err);

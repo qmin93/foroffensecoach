@@ -16,6 +16,58 @@ const DEFAULT_ACTION_STYLE: ActionStyle = {
   endMarker: 'arrow',
 };
 
+// Position alias mapping for concept matching
+// Concepts use labels like Y, Z, X, H, F but formations may use TE, WR, etc.
+const POSITION_ALIASES: Record<string, string[]> = {
+  // Receiver positions
+  'Y': ['TE', 'Y', 'U'],  // Y is typically TE
+  'Z': ['WR', 'Z', 'SE'],  // Z is split end / flanker
+  'X': ['WR', 'X', 'FL'],  // X is outside receiver
+  'H': ['WR', 'H', 'SLOT'],  // H is slot receiver
+  'F': ['WR', 'F', 'SLOT'],  // F is slot/flex
+  // Backfield
+  'RB': ['RB', 'TB', 'HB', 'B', 'TAIL'],  // Running back
+  'FB': ['FB', 'F', 'FULL'],  // Fullback
+  'WB': ['WB', 'WING'],  // Wingback
+  // Generic
+  'TE': ['TE', 'Y', 'U'],
+  'WR': ['WR', 'X', 'Z', 'H', 'F', 'SE', 'FL'],
+};
+
+/**
+ * Check if a player matches a role requirement
+ * Exported for use in editorStore
+ */
+export function playerMatchesRole(player: Player, roleMatch: string): boolean {
+  const upperRole = roleMatch.toUpperCase();
+  const playerRole = player.role?.toUpperCase() || '';
+  const playerLabel = player.label?.toUpperCase() || '';
+
+  // Direct match
+  if (playerRole.includes(upperRole) || playerLabel === upperRole) {
+    return true;
+  }
+
+  // Check aliases - if concept wants 'Y', also match 'TE'
+  const aliases = POSITION_ALIASES[upperRole] || [];
+  for (const alias of aliases) {
+    if (playerRole.includes(alias) || playerLabel === alias) {
+      return true;
+    }
+  }
+
+  // Reverse check - if player is 'TE' and concept wants 'Y'
+  for (const [key, vals] of Object.entries(POSITION_ALIASES)) {
+    if (vals.includes(upperRole)) {
+      if (playerRole.includes(key) || playerLabel === key) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 interface BuildConceptResult {
   actions: Action[];
   actionsCreated: number;
@@ -288,12 +340,9 @@ export function buildConceptActions(
 
   // Process each role in the template
   for (const role of template.roles) {
-    // Find matching players for this role
+    // Find matching players for this role using flexible position matching
     const matchingPlayers = players.filter((p) =>
-      role.appliesTo.some((roleMatch) =>
-        p.role.toUpperCase().includes(roleMatch.toUpperCase()) ||
-        p.label?.toUpperCase() === roleMatch.toUpperCase()
-      )
+      role.appliesTo.some((roleMatch) => playerMatchesRole(p, roleMatch))
     );
 
     for (const player of matchingPlayers) {

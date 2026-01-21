@@ -8,6 +8,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { FORMATION_PRESETS } from '@/store/editorStore';
 import { ALL_CONCEPTS } from '@/data/concepts';
+import { buildConceptActions } from './concept-builder';
 import type { Concept, FormationContext } from '@/types/concept';
 
 export interface GeneratedPlay {
@@ -339,6 +340,7 @@ export function getGeneratedPlaysStats(plays: GeneratedPlay[]) {
 export function convertGeneratedPlayToPlayDSL(generatedPlay: GeneratedPlay) {
   const formation = FORMATION_PRESETS[generatedPlay.formationKey];
   if (!formation) {
+    console.error(`Formation not found: ${generatedPlay.formationKey}`);
     throw new Error(`Formation not found: ${generatedPlay.formationKey}`);
   }
 
@@ -366,9 +368,26 @@ export function convertGeneratedPlayToPlayDSL(generatedPlay: GeneratedPlay) {
     },
   }));
 
-  // Build actions from concept template
-  const { buildConceptActions } = require('./concept-builder');
-  const { actions } = buildConceptActions(generatedPlay.concept, players);
+  // Build actions from concept template with error handling
+  let actions: ReturnType<typeof buildConceptActions>['actions'] = [];
+  try {
+    const result = buildConceptActions(generatedPlay.concept, players as any);
+    actions = result.actions;
+    console.log('Generated actions for play:', {
+      playName: generatedPlay.name,
+      conceptName: generatedPlay.concept.name,
+      formationKey: generatedPlay.formationKey,
+      playersCount: players.length,
+      actionsCount: actions.length,
+      firstAction: actions[0],
+    });
+  } catch (err) {
+    console.error('Error building concept actions:', err, {
+      concept: generatedPlay.concept.name,
+      formation: generatedPlay.formationKey,
+    });
+    // Continue with empty actions rather than failing
+  }
 
   return {
     schemaVersion: '1.0' as const,
@@ -388,11 +407,12 @@ export function convertGeneratedPlayToPlayDSL(generatedPlay: GeneratedPlay) {
       strength: 'right' as const,
     },
     field: {
-      displayHeight: 0.5,
-      yardLinePrimaryColor: '#ffffff',
-      yardLineSecondaryColor: '#888888',
-      losColor: '#ffcc00',
-      hashStyle: 'college' as const,
+      orientation: 'up' as const,
+      showGrid: true,
+      showHash: true,
+      showYardLines: true,
+      backgroundColor: '#ffffff',
+      lineColor: '#000000',
     },
     roster: {
       players,

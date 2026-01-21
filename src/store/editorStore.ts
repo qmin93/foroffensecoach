@@ -23,6 +23,7 @@ import {
   EndMarker,
 } from '@/types/dsl';
 import { getConceptById } from '@/data/concepts';
+import { playerMatchesRole } from '@/lib/concept-builder';
 
 interface EditorState {
   // Current play data
@@ -1693,13 +1694,16 @@ export const useEditorStore = create<EditorState & EditorActions>()(
 
     // Concept auto-build
     applyConceptTemplate: (conceptId) => {
+      console.log('applyConceptTemplate called with conceptId:', conceptId);
       const concept = getConceptById(conceptId);
+      console.log('Concept lookup result:', concept ? concept.name : 'NOT FOUND');
       if (!concept) {
-        return { success: false, actionsCreated: 0, message: 'Concept not found' };
+        return { success: false, actionsCreated: 0, message: `Concept not found: ${conceptId}` };
       }
 
       const state = get();
       const players = state.play.roster.players;
+      console.log('Players count:', players.length);
 
       if (players.length === 0) {
         return { success: false, actionsCreated: 0, message: 'No players on field' };
@@ -1719,12 +1723,9 @@ export const useEditorStore = create<EditorState & EditorActions>()(
 
         // Process each role in the template
         for (const role of template.roles) {
-          // Find matching players for this role
+          // Find matching players for this role using flexible position matching
           const matchingPlayers = draft.play.roster.players.filter((p) =>
-            role.appliesTo.some((roleMatch) =>
-              p.role.toUpperCase().includes(roleMatch.toUpperCase()) ||
-              p.label?.toUpperCase() === roleMatch.toUpperCase()
-            )
+            role.appliesTo.some((roleMatch) => playerMatchesRole(p, roleMatch))
           );
 
           for (const player of matchingPlayers) {
