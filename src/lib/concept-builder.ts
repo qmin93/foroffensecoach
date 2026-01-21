@@ -347,12 +347,15 @@ export function buildConceptActions(
 
     for (const player of matchingPlayers) {
       if (assignedPlayerIds.has(player.id)) continue;
+      // EXCEPTION: Never assign actions to the BALL
+      if (player.role === 'BALL') continue;
 
       const startPoint: Point = { x: player.alignment.x, y: player.alignment.y };
 
       // Create route action if specified
       if (role.defaultRoute) {
-        const routeDepth = (role.defaultRoute.depth ?? 10) / 100; // Convert yards to normalized
+        // Convert yards to normalized coordinates: 1 yard = 0.04 normalized y
+        const routeDepth = (role.defaultRoute.depth ?? 10) * 0.04;
         const { endPoint, controlPoint } = calculateRouteEndPoint(
           startPoint,
           role.defaultRoute.pattern,
@@ -468,10 +471,11 @@ export function buildConceptActions(
     // TE gets route or block based on concept type
     if (role === 'TE' || label === 'TE' || label === 'Y' || label === 'U') {
       if (isPassConcept) {
-        // Default flat route for TE
+        // Default flat route for TE (3 yards)
+        const teFlatDepth = 3 * 0.04; // 3 yards in normalized coords
         const endPoint: Point = {
           x: startPoint.x + (startPoint.x > 0.5 ? 0.1 : -0.1),
-          y: startPoint.y + 0.05,
+          y: startPoint.y + teFlatDepth,
         };
 
         const routeAction: RouteAction = {
@@ -527,9 +531,11 @@ export function buildConceptActions(
     // FB gets lead block for run, checkdown for pass
     if (role === 'FB' || label === 'FB') {
       if (isPassConcept) {
+        // FB checkdown (2 yards)
+        const fbCheckdownDepth = 2 * 0.04; // 2 yards in normalized coords
         const endPoint: Point = {
           x: startPoint.x + (startPoint.x > 0.5 ? 0.05 : -0.05),
-          y: startPoint.y + 0.03,
+          y: startPoint.y + fbCheckdownDepth,
         };
 
         const routeAction: RouteAction = {
@@ -584,10 +590,11 @@ export function buildConceptActions(
     // WR gets routes
     if (role === 'WR' || ['X', 'Z', 'H', 'F'].includes(label)) {
       if (isPassConcept) {
-        // Default go route for unassigned WRs
+        // Default go route for unassigned WRs (15 yards)
+        const wrRouteDepth = 15 * 0.04; // 15 yards in normalized coords
         const endPoint: Point = {
           x: startPoint.x,
-          y: startPoint.y + 0.2,
+          y: startPoint.y + wrRouteDepth,
         };
 
         const routeAction: RouteAction = {
@@ -643,10 +650,11 @@ export function buildConceptActions(
     // RB gets run path or checkdown
     if (role === 'RB' || label === 'RB' || label === 'HB') {
       if (isPassConcept) {
-        // Checkdown route
+        // Checkdown route (3 yards)
+        const rbCheckdownDepth = 3 * 0.04; // 3 yards in normalized coords
         const endPoint: Point = {
           x: startPoint.x + (startPoint.x > 0.5 ? 0.08 : -0.08),
-          y: startPoint.y + 0.05,
+          y: startPoint.y + rbCheckdownDepth,
         };
 
         const routeAction: RouteAction = {
@@ -667,15 +675,16 @@ export function buildConceptActions(
         actions.push(routeAction);
         actionsCreated++;
       } else {
-        // Run path for RB - draw a path toward the play side
+        // Run path for RB (15 yards) - draw a path toward the play side
+        const rbRunDepth = 15 * 0.04; // 15 yards in normalized coords
         const runEndPoint: Point = {
           x: startPoint.x + (defaultSide === 'right' ? 0.05 : -0.05),
-          y: startPoint.y + 0.15, // Run forward toward LOS and beyond
+          y: startPoint.y + rbRunDepth,
         };
 
         const controlPoint: Point = {
           x: startPoint.x,
-          y: startPoint.y + 0.08,
+          y: startPoint.y + rbRunDepth * 0.4,
         };
 
         const routeAction: RouteAction = {

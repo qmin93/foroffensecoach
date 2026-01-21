@@ -371,7 +371,19 @@ function RouteShape({
 }
 
 // Render Block action
-function BlockShape({ action, width, height, isSelected, isHovered = false, onSelect, onMouseEnter, onMouseLeave }: {
+function BlockShape({
+  action,
+  width,
+  height,
+  isSelected,
+  isHovered = false,
+  onSelect,
+  onMouseEnter,
+  onMouseLeave,
+  onEditStart,
+  editingPointType,
+  isEditing,
+}: {
   action: BlockAction;
   width: number;
   height: number;
@@ -380,6 +392,9 @@ function BlockShape({ action, width, height, isSelected, isHovered = false, onSe
   onSelect: (id: string, shiftKey: boolean) => void;
   onMouseEnter?: (id: string) => void;
   onMouseLeave?: () => void;
+  onEditStart: (actionId: string, pointType: 'start' | 'end' | 'control') => void;
+  editingPointType: 'start' | 'end' | 'control' | null;
+  isEditing: boolean;
 }) {
   const { block, style } = action;
   const points = pointsToPixelArray(block.pathPoints, width, height);
@@ -396,25 +411,109 @@ function BlockShape({ action, width, height, isSelected, isHovered = false, onSe
 
   const tension = block.pathType === 'tension' ? (block.tension || 0.3) : 0;
 
+  // Get pixel positions for edit handles
+  const pathPoints = block.pathPoints;
+  const startPixel = pathPoints.length > 0 ? toPixel(pathPoints[0], width, height) : null;
+  const endPixel = pathPoints.length > 1 ? toPixel(pathPoints[pathPoints.length - 1], width, height) : null;
+  const controlPixel = pathPoints.length > 2 ? toPixel(pathPoints[1], width, height) : null;
+
   return (
-    <LineWithMarker
-      points={points}
-      stroke={style.stroke}
-      strokeWidth={style.strokeWidth}
-      dash={getDash(style.lineStyle)}
-      tension={tension}
-      endMarker={style.endMarker}
-      isSelected={isSelected}
-      isHovered={isHovered}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={onMouseLeave}
-    />
+    <>
+      <LineWithMarker
+        points={points}
+        stroke={style.stroke}
+        strokeWidth={style.strokeWidth}
+        dash={getDash(style.lineStyle)}
+        tension={tension}
+        endMarker={style.endMarker}
+        isSelected={isSelected}
+        isHovered={isHovered}
+        onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={onMouseLeave}
+      />
+      {/* Edit handles and guide lines when selected */}
+      {isSelected && (
+        <>
+          {/* Guide lines for curved paths */}
+          {controlPixel && startPixel && endPixel && (
+            <>
+              <Line
+                points={[startPixel.x, startPixel.y, controlPixel.x, controlPixel.y]}
+                stroke="#94a3b8"
+                strokeWidth={1}
+                dash={[4, 4]}
+              />
+              <Line
+                points={[controlPixel.x, controlPixel.y, endPixel.x, endPixel.y]}
+                stroke="#94a3b8"
+                strokeWidth={1}
+                dash={[4, 4]}
+              />
+            </>
+          )}
+          {/* Start point handle */}
+          {startPixel && (
+            <EditHandle
+              x={startPixel.x}
+              y={startPixel.y}
+              onMouseDown={(e) => {
+                e.cancelBubble = true;
+                onEditStart(action.id, 'start');
+              }}
+              color="#3b82f6"
+              isActive={isEditing && editingPointType === 'start'}
+              label="Start"
+            />
+          )}
+          {/* End point handle */}
+          {endPixel && (
+            <EditHandle
+              x={endPixel.x}
+              y={endPixel.y}
+              onMouseDown={(e) => {
+                e.cancelBubble = true;
+                onEditStart(action.id, 'end');
+              }}
+              color="#22c55e"
+              isActive={isEditing && editingPointType === 'end'}
+              label="End"
+            />
+          )}
+          {/* Control point handle (for curved lines) */}
+          {controlPixel && (
+            <EditHandle
+              x={controlPixel.x}
+              y={controlPixel.y}
+              onMouseDown={(e) => {
+                e.cancelBubble = true;
+                onEditStart(action.id, 'control');
+              }}
+              color="#f59e0b"
+              isActive={isEditing && editingPointType === 'control'}
+              label="Curve"
+            />
+          )}
+        </>
+      )}
+    </>
   );
 }
 
 // Render Motion action
-function MotionShape({ action, width, height, isSelected, isHovered = false, onSelect, onMouseEnter, onMouseLeave }: {
+function MotionShape({
+  action,
+  width,
+  height,
+  isSelected,
+  isHovered = false,
+  onSelect,
+  onMouseEnter,
+  onMouseLeave,
+  onEditStart,
+  editingPointType,
+  isEditing,
+}: {
   action: MotionAction;
   width: number;
   height: number;
@@ -423,6 +522,9 @@ function MotionShape({ action, width, height, isSelected, isHovered = false, onS
   onSelect: (id: string, shiftKey: boolean) => void;
   onMouseEnter?: (id: string) => void;
   onMouseLeave?: () => void;
+  onEditStart: (actionId: string, pointType: 'start' | 'end' | 'control') => void;
+  editingPointType: 'start' | 'end' | 'control' | null;
+  isEditing: boolean;
 }) {
   const { motion, style } = action;
   const points = pointsToPixelArray(motion.pathPoints, width, height);
@@ -439,20 +541,92 @@ function MotionShape({ action, width, height, isSelected, isHovered = false, onS
 
   const tension = motion.pathType === 'tension' ? (motion.tension || 0.3) : 0;
 
+  // Get pixel positions for edit handles
+  const pathPoints = motion.pathPoints;
+  const startPixel = pathPoints.length > 0 ? toPixel(pathPoints[0], width, height) : null;
+  const endPixel = pathPoints.length > 1 ? toPixel(pathPoints[pathPoints.length - 1], width, height) : null;
+  const controlPixel = pathPoints.length > 2 ? toPixel(pathPoints[1], width, height) : null;
+
   return (
-    <LineWithMarker
-      points={points}
-      stroke={style.stroke}
-      strokeWidth={style.strokeWidth}
-      dash={getDash(style.lineStyle)}
-      tension={tension}
-      endMarker={style.endMarker}
-      isSelected={isSelected}
-      isHovered={isHovered}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={onMouseLeave}
-    />
+    <>
+      <LineWithMarker
+        points={points}
+        stroke={style.stroke}
+        strokeWidth={style.strokeWidth}
+        dash={getDash(style.lineStyle)}
+        tension={tension}
+        endMarker={style.endMarker}
+        isSelected={isSelected}
+        isHovered={isHovered}
+        onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={onMouseLeave}
+      />
+      {/* Edit handles and guide lines when selected */}
+      {isSelected && (
+        <>
+          {/* Guide lines for curved paths */}
+          {controlPixel && startPixel && endPixel && (
+            <>
+              <Line
+                points={[startPixel.x, startPixel.y, controlPixel.x, controlPixel.y]}
+                stroke="#94a3b8"
+                strokeWidth={1}
+                dash={[4, 4]}
+              />
+              <Line
+                points={[controlPixel.x, controlPixel.y, endPixel.x, endPixel.y]}
+                stroke="#94a3b8"
+                strokeWidth={1}
+                dash={[4, 4]}
+              />
+            </>
+          )}
+          {/* Start point handle */}
+          {startPixel && (
+            <EditHandle
+              x={startPixel.x}
+              y={startPixel.y}
+              onMouseDown={(e) => {
+                e.cancelBubble = true;
+                onEditStart(action.id, 'start');
+              }}
+              color="#3b82f6"
+              isActive={isEditing && editingPointType === 'start'}
+              label="Start"
+            />
+          )}
+          {/* End point handle */}
+          {endPixel && (
+            <EditHandle
+              x={endPixel.x}
+              y={endPixel.y}
+              onMouseDown={(e) => {
+                e.cancelBubble = true;
+                onEditStart(action.id, 'end');
+              }}
+              color="#22c55e"
+              isActive={isEditing && editingPointType === 'end'}
+              label="End"
+            />
+          )}
+          {/* Control point handle (for curved lines) */}
+          {controlPixel && (
+            <EditHandle
+              x={controlPixel.x}
+              y={controlPixel.y}
+              onMouseDown={(e) => {
+                e.cancelBubble = true;
+                onEditStart(action.id, 'control');
+              }}
+              color="#f59e0b"
+              isActive={isEditing && editingPointType === 'control'}
+              label="Curve"
+            />
+          )}
+        </>
+      )}
+    </>
   );
 }
 
@@ -619,6 +793,9 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
             onSelect={handleSelect}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onEditStart={handleEditStart}
+            editingPointType={isEditing ? editingPointType : null}
+            isEditing={isEditing}
           />
         );
       case 'motion':
@@ -633,6 +810,9 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
             onSelect={handleSelect}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onEditStart={handleEditStart}
+            editingPointType={isEditing ? editingPointType : null}
+            isEditing={isEditing}
           />
         );
       case 'landmark':

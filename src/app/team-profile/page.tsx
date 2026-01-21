@@ -6,6 +6,7 @@ import { useTeamProfileStore } from '@/store/teamProfileStore';
 import { RosterInput } from '@/components/team-profile/RosterInput';
 import { UnitStrengthInput } from '@/components/team-profile/UnitStrengthInput';
 import { StylePreferencesInput } from '@/components/team-profile/StylePreferencesInput';
+import { GlobalNavbar } from '@/components/layout/GlobalNavbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,8 +53,11 @@ export default function TeamProfilePage() {
 
   return (
     <div className="min-h-screen bg-zinc-900">
-      {/* Header */}
-      <header className="border-b border-zinc-700 bg-zinc-800">
+      {/* Global Navigation Bar */}
+      <GlobalNavbar />
+
+      {/* Page Header */}
+      <div className="border-b border-zinc-700 bg-zinc-800">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -71,7 +75,7 @@ export default function TeamProfilePage() {
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Progress Indicator */}
       <div className="border-b border-zinc-800 bg-zinc-900">

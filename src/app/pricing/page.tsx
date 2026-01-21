@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PRICING, SubscriptionTier } from '@/lib/subscription';
 import { useAuthStore } from '@/store/authStore';
+import { GlobalNavbar } from '@/components/layout/GlobalNavbar';
 
 export default function PricingPage() {
   const router = useRouter();
@@ -55,32 +56,8 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      {/* Header */}
-      <header className="border-b border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button
-            onClick={() => router.push('/')}
-            className="text-xl font-bold text-white hover:text-zinc-300 transition-colors"
-          >
-            ForOffenseCoach
-          </button>
-          {user ? (
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-            >
-              Dashboard
-            </button>
-          ) : (
-            <button
-              onClick={() => router.push('/auth/login')}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm transition-colors"
-            >
-              Sign In
-            </button>
-          )}
-        </div>
-      </header>
+      {/* Global Navigation Bar */}
+      <GlobalNavbar />
 
       {/* Pricing Content */}
       <main className="max-w-6xl mx-auto px-4 py-16">

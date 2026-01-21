@@ -2,7 +2,6 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { useAuthStore, selectIsAuthenticated, selectIsLoading } from '@/store/authStore';
 import { usePlaybookStore } from '@/store/playbookStore';
 import { PlaysGrid } from '@/components/dashboard/PlaysGrid';
@@ -10,6 +9,7 @@ import { PlaybooksGrid } from '@/components/dashboard/PlaybooksGrid';
 import { CreatePlaybookModal } from '@/components/dashboard/CreatePlaybookModal';
 import { QuickStartModal } from '@/components/dashboard/QuickStartModal';
 import { FormationRecommendPanel } from '@/components/recommendation';
+import { GlobalNavbar } from '@/components/layout/GlobalNavbar';
 import { type GeneratedPlay, convertGeneratedPlayToPlayDSL } from '@/lib/playbook-generator';
 import { createPlay } from '@/lib/api/plays';
 import { addPlayToPlaybook } from '@/lib/api/playbooks';
@@ -135,26 +135,8 @@ export default function DashboardPage() {
         <QuickStartHandler onQuickStart={() => setShowQuickStart(true)} />
       </Suspense>
 
-      {/* Header */}
-      <header className="border-b border-zinc-700 bg-zinc-800">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
-          <Link href="/" className="text-lg sm:text-xl font-bold hover:text-zinc-300 transition-colors">
-            FOC
-          </Link>
-
-          <div className="flex items-center gap-2 sm:gap-4">
-            <span className="text-xs sm:text-sm text-zinc-400 hidden sm:inline truncate max-w-[150px]">
-              {profile?.display_name || profile?.email}
-            </span>
-            <button
-              onClick={handleSignOut}
-              className="text-xs sm:text-sm text-zinc-400 hover:text-white transition-colors"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Global Navigation Bar */}
+      <GlobalNavbar />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">

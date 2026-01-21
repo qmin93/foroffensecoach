@@ -49,11 +49,17 @@ export function PlayerNode({
   const { shape, strokeWidth, labelFontSize, showLabel } =
     appearance;
 
+  // Check if this is the BALL - BALL has special handling
+  const isBall = player.role === 'BALL';
+
   // Responsive sizing: scale radius and font based on stage width
   // Desktop (~1200px): radius ~30px, Mobile (~400px): radius ~12px
   // Also cap at maxRadius to prevent overlap
+  // EXCEPTION: BALL uses fixed size from appearance.radius (default 10)
   const baseRadius = Math.max(12, Math.min(30, stageWidth * 0.025));
-  const radius = Math.min(baseRadius, maxRadius);
+  const radius = isBall
+    ? (appearance.radius || 10) // BALL uses its own fixed size
+    : Math.min(baseRadius, maxRadius);
   const responsiveLabelFontSize = Math.max(8, Math.min(14, stageWidth * 0.012));
 
   // Check if this player is the drawing source
@@ -90,11 +96,12 @@ export function PlayerNode({
 
     // Editor uses only black and white: white fill, black border
     // Selection/hover states use blue for visibility
+    // EXCEPTION: BALL uses its original brown color (#8B4513)
     const shapeProps = {
       x: 0,
       y: 0,
-      fill: '#ffffff', // Always white fill
-      stroke: isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : '#000000', // Black border (blue when selected/hovered)
+      fill: isBall ? (appearance.fill || '#8B4513') : '#ffffff', // BALL uses brown, others white
+      stroke: isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : (isBall ? '#ffffff' : '#000000'), // BALL has white border, others black
       strokeWidth: isHighlighted ? strokeWidth + 2 : isHovered ? strokeWidth + 1 : strokeWidth,
       shadowColor: isHovered && !isSelected ? '#3b82f6' : undefined,
       shadowBlur: isHovered && !isSelected ? 8 : 0,
@@ -162,8 +169,8 @@ export function PlayerNode({
               context.bezierCurveTo(w, h * 1.2, -w, h * 1.2, -w, 0);
               context.closePath();
               context.fillStrokeShape(shape);
-              // Draw laces (black, or blue when selected/hovered)
-              const laceColor = isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : '#000000';
+              // Draw laces - BALL uses white laces, others use black/blue
+              const laceColor = isHighlighted ? '#3b82f6' : isHovered ? '#60a5fa' : (isBall ? '#ffffff' : '#000000');
               context.save();
               context.strokeStyle = laceColor;
               context.lineWidth = strokeWidth * 0.7;

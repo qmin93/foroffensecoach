@@ -1509,21 +1509,56 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       if (!editingActionId || !editingPointType) return;
 
       const action = state.play.actions.find(a => a.id === editingActionId);
-      if (!action || action.actionType !== 'route') return;
+      if (!action) return;
 
-      const routeAction = action as RouteAction;
-      const points = [...routeAction.route.controlPoints];
+      // Handle route actions
+      if (action.actionType === 'route') {
+        const routeAction = action as RouteAction;
+        const points = [...routeAction.route.controlPoints];
 
-      if (editingPointType === 'start' && points.length >= 1) {
-        points[0] = point;
-      } else if (editingPointType === 'end' && points.length >= 2) {
-        points[points.length - 1] = point;
-      } else if (editingPointType === 'control' && points.length >= 3) {
-        points[1] = point;
+        if (editingPointType === 'start' && points.length >= 1) {
+          points[0] = point;
+        } else if (editingPointType === 'end' && points.length >= 2) {
+          points[points.length - 1] = point;
+        } else if (editingPointType === 'control' && points.length >= 3) {
+          points[1] = point;
+        }
+
+        routeAction.route.controlPoints = points;
+        state.play.updatedAt = new Date().toISOString();
       }
+      // Handle block actions
+      else if (action.actionType === 'block') {
+        const blockAction = action as BlockAction;
+        const points = [...blockAction.block.pathPoints];
 
-      routeAction.route.controlPoints = points;
-      state.play.updatedAt = new Date().toISOString();
+        if (editingPointType === 'start' && points.length >= 1) {
+          points[0] = point;
+        } else if (editingPointType === 'end' && points.length >= 2) {
+          points[points.length - 1] = point;
+        } else if (editingPointType === 'control' && points.length >= 3) {
+          points[1] = point;
+        }
+
+        blockAction.block.pathPoints = points;
+        state.play.updatedAt = new Date().toISOString();
+      }
+      // Handle motion actions
+      else if (action.actionType === 'motion') {
+        const motionAction = action as MotionAction;
+        const points = [...motionAction.motion.pathPoints];
+
+        if (editingPointType === 'start' && points.length >= 1) {
+          points[0] = point;
+        } else if (editingPointType === 'end' && points.length >= 2) {
+          points[points.length - 1] = point;
+        } else if (editingPointType === 'control' && points.length >= 3) {
+          points[1] = point;
+        }
+
+        motionAction.motion.pathPoints = points;
+        state.play.updatedAt = new Date().toISOString();
+      }
     }),
 
     finishEditingAction: () => set((state) => {
