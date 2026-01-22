@@ -28,7 +28,6 @@ import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { ZoomControls } from './ZoomControls';
 import { TopBar } from './TopBar';
 import { MobileBottomBar } from './MobileBottomBar';
-import { FloatingActions } from './FloatingActions';
 import { PropertiesPanel } from './PropertiesPanel';
 import { PlaysPanel } from './PlaysPanel';
 import { DrawingToolsPanel } from './DrawingToolsPanel';
@@ -812,23 +811,6 @@ export function PlayEditor() {
       <KeyboardShortcutsModal
         isOpen={showShortcuts}
         onClose={() => setShowShortcuts(false)}
-      />
-
-      {/* Floating Action Button - Desktop only */}
-      <FloatingActions
-        onAddPlayer={() => {
-          // Add a new player at center field
-          useEditorStore.getState().addPlayer(
-            'WR',
-            { x: 0.5, y: -0.1 },
-            {
-              shape: 'circle',
-              fill: '#ffffff',
-              stroke: '#000000',
-              showLabel: true,
-            }
-          );
-        }}
       />
 
       {/* Properties Panel - Shows when element is selected */}
