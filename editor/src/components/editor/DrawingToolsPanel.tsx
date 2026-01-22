@@ -6,12 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { PlayerShape, EndMarker, LineStyle, ZoneShapeType } from '@/types/dsl';
 import {
@@ -29,13 +23,6 @@ const PLAYER_SHAPES: { value: PlayerShape; label: string; preview: string }[] = 
   { value: 'diamond', label: 'Diamond', preview: '◇' },
   { value: 'star', label: 'Star', preview: '☆' },
   { value: 'x_mark', label: 'X Mark', preview: 'X' },
-];
-
-const PLAYER_SIZES = [
-  { value: 'xs', label: 'XS', size: 16, previewSize: 8 },
-  { value: 's', label: 'S', size: 24, previewSize: 12 },
-  { value: 'm', label: 'M', size: 32, previewSize: 16 },
-  { value: 'l', label: 'L', size: 40, previewSize: 20 },
 ];
 
 const FILL_COLORS = [
@@ -133,9 +120,7 @@ interface DrawingToolsPanelProps {
 
 export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
   // Player state
-  const [addPlayerOpen, setAddPlayerOpen] = useState(false);
   const [selectedShape, setSelectedShape] = useState<PlayerShape>('circle');
-  const [selectedSize, setSelectedSize] = useState('m');
   const [selectedFillColor, setSelectedFillColor] = useState('#ffffff');
   const [selectedLabelColor, setSelectedLabelColor] = useState('#000000');
   const [labelText, setLabelText] = useState('');
@@ -179,7 +164,6 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
         stroke: '#000000',
       });
     }
-    setAddPlayerOpen(false);
   };
 
   const handleShapeChange = (shape: PlayerShape) => {
@@ -210,14 +194,6 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
     }
   };
 
-  const handleSizeChange = (sizeValue: string) => {
-    setSelectedSize(sizeValue);
-    const sizeOption = PLAYER_SIZES.find((s) => s.value === sizeValue);
-    if (selectedPlayer && sizeOption) {
-      updatePlayerAppearance(selectedPlayer.id, { radius: sizeOption.size });
-    }
-  };
-
   // ===== Line Handlers =====
   const handleStraightLine = () => {
     setMode('draw');
@@ -237,53 +213,40 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
   return (
     <div className={`w-64 bg-card border-l border-border flex flex-col h-full overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="px-3 py-2 border-b border-border">
+      <div className="px-3 py-2 border-b border-border flex-shrink-0">
         <h2 className="text-sm font-semibold text-foreground">Tools</h2>
       </div>
 
+      {/* Add Player Buttons - Fixed under header */}
+      <div className="px-3 py-2 border-b border-border flex-shrink-0 space-y-2">
+        <Label className="text-[10px] text-muted-foreground uppercase tracking-wide block">Offense</Label>
+        <div className="grid grid-cols-5 gap-1">
+          {OFFENSE_PRESETS.map(({ role, label }) => (
+            <Button key={role} variant="secondary" size="sm" onClick={() => handleAddPlayer(role)}
+              className="bg-green-100 hover:bg-green-200 text-green-800 text-xs px-1 h-7">{label}</Button>
+          ))}
+        </div>
+        <Label className="text-[10px] text-muted-foreground uppercase tracking-wide block">Defense</Label>
+        <div className="grid grid-cols-5 gap-1">
+          {DEFENSE_PRESETS.map(({ role, label }) => (
+            <Button key={role} variant="secondary" size="sm" onClick={() => handleAddPlayer(role)}
+              className="bg-red-100 hover:bg-red-200 text-red-800 text-xs px-1 h-7">{label}</Button>
+          ))}
+        </div>
+        <Label className="text-[10px] text-muted-foreground uppercase tracking-wide block">Special</Label>
+        <div className="grid grid-cols-5 gap-1">
+          {SPECIAL_PRESETS.map(({ role, label }) => (
+            <Button key={role} variant="secondary" size="sm" onClick={() => handleAddPlayer(role)}
+              className="bg-muted hover:bg-muted/80 text-foreground text-xs px-1 h-7">{label}</Button>
+          ))}
+        </div>
+      </div>
+
       {/* Scrollable Content */}
-      <ScrollArea className="flex-1">
-        <div className="p-3">
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-3 pb-8">
           {/* ===== PLAYER Section ===== */}
           <Section title="PLAYER">
-            {/* Add Player */}
-            <Popover open={addPlayerOpen} onOpenChange={setAddPlayerOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full justify-start text-xs">
-                  + Add Player
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 p-3" align="start">
-                <div className="mb-3">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1.5 block">Offense</Label>
-                  <div className="grid grid-cols-5 gap-1">
-                    {OFFENSE_PRESETS.map(({ role, label }) => (
-                      <Button key={role} variant="secondary" size="sm" onClick={() => handleAddPlayer(role)}
-                        className="bg-green-100 hover:bg-green-200 text-green-800 text-xs px-1 h-7">{label}</Button>
-                    ))}
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1.5 block">Defense</Label>
-                  <div className="grid grid-cols-5 gap-1">
-                    {DEFENSE_PRESETS.map(({ role, label }) => (
-                      <Button key={role} variant="secondary" size="sm" onClick={() => handleAddPlayer(role)}
-                        className="bg-red-100 hover:bg-red-200 text-red-800 text-xs px-1 h-7">{label}</Button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1.5 block">Special</Label>
-                  <div className="grid grid-cols-5 gap-1">
-                    {SPECIAL_PRESETS.map(({ role, label }) => (
-                      <Button key={role} variant="secondary" size="sm" onClick={() => handleAddPlayer(role)}
-                        className="bg-muted hover:bg-muted/80 text-foreground text-xs px-1 h-7">{label}</Button>
-                    ))}
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-
             {/* Shape */}
             <div>
               <Label className="text-[10px] text-muted-foreground mb-1.5 block">Shape</Label>
@@ -293,22 +256,6 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
                     className={cn('h-8 w-8 flex items-center justify-center rounded border text-sm transition-colors',
                       selectedShape === value ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50 text-muted-foreground'
                     )} title={label}>{preview}</button>
-                ))}
-              </div>
-            </div>
-
-            {/* Size */}
-            <div>
-              <Label className="text-[10px] text-muted-foreground mb-1.5 block">Size</Label>
-              <div className="flex gap-1">
-                {PLAYER_SIZES.map(({ value, label, previewSize }) => (
-                  <button key={value} onClick={() => handleSizeChange(value)}
-                    className={cn('flex-1 h-8 flex flex-col items-center justify-center rounded border transition-colors gap-0.5',
-                      selectedSize === value ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'
-                    )} title={label}>
-                    <div className={cn('rounded-full border-2', selectedSize === value ? 'border-primary bg-primary/30' : 'border-muted-foreground bg-muted')}
-                      style={{ width: previewSize, height: previewSize }} />
-                  </button>
                 ))}
               </div>
             </div>
@@ -438,7 +385,7 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
             </div>
           </Section>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
