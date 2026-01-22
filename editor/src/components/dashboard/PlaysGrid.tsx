@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { PlayCard } from './PlayCard';
-import { getPlays, deletePlay, duplicatePlay, deleteAllPlays } from '@/lib/api/plays';
+import { getPlays, deletePlay, duplicatePlay } from '@/lib/api/plays';
 import { Tables } from '@/types/database';
 import { PlayCardSkeleton } from '@/components/ui/Skeleton';
 
@@ -19,8 +19,6 @@ export function PlaysGrid({ workspaceId, userId, onOpenPlay, onCreatePlay }: Pla
   const [plays, setPlays] = useState<PlayRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter plays based on search query
@@ -73,19 +71,6 @@ export function PlaysGrid({ workspaceId, userId, onOpenPlay, onCreatePlay }: Pla
     }
   };
 
-  const handleDeleteAll = async () => {
-    try {
-      setDeleting(true);
-      await deleteAllPlays(workspaceId);
-      setPlays([]);
-      setShowDeleteAllConfirm(false);
-    } catch (err) {
-      console.error('Failed to delete all plays:', err);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   if (loading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4">
@@ -115,12 +100,12 @@ export function PlaysGrid({ workspaceId, userId, onOpenPlay, onCreatePlay }: Pla
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 sm:mb-4">
-        <h3 className="text-base sm:text-lg font-medium text-foreground">My Plays ({plays.length})</h3>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3 sm:mb-4">
+        <h3 className="text-base sm:text-lg font-medium text-foreground shrink-0">My Plays ({plays.length})</h3>
 
         {/* Search Bar */}
         {plays.length > 0 && (
-          <div className="flex-1 max-w-md mx-0 sm:mx-4">
+          <div className="flex-1 max-w-md">
             <div className="relative">
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
@@ -155,52 +140,7 @@ export function PlaysGrid({ workspaceId, userId, onOpenPlay, onCreatePlay }: Pla
             </div>
           </div>
         )}
-
-        <div className="flex items-center gap-2">
-          {plays.length > 0 && (
-            <button
-              onClick={() => setShowDeleteAllConfirm(true)}
-              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm font-medium rounded-lg transition-colors"
-            >
-              Delete All
-            </button>
-          )}
-          <button
-            onClick={onCreatePlay}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-medium rounded-lg transition-colors"
-          >
-            + New Play
-          </button>
-        </div>
       </div>
-
-      {/* Delete All Confirmation Modal */}
-      {showDeleteAllConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card border border-border rounded-lg p-6 max-w-md mx-4 shadow-lg">
-            <h3 className="text-lg font-bold text-foreground mb-2">Delete All Plays?</h3>
-            <p className="text-muted-foreground mb-4">
-              This will permanently delete all {plays.length} plays. This action cannot be undone.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowDeleteAllConfirm(false)}
-                disabled={deleting}
-                className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteAll}
-                disabled={deleting}
-                className="px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-lg transition-colors disabled:opacity-50"
-              >
-                {deleting ? 'Deleting...' : 'Delete All'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Grid */}
       {plays.length === 0 ? (
