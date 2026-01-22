@@ -140,17 +140,17 @@ const cappedDepth = Math.min(routeDepth, 0.56);
 ## Visual Specifications (Canvas & Nodes)
 
 ### Canvas Aspect Ratio
-- Default: **16:9** (widescreen)
+- Default: **3:2** (balanced)
 - Location: `PlayEditor.tsx` line ~136
 ```typescript
-const aspectRatio = 16 / 9;
+const aspectRatio = 3 / 2;
 ```
 
 ### Node Sizing Formula
 ```typescript
 // PlayerNode.tsx - 1.8% of canvas width
 const baseRadius = Math.max(8, Math.min(18, stageWidth * 0.018));
-const responsiveLabelFontSize = Math.max(6, Math.min(9, stageWidth * 0.009));
+const responsiveLabelFontSize = Math.max(7, Math.min(10, stageWidth * 0.01));
 ```
 
 ### Formation Spacing (Normalized)
