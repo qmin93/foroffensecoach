@@ -965,6 +965,11 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
   const previewPoint = useEditorStore((state) => state.previewPoint);
   const angularPoints = useEditorStore((state) => state.angularPoints);
 
+  // Zone drag preview state
+  const zoneDragStart = useEditorStore((state) => state.zoneDragStart);
+  const zoneDragCurrent = useEditorStore((state) => state.zoneDragCurrent);
+  const zonePlacementConfig = useEditorStore((state) => state.zonePlacementConfig);
+
   const handleSelect = (actionId: string, shiftKey: boolean) => {
     if (isReadOnly) return;
     // Allow selection in select mode or any non-draw mode
@@ -1316,11 +1321,85 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
     });
   };
 
+  // Render zone drag preview
+  const renderZonePreview = () => {
+    if (!zoneDragStart || !zoneDragCurrent) return null;
+
+    const startPixel = toPixel(zoneDragStart, width, height);
+    const currentPixel = toPixel(zoneDragCurrent, width, height);
+
+    const x = Math.min(startPixel.x, currentPixel.x);
+    const y = Math.min(startPixel.y, currentPixel.y);
+    const zoneWidth = Math.abs(currentPixel.x - startPixel.x);
+    const zoneHeight = Math.abs(currentPixel.y - startPixel.y);
+
+    const centerX = x + zoneWidth / 2;
+    const centerY = y + zoneHeight / 2;
+
+    if (zonePlacementConfig.shape === 'circle') {
+      const radius = Math.min(zoneWidth, zoneHeight) / 2;
+      return (
+        <Circle
+          x={centerX}
+          y={centerY}
+          radius={radius}
+          fill={zonePlacementConfig.fillColor}
+          opacity={zonePlacementConfig.opacity / 100}
+          stroke={zonePlacementConfig.fillColor}
+          strokeWidth={2}
+          dash={[6, 4]}
+        />
+      );
+    }
+
+    if (zonePlacementConfig.shape === 'triangle') {
+      return (
+        <Shape
+          x={centerX}
+          y={centerY}
+          sceneFunc={(context, shape) => {
+            context.beginPath();
+            context.moveTo(0, -zoneHeight / 2);
+            context.lineTo(-zoneWidth / 2, zoneHeight / 2);
+            context.lineTo(zoneWidth / 2, zoneHeight / 2);
+            context.closePath();
+            context.fillStrokeShape(shape);
+          }}
+          fill={zonePlacementConfig.fillColor}
+          opacity={zonePlacementConfig.opacity / 100}
+          stroke={zonePlacementConfig.fillColor}
+          strokeWidth={2}
+          dash={[6, 4]}
+        />
+      );
+    }
+
+    // Default: square/rectangle
+    return (
+      <Shape
+        x={centerX}
+        y={centerY}
+        sceneFunc={(context, shape) => {
+          context.beginPath();
+          context.rect(-zoneWidth / 2, -zoneHeight / 2, zoneWidth, zoneHeight);
+          context.closePath();
+          context.fillStrokeShape(shape);
+        }}
+        fill={zonePlacementConfig.fillColor}
+        opacity={zonePlacementConfig.opacity / 100}
+        stroke={zonePlacementConfig.fillColor}
+        strokeWidth={2}
+        dash={[6, 4]}
+      />
+    );
+  };
+
   return (
     <Layer>
       {actions.map(renderAction)}
       {!isReadOnly && renderConceptPreview()}
       {!isReadOnly && renderDrawingPreview()}
+      {!isReadOnly && renderZonePreview()}
     </Layer>
   );
 }
