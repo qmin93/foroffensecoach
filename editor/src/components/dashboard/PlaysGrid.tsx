@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { PlayCard } from './PlayCard';
 import { getPlays, deletePlay, duplicatePlay, deleteAllPlays } from '@/lib/api/plays';
 import { Tables } from '@/types/database';
+import { PlayCardSkeleton } from '@/components/ui/Skeleton';
 
 type PlayRow = Tables<'plays'>;
 
@@ -74,10 +75,10 @@ export function PlaysGrid({ workspaceId, userId, onOpenPlay, onCreatePlay }: Pla
 
   if (loading) {
     return (
-      <div className="bg-card border border-border rounded-lg p-8">
-        <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4">
+        {[...Array(8)].map((_, i) => (
+          <PlayCardSkeleton key={i} />
+        ))}
       </div>
     );
   }

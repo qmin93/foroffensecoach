@@ -9,6 +9,7 @@ import { usePlaybookStore } from '@/store/playbookStore';
 import { PlayCard } from '@/components/dashboard/PlayCard';
 import { getPlays, deletePlay, duplicatePlay } from '@/lib/api/plays';
 import { Tables } from '@/types/database';
+import { PlaybookDetailSkeleton, PlaysGridSkeleton } from '@/components/ui/Skeleton';
 
 type PlayRow = Tables<'plays'>;
 
@@ -114,21 +115,17 @@ export default function PlaybookPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500" />
-      </div>
-    );
+    return <PlaybookDetailSkeleton />;
   }
 
   if (error || !currentPlaybook) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-red-400 mb-4">{error || 'Playbook not found'}</p>
+          <p className="text-destructive mb-4">{error || 'Playbook not found'}</p>
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg transition-colors"
           >
             Back to Dashboard
           </button>
@@ -138,20 +135,20 @@ export default function PlaybookPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b border-zinc-700 bg-zinc-800">
+      <header className="border-b border-border bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push('/dashboard')}
-              className="text-zinc-400 hover:text-white transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <Link href="/" className="text-xl font-bold hover:text-zinc-300 transition-colors">
+            <Link href="/" className="text-xl font-bold hover:text-muted-foreground transition-colors">
               ForOffenseCoach
             </Link>
           </div>
@@ -161,7 +158,7 @@ export default function PlaybookPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Playbook Header */}
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-6 mb-8">
+        <div className="bg-card border border-border rounded-lg p-6 mb-8">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               {isEditing ? (
@@ -170,12 +167,12 @@ export default function PlaybookPage() {
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="flex-1 bg-zinc-700 border border-zinc-600 rounded px-3 py-2 text-xl font-bold"
+                    className="flex-1 bg-muted border border-border rounded px-3 py-2 text-xl font-bold"
                     autoFocus
                   />
                   <button
                     onClick={handleSaveName}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm"
+                    className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-sm"
                   >
                     Save
                   </button>
@@ -184,21 +181,21 @@ export default function PlaybookPage() {
                       setEditName(currentPlaybook.name);
                       setIsEditing(false);
                     }}
-                    className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm"
+                    className="px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-sm"
                   >
                     Cancel
                   </button>
                 </div>
               ) : (
                 <h2
-                  className="text-2xl font-bold cursor-pointer hover:text-blue-400 transition-colors"
+                  className="text-2xl font-bold cursor-pointer hover:text-primary transition-colors"
                   onClick={() => setIsEditing(true)}
                   title="Click to edit"
                 >
                   {currentPlaybook.name}
                 </h2>
               )}
-              <p className="text-zinc-400 mt-2">
+              <p className="text-muted-foreground mt-2">
                 {plays.length} plays &bull; Updated{' '}
                 {formatDistanceToNow(new Date(currentPlaybook.updated_at), { addSuffix: true })}
               </p>
@@ -207,7 +204,7 @@ export default function PlaybookPage() {
                   {currentPlaybook.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 text-sm bg-blue-900/50 text-blue-300 rounded"
+                      className="px-2 py-1 text-sm bg-primary/10 text-primary rounded"
                     >
                       {tag}
                     </span>
@@ -217,14 +214,14 @@ export default function PlaybookPage() {
             </div>
             <div className="flex gap-2 ml-4">
               <button
-                onClick={() => router.push('/')}
-                className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm font-medium transition-colors"
+                onClick={() => router.push('/editor')}
+                className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-medium transition-colors"
               >
                 + Add Play
               </button>
               <button
                 onClick={handleDeletePlaybook}
-                className="px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-lg text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-destructive/10 hover:bg-destructive text-destructive hover:text-destructive-foreground rounded-lg text-sm font-medium transition-colors"
               >
                 Delete
               </button>
@@ -234,19 +231,17 @@ export default function PlaybookPage() {
 
         {/* Plays Grid */}
         {isLoadingPlays ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500" />
-          </div>
+          <PlaysGridSkeleton />
         ) : plays.length === 0 ? (
-          <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-8 text-center">
+          <div className="bg-card border border-border rounded-lg p-8 text-center">
             <div className="text-4xl mb-4">📋</div>
             <h3 className="text-lg font-medium mb-2">No Plays in This Playbook</h3>
-            <p className="text-zinc-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Add plays to this playbook from the editor
             </p>
             <button
-              onClick={() => router.push('/')}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-colors"
+              onClick={() => router.push('/editor')}
+              className="px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 font-medium rounded-lg transition-colors"
             >
               Create Play
             </button>

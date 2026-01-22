@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PlaybookCard } from './PlaybookCard';
 import { usePlaybookStore } from '@/store/playbookStore';
+import { PlaybookCardSkeleton } from '@/components/ui/Skeleton';
 
 interface PlaybooksGridProps {
   workspaceId: string;
@@ -45,10 +46,10 @@ export function PlaybooksGrid({ workspaceId, userId, onOpenPlaybook, onCreatePla
 
   if (isLoading) {
     return (
-      <div className="bg-card border border-border rounded-lg p-8">
-        <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {[...Array(6)].map((_, i) => (
+          <PlaybookCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
