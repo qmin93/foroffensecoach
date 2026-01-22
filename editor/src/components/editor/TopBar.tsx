@@ -187,22 +187,22 @@ export function TopBar({
 
         {/* Center Section: Formation Dropdown */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground font-medium">FORMATION</span>
+          <span className="text-sm text-foreground font-bold">FORMATION:</span>
           <Select value={selectedFormation} onValueChange={handleFormationChange}>
-            <SelectTrigger className="w-48 h-8 text-xs">
+            <SelectTrigger className="w-52 h-9 text-sm font-semibold">
               <SelectValue placeholder="Select Formation..." />
             </SelectTrigger>
             <SelectContent className="max-h-80">
               {Object.entries(FORMATION_CATEGORIES).map(([category, formations]) => (
                 <div key={category}>
-                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground font-semibold">
                     {category}
                   </DropdownMenuLabel>
                   {formations.map((key) => {
                     const formation = FORMATION_PRESETS[key];
                     if (!formation) return null;
                     return (
-                      <SelectItem key={key} value={key} className="text-xs">
+                      <SelectItem key={key} value={key} className="text-sm">
                         {formation.name}
                       </SelectItem>
                     );
