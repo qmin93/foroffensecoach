@@ -6,11 +6,11 @@ import { EditorMode } from '@/types/dsl';
 
 interface FloatingActionsProps {
   onAddPlayer: () => void;
-  onOpenConcepts: () => void;
+  onOpenConcepts?: () => void;
   showConcepts?: boolean;
 }
 
-export function FloatingActions({ onAddPlayer, onOpenConcepts, showConcepts = true }: FloatingActionsProps) {
+export function FloatingActions({ onAddPlayer, onOpenConcepts, showConcepts = false }: FloatingActionsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const mode = useEditorStore((state) => state.mode);
   const setMode = useEditorStore((state) => state.setMode);
@@ -85,8 +85,8 @@ export function FloatingActions({ onAddPlayer, onOpenConcepts, showConcepts = tr
             <span className="text-sm font-medium">Add Player</span>
           </button>
 
-          {/* Concepts - only show if no concept is applied yet */}
-          {showConcepts && (
+          {/* Concepts - only show if handler provided and no concept is applied yet */}
+          {showConcepts && onOpenConcepts && (
             <button
               onClick={() => { onOpenConcepts(); setIsExpanded(false); }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white shadow-lg transition-all"
