@@ -1,12 +1,6 @@
 'use client';
 
 import { useState, lazy, Suspense } from 'react';
-import { useEditorStore } from '@/store/editorStore';
-import { EditorMode } from '@/types/dsl';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/Skeleton';
 import {
@@ -17,13 +11,6 @@ import {
   FileText,
   Video,
   LayoutTemplate,
-  Plus,
-  Trash2,
-  Spline,
-  Copy,
-  FlipHorizontal2,
-  Group,
-  Ungroup,
 } from 'lucide-react';
 
 // Lazy load tab contents for better performance
@@ -70,39 +57,6 @@ interface DrawingToolsPanelProps {
 
 export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('player');
-  const [showLOS, setShowLOS] = useState(true);
-
-  const mode = useEditorStore((state) => state.mode);
-  const setMode = useEditorStore((state) => state.setMode);
-  const selectedPlayerIds = useEditorStore((state) => state.selectedPlayerIds);
-  const selectedActionIds = useEditorStore((state) => state.selectedActionIds);
-  const deletePlayer = useEditorStore((state) => state.deletePlayer);
-  const deleteAction = useEditorStore((state) => state.deleteAction);
-  const duplicateSelected = useEditorStore((state) => state.duplicateSelected);
-  const flipPlay = useEditorStore((state) => state.flipPlay);
-  const drawingConfig = useEditorStore((state) => state.drawingConfig);
-  const setDrawingConfig = useEditorStore((state) => state.setDrawingConfig);
-
-  const hasSelection = selectedPlayerIds.length > 0 || selectedActionIds.length > 0;
-
-  const handleRemove = () => {
-    selectedPlayerIds.forEach((id) => deletePlayer(id));
-    selectedActionIds.forEach((id) => deleteAction(id));
-  };
-
-  const handleDuplicate = () => {
-    duplicateSelected();
-  };
-
-  const handleStraightLine = () => {
-    setMode('draw');
-    setDrawingConfig({ lineType: 'straight' });
-  };
-
-  const handleCurveLine = () => {
-    setMode('draw');
-    setDrawingConfig({ lineType: 'curved' });
-  };
 
   return (
     <div className={`w-64 bg-card border-l border-border flex flex-col h-full overflow-hidden ${className}`}>
@@ -147,96 +101,6 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
       {/* Scrollable Content Area */}
       <ScrollArea className="flex-1">
         <div className="p-3">
-          {/* Line of Scrimmage Toggle */}
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
-            <Label htmlFor="los-toggle" className="text-xs font-medium">
-              LINE OF SCRIMMAGE
-            </Label>
-            <Switch
-              id="los-toggle"
-              checked={showLOS}
-              onCheckedChange={setShowLOS}
-            />
-          </div>
-
-          {/* Tool Buttons Grid */}
-          <div className="grid grid-cols-2 gap-2 mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 text-xs justify-start"
-              onClick={() => setActiveTab('player')}
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Add Player
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 text-xs justify-start"
-              onClick={handleRemove}
-              disabled={!hasSelection}
-            >
-              <Trash2 className="w-4 h-4 mr-1" />
-              Remove
-            </Button>
-            <Button
-              variant={mode === 'draw' && drawingConfig.lineType === 'straight' ? 'default' : 'outline'}
-              size="sm"
-              className="h-9 text-xs justify-start"
-              onClick={handleStraightLine}
-            >
-              <Minus className="w-4 h-4 mr-1" />
-              Straight Line
-            </Button>
-            <Button
-              variant={mode === 'draw' && drawingConfig.lineType === 'curved' ? 'default' : 'outline'}
-              size="sm"
-              className="h-9 text-xs justify-start"
-              onClick={handleCurveLine}
-            >
-              <Spline className="w-4 h-4 mr-1" />
-              Curve Line
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 text-xs justify-start"
-              onClick={flipPlay}
-            >
-              <FlipHorizontal2 className="w-4 h-4 mr-1" />
-              Flip Object
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 text-xs justify-start"
-              onClick={handleDuplicate}
-              disabled={selectedPlayerIds.length === 0}
-            >
-              <Copy className="w-4 h-4 mr-1" />
-              Duplicate
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 text-xs justify-start"
-              disabled
-            >
-              <Group className="w-4 h-4 mr-1" />
-              Group
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 text-xs justify-start"
-              disabled
-            >
-              <Ungroup className="w-4 h-4 mr-1" />
-              Ungroup
-            </Button>
-          </div>
-
           {/* Tab Content */}
           <Suspense fallback={<TabSkeleton />}>
             {activeTab === 'player' && <PlayerTab />}
