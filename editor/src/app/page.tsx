@@ -83,32 +83,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Demo Preview */}
-      <section className="py-16 px-4 bg-muted/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="rounded-xl border border-border overflow-hidden shadow-2xl">
-            <div className="bg-muted px-4 py-2 flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="ml-4 text-muted-foreground text-sm">ForOffenseCoach Editor</span>
-            </div>
-            <div className="aspect-video bg-card flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">🏈</div>
-                <Button
-                  onClick={() => router.push('/editor')}
-                  className="mt-4"
-                  variant="outline"
-                >
-                  Open Editor
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Features Grid */}
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
