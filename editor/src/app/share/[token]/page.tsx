@@ -12,6 +12,7 @@ import { PlayerLayer } from '@/components/editor/PlayerLayer';
 import { ActionLayer } from '@/components/editor/ActionLayer';
 import { Button } from '@/components/ui/button';
 import { Play } from '@/types/dsl';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function SharePage() {
   const params = useParams();
@@ -128,25 +129,36 @@ export default function SharePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4" />
-          <p className="text-zinc-400">Loading shared play...</p>
-        </div>
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border bg-card">
+          <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-24" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+        </header>
+        <main className="max-w-5xl mx-auto px-4 py-8">
+          <Skeleton className="w-full aspect-[4/3] rounded-lg" />
+        </main>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center max-w-md mx-4">
           <div className="text-5xl mb-4">🔗</div>
-          <h1 className="text-xl font-bold text-white mb-2">Link Not Found</h1>
-          <p className="text-zinc-400 mb-6">{error}</p>
+          <h1 className="text-xl font-bold text-foreground mb-2">Link Not Found</h1>
+          <p className="text-muted-foreground mb-6">{error}</p>
           <Button
             onClick={() => router.push('/')}
-            className="bg-blue-600 hover:bg-blue-500"
+            className="bg-primary hover:bg-primary/90"
           >
             Go to Editor
           </Button>
@@ -158,19 +170,19 @@ export default function SharePage() {
   if (!play) return null;
 
   return (
-    <div className="min-h-screen bg-zinc-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-zinc-700 bg-zinc-800">
+      <header className="border-b border-border bg-card">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-white">{play.name}</h1>
-            <p className="text-sm text-zinc-400">Shared play via ForOffenseCoach</p>
+            <h1 className="text-xl font-bold text-foreground">{play.name}</h1>
+            <p className="text-sm text-muted-foreground">Shared play via ForOffenseCoach</p>
           </div>
           <div className="flex items-center gap-3">
             <Button
               onClick={handleExportPNG}
               variant="outline"
-              className="border-zinc-600 hover:bg-zinc-700"
+              className="border-border hover:bg-muted"
             >
               Export PNG
             </Button>
@@ -178,7 +190,7 @@ export default function SharePage() {
               <Button
                 onClick={handleFork}
                 disabled={isForkingd}
-                className="bg-green-600 hover:bg-green-500"
+                className="bg-green-600 hover:bg-green-500 text-white"
               >
                 {isForkingd ? 'Copying...' : user ? 'Copy to My Plays' : 'Sign in to Copy'}
               </Button>
@@ -215,13 +227,13 @@ export default function SharePage() {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Tags */}
           {play.tags && play.tags.length > 0 && (
-            <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-              <h3 className="text-sm font-medium text-white mb-3">Tags</h3>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="text-sm font-medium text-foreground mb-3">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {play.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 text-sm bg-zinc-700 text-zinc-300 rounded"
+                    className="px-2 py-1 text-sm bg-muted text-muted-foreground rounded"
                   >
                     {tag}
                   </span>
@@ -232,12 +244,12 @@ export default function SharePage() {
 
           {/* Coaching Notes */}
           {play.notes?.coachingPoints && play.notes.coachingPoints.length > 0 && (
-            <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-              <h3 className="text-sm font-medium text-white mb-3">Coaching Points</h3>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="text-sm font-medium text-foreground mb-3">Coaching Points</h3>
               <ul className="space-y-2">
                 {play.notes.coachingPoints.map((point, index) => (
-                  <li key={index} className="text-sm text-zinc-300 flex gap-2">
-                    <span className="text-zinc-500">{index + 1}.</span>
+                  <li key={index} className="text-sm text-muted-foreground flex gap-2">
+                    <span className="text-muted-foreground/60">{index + 1}.</span>
                     <span>{point}</span>
                   </li>
                 ))}
@@ -248,9 +260,9 @@ export default function SharePage() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-zinc-500 text-sm">
+          <p className="text-muted-foreground text-sm">
             Create your own plays with{' '}
-            <a href="/" className="text-blue-400 hover:text-blue-300">
+            <a href="/" className="text-primary hover:text-primary/80">
               ForOffenseCoach
             </a>
           </p>

@@ -52,24 +52,24 @@ export default function TeamProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900">
+    <div className="min-h-screen bg-background">
       {/* Global Navigation Bar */}
       <GlobalNavbar />
 
       {/* Page Header */}
-      <div className="border-b border-zinc-700 bg-zinc-800">
+      <div className="border-b border-border bg-card">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-white">Team Profile Setup</h1>
-              <p className="text-sm text-zinc-400">
+              <h1 className="text-xl font-bold text-foreground">Team Profile Setup</h1>
+              <p className="text-sm text-muted-foreground">
                 Help us recommend the best formations for your team
               </p>
             </div>
             <Button
               variant="ghost"
               onClick={() => router.push('/dashboard')}
-              className="text-zinc-400 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
             >
               Skip for now
             </Button>
@@ -78,7 +78,7 @@ export default function TeamProfilePage() {
       </div>
 
       {/* Progress Indicator */}
-      <div className="border-b border-zinc-800 bg-zinc-900">
+      <div className="border-b border-border bg-background">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             {STEPS.map((step, index) => (
@@ -86,23 +86,23 @@ export default function TeamProfilePage() {
                 key={step.key}
                 onClick={() => setCurrentStep(step.key)}
                 className={`flex items-center gap-3 ${
-                  index <= currentStepIndex ? 'text-white' : 'text-zinc-500'
+                  index <= currentStepIndex ? 'text-foreground' : 'text-muted-foreground'
                 }`}
               >
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     step.key === currentStep
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-primary text-primary-foreground'
                       : index < currentStepIndex
                       ? 'bg-green-600 text-white'
-                      : 'bg-zinc-700 text-zinc-400'
+                      : 'bg-muted text-muted-foreground'
                   }`}
                 >
                   {index < currentStepIndex ? '✓' : index + 1}
                 </div>
                 <div className="hidden sm:block">
                   <div className="text-sm font-medium">{step.label}</div>
-                  <div className="text-xs text-zinc-500">{step.description}</div>
+                  <div className="text-xs text-muted-foreground">{step.description}</div>
                 </div>
               </button>
             ))}
@@ -114,13 +114,13 @@ export default function TeamProfilePage() {
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Team Name (always visible) */}
         {currentStep === 'roster' && (
-          <div className="mb-8 bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-            <Label className="text-white font-medium block mb-2">Team Name</Label>
+          <div className="mb-8 bg-card border border-border rounded-lg p-4">
+            <Label className="text-foreground font-medium block mb-2">Team Name</Label>
             <Input
               value={profile.teamName}
               onChange={(e) => setTeamName(e.target.value)}
               placeholder="Enter your team name"
-              className="bg-zinc-900 border-zinc-600 text-white text-lg"
+              className="bg-background border-border text-foreground text-lg"
             />
           </div>
         )}
@@ -148,31 +148,31 @@ export default function TeamProfilePage() {
         )}
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-zinc-700">
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
           <Button
             variant="outline"
             onClick={handlePrevious}
             disabled={currentStepIndex === 0}
-            className="border-zinc-600 text-zinc-300 hover:bg-zinc-800 disabled:opacity-50"
+            className="border-border text-muted-foreground hover:bg-muted disabled:opacity-50"
           >
             Previous
           </Button>
 
-          <div className="text-sm text-zinc-500">
+          <div className="text-sm text-muted-foreground">
             Step {currentStepIndex + 1} of {STEPS.length}
           </div>
 
           {currentStepIndex < STEPS.length - 1 ? (
             <Button
               onClick={handleNext}
-              className="bg-blue-600 hover:bg-blue-500"
+              className="bg-primary hover:bg-primary/90"
             >
               Next
             </Button>
           ) : (
             <Button
               onClick={handleComplete}
-              className="bg-green-600 hover:bg-green-500"
+              className="bg-green-600 hover:bg-green-500 text-white"
             >
               Complete Setup
             </Button>

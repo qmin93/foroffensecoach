@@ -55,7 +55,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Global Navigation Bar */}
       <GlobalNavbar />
 
@@ -63,13 +63,13 @@ export default function PricingPage() {
       <main className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-xl text-zinc-400">
+          <p className="text-xl text-muted-foreground">
             Choose the plan that works best for your coaching needs
           </p>
         </div>
 
         {error && (
-          <div className="max-w-md mx-auto mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-center">
+          <div className="max-w-md mx-auto mb-8 p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-center">
             {error}
           </div>
         )}
@@ -80,13 +80,13 @@ export default function PricingPage() {
               key={plan.tier}
               className={`relative rounded-2xl p-8 ${
                 plan.highlighted
-                  ? 'bg-gradient-to-b from-blue-600/20 to-blue-600/5 border-2 border-blue-500'
-                  : 'bg-zinc-900 border border-zinc-800'
+                  ? 'bg-gradient-to-b from-primary/20 to-primary/5 border-2 border-primary'
+                  : 'bg-card border border-border'
               }`}
             >
               {plan.highlighted && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full">
+                  <span className="px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full">
                     Most Popular
                   </span>
                 </div>
@@ -99,7 +99,7 @@ export default function PricingPage() {
                     {plan.price === 0 ? 'Free' : `$${plan.price}`}
                   </span>
                   {plan.price > 0 && (
-                    <span className="text-zinc-400">
+                    <span className="text-muted-foreground">
                       /{plan.period === 'monthly' ? 'mo' : 'season'}
                     </span>
                   )}
@@ -111,7 +111,7 @@ export default function PricingPage() {
                   <li key={index} className="flex items-start gap-3">
                     <svg
                       className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                        plan.highlighted ? 'text-blue-400' : 'text-green-400'
+                        plan.highlighted ? 'text-primary' : 'text-green-500'
                       }`}
                       fill="none"
                       viewBox="0 0 24 24"
@@ -124,7 +124,7 @@ export default function PricingPage() {
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    <span className="text-zinc-300">{feature}</span>
+                    <span className="text-muted-foreground">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -134,8 +134,8 @@ export default function PricingPage() {
                 disabled={loading !== null}
                 className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
                   plan.highlighted
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                    : 'bg-zinc-800 hover:bg-zinc-700 text-white'
+                    ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                    : 'bg-muted hover:bg-muted/80 text-foreground'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {loading === plan.tier ? (
@@ -177,28 +177,28 @@ export default function PricingPage() {
             Frequently Asked Questions
           </h2>
           <div className="space-y-6">
-            <div className="bg-zinc-900 rounded-lg p-6">
+            <div className="bg-card border border-border rounded-lg p-6">
               <h3 className="font-semibold mb-2">Can I cancel anytime?</h3>
-              <p className="text-zinc-400">
+              <p className="text-muted-foreground">
                 Yes, you can cancel your subscription at any time. Your access
                 will continue until the end of your billing period.
               </p>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-6">
+            <div className="bg-card border border-border rounded-lg p-6">
               <h3 className="font-semibold mb-2">
                 What happens to my plays if I downgrade?
               </h3>
-              <p className="text-zinc-400">
+              <p className="text-muted-foreground">
                 Your plays are never deleted. If you exceed the free tier limit,
                 you&apos;ll still be able to view them but won&apos;t be able to create new
                 ones until you upgrade or delete some plays.
               </p>
             </div>
-            <div className="bg-zinc-900 rounded-lg p-6">
+            <div className="bg-card border border-border rounded-lg p-6">
               <h3 className="font-semibold mb-2">
                 Is there a discount for annual billing?
               </h3>
-              <p className="text-zinc-400">
+              <p className="text-muted-foreground">
                 The Team plan is billed per season (approximately 5 months),
                 which already offers better value than monthly billing.
               </p>
@@ -208,8 +208,8 @@ export default function PricingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800 py-8 mt-20">
-        <div className="max-w-6xl mx-auto px-4 text-center text-zinc-500 text-sm">
+      <footer className="border-t border-border py-8 mt-20">
+        <div className="max-w-6xl mx-auto px-4 text-center text-muted-foreground text-sm">
           <p>&copy; 2025 ForOffenseCoach. All rights reserved.</p>
         </div>
       </footer>
