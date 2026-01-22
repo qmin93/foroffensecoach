@@ -14,7 +14,6 @@ import {
   Minus,
   Square,
   Type,
-  Star,
   FileText,
   Video,
   LayoutTemplate,
@@ -25,14 +24,12 @@ import {
   FlipHorizontal2,
   Group,
   Ungroup,
-  Eraser,
 } from 'lucide-react';
 
 // Lazy load tab contents for better performance
 const PlayerTab = lazy(() => import('./tabs/PlayerTab'));
 const LineTab = lazy(() => import('./tabs/LineTab'));
 const ZonesTab = lazy(() => import('./tabs/ZonesTab'));
-const SymbolTab = lazy(() => import('./tabs/SymbolTab'));
 
 // Skeleton component for loading states
 function TabSkeleton() {
@@ -57,7 +54,6 @@ const TABS = [
   { id: 'line', label: 'LINE', icon: Minus },
   { id: 'zones', label: 'ZONES', icon: Square },
   { id: 'text', label: 'TEXT', icon: Type },
-  { id: 'symbol', label: 'SYMBOL', icon: Star },
 ] as const;
 
 const SECONDARY_TABS = [
@@ -84,7 +80,6 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
   const deleteAction = useEditorStore((state) => state.deleteAction);
   const duplicateSelected = useEditorStore((state) => state.duplicateSelected);
   const flipPlay = useEditorStore((state) => state.flipPlay);
-  const resetPlay = useEditorStore((state) => state.resetPlay);
   const drawingConfig = useEditorStore((state) => state.drawingConfig);
   const setDrawingConfig = useEditorStore((state) => state.setDrawingConfig);
 
@@ -110,7 +105,7 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
   };
 
   return (
-    <div className={`w-64 bg-card border-l border-border flex flex-col h-full ${className}`}>
+    <div className={`w-64 bg-card border-l border-border flex flex-col h-full overflow-hidden ${className}`}>
       {/* Tab Navigation - Primary Tabs */}
       <div className="border-b border-border">
         <div className="flex flex-wrap">
@@ -123,7 +118,7 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
-              style={{ width: '20%' }}
+              style={{ width: '25%' }}
             >
               <tab.icon className="w-4 h-4 mb-0.5" />
               {tab.label}
@@ -240,15 +235,6 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
               <Ungroup className="w-4 h-4 mr-1" />
               Ungroup
             </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              className="h-9 text-xs justify-start col-span-2"
-              onClick={resetPlay}
-            >
-              <Eraser className="w-4 h-4 mr-1" />
-              Delete All
-            </Button>
           </div>
 
           {/* Tab Content */}
@@ -261,7 +247,6 @@ export function DrawingToolsPanel({ className }: DrawingToolsPanelProps) {
                 Text tool coming soon
               </div>
             )}
-            {activeTab === 'symbol' && <SymbolTab />}
             {activeTab === 'notes' && (
               <div className="text-center text-muted-foreground text-sm py-8">
                 Notes coming soon

@@ -23,12 +23,12 @@ const PLAYER_SHAPES: { value: PlayerShape; label: string; preview: string }[] = 
   { value: 'x_mark', label: 'X Mark', preview: 'X' },
 ];
 
-// Player size options
+// Player size options - with visual preview sizes
 const PLAYER_SIZES = [
-  { value: 'xs', label: 'XS', size: 16 },
-  { value: 's', label: 'S', size: 24 },
-  { value: 'm', label: 'M', size: 32 },
-  { value: 'l', label: 'L', size: 40 },
+  { value: 'xs', label: 'XS', size: 16, previewSize: 8 },
+  { value: 's', label: 'S', size: 24, previewSize: 12 },
+  { value: 'm', label: 'M', size: 32, previewSize: 16 },
+  { value: 'l', label: 'L', size: 40, previewSize: 20 },
 ];
 
 // Fill color palette
@@ -261,24 +261,35 @@ export default function PlayerTab() {
       <div>
         <Label className="text-xs font-medium mb-2 block">Player Size</Label>
         <div className="flex gap-1.5">
-          {PLAYER_SIZES.map(({ value, label }) => (
+          {PLAYER_SIZES.map(({ value, label, previewSize }) => (
             <button
               key={value}
               onClick={() => handleSizeChange(value)}
               className={cn(
-                'flex-1 h-9 flex items-center justify-center rounded border text-xs font-bold transition-colors',
+                'flex-1 h-10 flex flex-col items-center justify-center rounded border transition-colors gap-0.5',
                 selectedSize === value
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border hover:border-primary/50 text-muted-foreground'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border hover:border-primary/50'
               )}
+              title={label}
             >
-              T
+              <div
+                className={cn(
+                  'rounded-full border-2',
+                  selectedSize === value
+                    ? 'border-primary bg-primary/30'
+                    : 'border-muted-foreground bg-muted'
+                )}
+                style={{ width: previewSize, height: previewSize }}
+              />
+              <span className={cn(
+                'text-[9px] font-medium',
+                selectedSize === value ? 'text-primary' : 'text-muted-foreground'
+              )}>
+                {label}
+              </span>
             </button>
           ))}
-        </div>
-        <div className="flex justify-between text-[10px] text-muted-foreground mt-1 px-1">
-          <span>Small</span>
-          <span>Large</span>
         </div>
       </div>
 
