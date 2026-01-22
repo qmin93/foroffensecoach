@@ -59,7 +59,7 @@ export function PlayerNode({
   const radius = isBall
     ? (appearance.radius || 10) // BALL uses its own fixed size
     : Math.min(baseRadius, maxRadius);
-  const responsiveLabelFontSize = Math.max(6, Math.min(9, stageWidth * 0.009));
+  const responsiveLabelFontSize = Math.max(7, Math.min(10, stageWidth * 0.01));
 
   // Check if this player is the drawing source
   const isDrawingSource = drawingFromPlayerId === player.id;

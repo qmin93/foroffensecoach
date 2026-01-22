@@ -132,8 +132,8 @@ export function PlayEditor() {
       const availableWidth = rect.width - padding;
       const availableHeight = rect.height - padding;
 
-      // Maintain 16:9 aspect ratio (widescreen)
-      const aspectRatio = 16 / 9;
+      // Maintain 3:2 aspect ratio (balanced)
+      const aspectRatio = 3 / 2;
       let width = availableWidth;
       let height = width / aspectRatio;
 
