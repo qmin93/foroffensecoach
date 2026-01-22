@@ -115,6 +115,7 @@ export function PlayEditor() {
   const cancelPlacement = useEditorStore((state) => state.cancelPlacement);
   const zoneDragStart = useEditorStore((state) => state.zoneDragStart);
   const startZoneDrag = useEditorStore((state) => state.startZoneDrag);
+  const updateZoneDrag = useEditorStore((state) => state.updateZoneDrag);
   const finishZoneDrag = useEditorStore((state) => state.finishZoneDrag);
 
   // Computed undo/redo availability
@@ -245,8 +246,13 @@ export function PlayEditor() {
           setPreviewPoint(normalized);
         }
       }
+
+      // Handle zone drag preview
+      if (mode === 'zone' && zoneDragStart) {
+        updateZoneDrag(normalized);
+      }
     },
-    [mode, drawingPhase, stageWidth, stageHeight, setDrawingControlPoint, setPreviewPoint, editingActionId, updateEditingPoint]
+    [mode, drawingPhase, stageWidth, stageHeight, setDrawingControlPoint, setPreviewPoint, editingActionId, updateEditingPoint, zoneDragStart, updateZoneDrag]
   );
 
   // Handle mouse up for finishing editing and zone placement

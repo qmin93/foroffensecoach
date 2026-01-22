@@ -90,6 +90,7 @@ interface EditorState {
     opacity: number;
   };
   zoneDragStart: Point | null;
+  zoneDragCurrent: Point | null;
 }
 
 interface EditorActions {
@@ -186,6 +187,7 @@ interface EditorActions {
   setZoneConfig: (config: Partial<{ shape: ZoneShapeType; fillColor: string; opacity: number }>) => void;
   startZonePlacement: () => void;
   startZoneDrag: (position: Point) => void;
+  updateZoneDrag: (position: Point) => void;
   finishZoneDrag: (endPosition: Point) => void;
 
   // Transform operations
@@ -1187,6 +1189,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     // Zone placement state
     zonePlacementConfig: { shape: 'circle' as const, fillColor: '#3b82f6', opacity: 50 },
     zoneDragStart: null,
+    zoneDragCurrent: null,
 
     // Mode
     setMode: (mode) => set((state) => {
@@ -1555,6 +1558,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
         state.drawingStartPoint = null;
         state.drawingEndPoint = null;
         state.drawingControlPoint = null;
+        state.mode = 'select'; // Return to select mode after drawing
       });
     },
 
@@ -1612,6 +1616,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
           state.drawingControlPoint = null;
           state.previewPoint = null;
           state.angularPoints = [];
+          state.mode = 'select'; // Return to select mode after drawing
         });
       } else {
         // Cancel if not enough points
@@ -1621,6 +1626,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
           state.drawingStartPoint = null;
           state.angularPoints = [];
           state.previewPoint = null;
+          state.mode = 'select'; // Return to select mode
         });
       }
     },
@@ -2475,6 +2481,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       state.mode = 'select';
       state.placementPhase = 'idle';
       state.zoneDragStart = null;
+      state.zoneDragCurrent = null;
     }),
 
     // Zone placement
@@ -2494,6 +2501,11 @@ export const useEditorStore = create<EditorState & EditorActions>()(
 
     startZoneDrag: (position) => set((state) => {
       state.zoneDragStart = position;
+      state.zoneDragCurrent = position;
+    }),
+
+    updateZoneDrag: (position) => set((state) => {
+      state.zoneDragCurrent = position;
     }),
 
     finishZoneDrag: (endPosition) => set((state) => {
@@ -2509,6 +2521,9 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       // Minimum size check
       if (width < 0.02 || height < 0.02) {
         state.zoneDragStart = null;
+        state.zoneDragCurrent = null;
+        state.mode = 'select'; // Return to select mode
+        state.placementPhase = 'idle';
         return;
       }
 
@@ -2532,6 +2547,9 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       state.play.actions.push(zoneAction);
       state.play.updatedAt = new Date().toISOString();
       state.zoneDragStart = null;
+      state.zoneDragCurrent = null;
+      state.mode = 'select'; // Return to select mode after zone placement
+      state.placementPhase = 'idle';
     }),
 
     // Transform operations
