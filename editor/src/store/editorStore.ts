@@ -91,6 +91,10 @@ interface EditorState {
   };
   zoneDragStart: Point | null;
   zoneDragCurrent: Point | null;
+
+  // Marquee selection state
+  marqueeStart: Point | null;
+  marqueeEnd: Point | null;
 }
 
 interface EditorActions {
@@ -193,6 +197,11 @@ interface EditorActions {
   // Transform operations
   rotateSelected: (angleDelta: number) => void;
   scaleSelected: (scaleFactor: number) => void;
+
+  // Marquee selection
+  startMarqueeSelection: (start: Point) => void;
+  updateMarqueeSelection: (current: Point) => void;
+  finishMarqueeSelection: () => void;
 }
 
 const createEmptyPlay = (): Play => ({
@@ -1190,6 +1199,10 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     zonePlacementConfig: { shape: 'circle' as const, fillColor: '#3b82f6', opacity: 50 },
     zoneDragStart: null,
     zoneDragCurrent: null,
+
+    // Marquee selection state
+    marqueeStart: null,
+    marqueeEnd: null,
 
     // Mode
     setMode: (mode) => set((state) => {
@@ -2593,6 +2606,92 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       });
 
       state.play.updatedAt = new Date().toISOString();
+    }),
+
+    // Marquee selection
+    startMarqueeSelection: (start) => set((state) => {
+      state.marqueeStart = start;
+      state.marqueeEnd = start;
+    }),
+
+    updateMarqueeSelection: (current) => set((state) => {
+      state.marqueeEnd = current;
+    }),
+
+    finishMarqueeSelection: () => set((state) => {
+      if (!state.marqueeStart || !state.marqueeEnd) {
+        state.marqueeStart = null;
+        state.marqueeEnd = null;
+        return;
+      }
+
+      // Calculate bounds
+      const minX = Math.min(state.marqueeStart.x, state.marqueeEnd.x);
+      const maxX = Math.max(state.marqueeStart.x, state.marqueeEnd.x);
+      const minY = Math.min(state.marqueeStart.y, state.marqueeEnd.y);
+      const maxY = Math.max(state.marqueeStart.y, state.marqueeEnd.y);
+
+      // Minimum size check - if too small, treat as a click (clear selection)
+      if (maxX - minX < 0.01 && maxY - minY < 0.01) {
+        state.marqueeStart = null;
+        state.marqueeEnd = null;
+        return;
+      }
+
+      // Find players within bounds
+      const playersInBounds = state.play.roster.players.filter((player) => {
+        return (
+          player.alignment.x >= minX &&
+          player.alignment.x <= maxX &&
+          player.alignment.y >= minY &&
+          player.alignment.y <= maxY
+        );
+      });
+
+      // Find actions within bounds (check path points or center)
+      const actionsInBounds = state.play.actions.filter((action) => {
+        if (action.actionType === 'zone' && 'zone' in action) {
+          // Zone: check center position
+          return (
+            action.zone.x >= minX &&
+            action.zone.x <= maxX &&
+            action.zone.y >= minY &&
+            action.zone.y <= maxY
+          );
+        } else if (action.actionType === 'symbol' && 'symbol' in action) {
+          // Symbol: check position
+          return (
+            action.symbol.x >= minX &&
+            action.symbol.x <= maxX &&
+            action.symbol.y >= minY &&
+            action.symbol.y <= maxY
+          );
+        } else if (action.actionType === 'route' && 'route' in action) {
+          // Route: check if any control point is within bounds
+          return action.route.controlPoints.some(
+            (p) => p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY
+          );
+        } else if (action.actionType === 'block' && 'block' in action) {
+          // Block: check if any path point is within bounds
+          return action.block.pathPoints.some(
+            (p) => p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY
+          );
+        } else if (action.actionType === 'motion' && 'motion' in action) {
+          // Motion: check if any path point is within bounds
+          return action.motion.pathPoints.some(
+            (p) => p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY
+          );
+        }
+        return false;
+      });
+
+      // Update selection
+      state.selectedPlayerIds = playersInBounds.map((p) => p.id);
+      state.selectedActionIds = actionsInBounds.map((a) => a.id);
+
+      // Clear marquee state
+      state.marqueeStart = null;
+      state.marqueeEnd = null;
     }),
   }))
 );

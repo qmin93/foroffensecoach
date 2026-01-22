@@ -96,7 +96,6 @@ export default function LandingPage() {
             <div className="aspect-video bg-card flex items-center justify-center">
               <div className="text-center">
                 <div className="text-6xl mb-4">🏈</div>
-                <p className="text-muted-foreground">Interactive Playbook Editor</p>
                 <Button
                   onClick={() => router.push('/editor')}
                   className="mt-4"

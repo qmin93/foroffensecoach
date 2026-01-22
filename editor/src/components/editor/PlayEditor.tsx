@@ -10,6 +10,7 @@ import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { FieldLayer } from './FieldLayer';
 import { PlayerLayer } from './PlayerLayer';
 import { ActionLayer } from './ActionLayer';
+import { SelectionLayer } from './SelectionLayer';
 import { EditorBottomBar } from './EditorBottomBar';
 import { Toolbar } from './Toolbar';
 import { ContextMenu } from './ContextMenu';
@@ -118,6 +119,12 @@ export function PlayEditor() {
   const updateZoneDrag = useEditorStore((state) => state.updateZoneDrag);
   const finishZoneDrag = useEditorStore((state) => state.finishZoneDrag);
 
+  // Marquee selection
+  const marqueeStart = useEditorStore((state) => state.marqueeStart);
+  const startMarqueeSelection = useEditorStore((state) => state.startMarqueeSelection);
+  const updateMarqueeSelection = useEditorStore((state) => state.updateMarqueeSelection);
+  const finishMarqueeSelection = useEditorStore((state) => state.finishMarqueeSelection);
+
   // Computed undo/redo availability
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -206,12 +213,27 @@ export function PlayEditor() {
         return;
       }
 
-      // Only deselect if clicking on the stage background in select mode
+      // In select mode, we handle deselection in finishMarqueeSelection
+      // Small drags are treated as clicks
+    },
+    [mode, drawingPhase, placementPhase, zoneDragStart, stageWidth, stageHeight, setDrawingEndPoint, confirmDrawing, addAngularPoint, placeSymbol, startZoneDrag]
+  );
+
+  // Handle mouse down for starting marquee selection
+  const handleMouseDown = useCallback(
+    (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+      const stage = e.target.getStage();
+      if (!stage) return;
+
+      // Only start marquee if clicking on stage background in select mode
       if (e.target === stage && mode === 'select') {
-        clearSelection();
+        const pointerPos = stage.getPointerPosition();
+        if (!pointerPos) return;
+        const normalized = toNormalized(pointerPos, stageWidth, stageHeight);
+        startMarqueeSelection(normalized);
       }
     },
-    [mode, drawingPhase, placementPhase, zoneDragStart, stageWidth, stageHeight, setDrawingEndPoint, confirmDrawing, clearSelection, addAngularPoint, placeSymbol, startZoneDrag]
+    [mode, stageWidth, stageHeight, startMarqueeSelection]
   );
 
   // Handle mouse move for drawing preview and control point adjustment
@@ -251,11 +273,16 @@ export function PlayEditor() {
       if (mode === 'zone' && zoneDragStart) {
         updateZoneDrag(normalized);
       }
+
+      // Handle marquee selection drag
+      if (mode === 'select' && marqueeStart) {
+        updateMarqueeSelection(normalized);
+      }
     },
-    [mode, drawingPhase, stageWidth, stageHeight, setDrawingControlPoint, setPreviewPoint, editingActionId, updateEditingPoint, zoneDragStart, updateZoneDrag]
+    [mode, drawingPhase, stageWidth, stageHeight, setDrawingControlPoint, setPreviewPoint, editingActionId, updateEditingPoint, zoneDragStart, updateZoneDrag, marqueeStart, updateMarqueeSelection]
   );
 
-  // Handle mouse up for finishing editing and zone placement
+  // Handle mouse up for finishing editing, zone placement, and marquee selection
   const handleMouseUp = useCallback(
     (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
       // Handle zone drag end
@@ -269,11 +296,17 @@ export function PlayEditor() {
         return;
       }
 
+      // Handle marquee selection end
+      if (mode === 'select' && marqueeStart) {
+        finishMarqueeSelection();
+        return;
+      }
+
       if (editingActionId) {
         finishEditingAction();
       }
     },
-    [editingActionId, finishEditingAction, mode, zoneDragStart, stageWidth, stageHeight, finishZoneDrag]
+    [editingActionId, finishEditingAction, mode, zoneDragStart, stageWidth, stageHeight, finishZoneDrag, marqueeStart, finishMarqueeSelection]
   );
 
   // Handle double-click for confirming angular drawing
@@ -711,16 +744,19 @@ export function PlayEditor() {
             height={stageHeight}
             onClick={handleStageClick}
             onDblClick={handleDoubleClick}
+            onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onTap={handleStageClick}
             onDblTap={handleDoubleClick}
+            onTouchStart={handleMouseDown}
             onTouchEnd={handleMouseUp}
             onContextMenu={handleContextMenu}
           >
             <FieldLayer width={stageWidth} height={stageHeight} />
             <ActionLayer width={stageWidth} height={stageHeight} />
             <PlayerLayer width={stageWidth} height={stageHeight} />
+            <SelectionLayer width={stageWidth} height={stageHeight} />
           </Stage>
         </div>
         </div>
