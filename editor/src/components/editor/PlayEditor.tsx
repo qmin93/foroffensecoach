@@ -11,6 +11,7 @@ import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { FieldLayer } from './FieldLayer';
 import { PlayerLayer } from './PlayerLayer';
 import { ActionLayer } from './ActionLayer';
+import { EditorBottomBar } from './EditorBottomBar';
 import { Toolbar } from './Toolbar';
 import { ContextMenu } from './ContextMenu';
 import { ConceptPanel } from './ConceptPanel';
@@ -27,12 +28,11 @@ import { FeatureAccess } from '@/lib/subscription';
 import { toast } from '@/store/toastStore';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { ZoomControls } from './ZoomControls';
-import { SituationHeader } from './SituationHeader';
 import { TopBar } from './TopBar';
-import { FormationBar } from './FormationBar';
 import { MobileBottomBar } from './MobileBottomBar';
 import { FloatingActions } from './FloatingActions';
 import { PropertiesPanel } from './PropertiesPanel';
+import { PlaysPanel } from './PlaysPanel';
 
 export function PlayEditor() {
   const stageRef = useRef<Konva.Stage>(null);
@@ -67,6 +67,9 @@ export function PlayEditor() {
 
   // Keyboard shortcuts modal
   const [showShortcuts, setShowShortcuts] = useState(false);
+
+  // Plays panel state (default open if authenticated)
+  const [isPlaysPanelOpen, setIsPlaysPanelOpen] = useState(true);
 
   // Auth state
   const { user, workspace } = useAuthStore();
@@ -129,8 +132,8 @@ export function PlayEditor() {
       const availableWidth = rect.width - padding;
       const availableHeight = rect.height - padding;
 
-      // Maintain 4:3 aspect ratio
-      const aspectRatio = 4 / 3;
+      // Maintain 16:9 aspect ratio (widescreen)
+      const aspectRatio = 16 / 9;
       let width = availableWidth;
       let height = width / aspectRatio;
 
@@ -524,8 +527,6 @@ export function PlayEditor() {
         canShare={!!(canShareLinks && isAuthenticated && play.id && !play.id.startsWith('new-'))}
       />
 
-      {/* Desktop FormationBar */}
-      <FormationBar />
 
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-3 border-b border-zinc-800 bg-zinc-900">
@@ -581,102 +582,31 @@ export function PlayEditor() {
 
       {/* Main Content with Sidebar */}
       <div className="flex-1 flex flex-row min-h-0">
-      {/* Toolbar - Slide-out on mobile */}
+      {/* Plays Panel - Left side (Desktop only) */}
+      {isAuthenticated && (
+        <PlaysPanel
+          isOpen={isPlaysPanelOpen}
+          onToggle={() => setIsPlaysPanelOpen(!isPlaysPanelOpen)}
+        />
+      )}
+
+      {/* Mobile Toolbar - Slide-out on mobile only */}
       <div
         className={`
-          fixed md:relative inset-y-0 left-0 z-40
+          fixed md:hidden inset-y-0 left-0 z-40
           w-72 flex-shrink-0 border-r border-zinc-800 flex flex-col
           bg-zinc-950 transform transition-transform duration-300 ease-in-out
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         <div className="flex-1 overflow-y-auto">
           <Toolbar
             onConceptPanelToggle={(isOpen) => {
-              // Close Install Focus when opening concepts panel
               if (isOpen) {
                 setShowInstallFocus(false);
               }
             }}
           />
-        </div>
-        <div className="p-4 border-t border-zinc-800 bg-zinc-900 space-y-2">
-          {isAuthenticated ? (
-            <>
-              <Button
-                onClick={() => { save(); setIsMobileMenuOpen(false); }}
-                disabled={isSaving}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50"
-              >
-                {isSaving ? 'Saving...' : 'Save Play'}
-              </Button>
-              {lastSaved && (
-                <p className="text-xs text-zinc-500 text-center">
-                  Saved {lastSaved.toLocaleTimeString()}
-                </p>
-              )}
-            </>
-          ) : (
-            <Button
-              onClick={() => router.push('/auth/login')}
-              className="w-full bg-green-600 hover:bg-green-700"
-            >
-              Login to Save
-            </Button>
-          )}
-          <div className="flex gap-2">
-            <Button
-              onClick={() => { handleExport(); setIsMobileMenuOpen(false); }}
-              variant="outline"
-              className="flex-1 border-zinc-600 hover:bg-zinc-800 text-sm"
-            >
-              PNG
-            </Button>
-            <Button
-              onClick={() => { handlePDFClick(); setIsMobileMenuOpen(false); }}
-              variant="outline"
-              className={`flex-1 border-zinc-600 hover:bg-zinc-800 text-sm relative ${
-                !canExportPDF ? 'opacity-75' : ''
-              }`}
-            >
-              PDF
-              {!canExportPDF && (
-                <svg className="w-3 h-3 absolute top-1 right-1 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              )}
-            </Button>
-          </div>
-          {showWatermark && canExportPDF && (
-            <p className="text-[10px] text-orange-400 text-center">
-              Free tier: PDF exports include watermark
-            </p>
-          )}
-          {isAuthenticated && play.id && !play.id.startsWith('new-') && (
-            <Button
-              onClick={() => { handleShareClick(); setIsMobileMenuOpen(false); }}
-              variant="outline"
-              className={`w-full border-zinc-600 hover:bg-zinc-800 relative ${
-                !canShareLinks ? 'opacity-75' : ''
-              }`}
-            >
-              Share
-              {!canShareLinks && (
-                <svg className="w-3 h-3 absolute top-2 right-2 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              )}
-            </Button>
-          )}
-          {isAuthenticated && (
-            <Button
-              onClick={() => router.push('/dashboard')}
-              variant="ghost"
-              className="w-full text-zinc-400 hover:text-white hover:bg-zinc-800"
-            >
-              Dashboard
-            </Button>
-          )}
         </div>
       </div>
 
@@ -740,9 +670,6 @@ export function PlayEditor() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-0">
-        {/* Situation Header - Down & Distance, Defense Settings */}
-        <SituationHeader />
-
         {/* Canvas */}
         <div
           ref={containerRef}
@@ -808,33 +735,6 @@ export function PlayEditor() {
       </div>
       </div> {/* End Main Content with Sidebar */}
 
-      {/* Instructions - Desktop */}
-      <div className="hidden md:block absolute bottom-4 left-4 bg-black/70 text-white text-xs p-3 rounded max-w-xs z-10">
-        <div className="font-semibold mb-1">Mode: {mode.toUpperCase()}</div>
-        {mode === 'select' && (
-          <>
-            <div>Click to select, Shift+click to multi-select</div>
-            <div>Drag handles to edit lines</div>
-            <div>Right-click for context menu</div>
-          </>
-        )}
-        {mode === 'draw' && (
-          <>
-            <div className="mb-1">
-              {drawingConfig.lineType === 'straight' ? 'Straight' : 'Curved'} line | End: {drawingConfig.endMarker}
-            </div>
-            {drawingPhase === 'idle' && <div>Click a player to start</div>}
-            {drawingPhase === 'start_selected' && <div>Click to set end point</div>}
-            {drawingPhase === 'end_selected' && <div>Click to confirm</div>}
-            {drawingPhase === 'adjusting_curve' && <div>Move mouse to adjust curve, click to confirm</div>}
-          </>
-        )}
-        <div className="mt-2 text-zinc-400 space-y-0.5">
-          <div>ESC: Cancel | Ctrl+Z/Y: Undo/Redo</div>
-          <div>Ctrl+A: Select All | Ctrl+D: Duplicate</div>
-          <div>Arrow keys: Move (Shift for larger)</div>
-        </div>
-      </div>
 
       {/* Mobile Instructions Modal */}
       {showMobileInstructions && (
@@ -955,6 +855,15 @@ export function PlayEditor() {
 
       {/* Properties Panel - Shows when element is selected */}
       <PropertiesPanel />
+
+      {/* Desktop Bottom Toolbar */}
+      <EditorBottomBar
+        onConceptPanelToggle={(isOpen) => {
+          if (isOpen) {
+            setShowInstallFocus(false);
+          }
+        }}
+      />
 
       {/* Mobile Bottom Bar - Fixed at bottom */}
       <MobileBottomBar
