@@ -137,6 +137,33 @@ const routeDepth = depthInYards * 0.04; // CORRECT
 const cappedDepth = Math.min(routeDepth, 0.56);
 ```
 
+## Visual Specifications (Canvas & Nodes)
+
+### Canvas Aspect Ratio
+- Default: **16:9** (widescreen)
+- Location: `PlayEditor.tsx` line ~136
+```typescript
+const aspectRatio = 16 / 9;
+```
+
+### Node Sizing Formula
+```typescript
+// PlayerNode.tsx - 1.8% of canvas width
+const baseRadius = Math.max(8, Math.min(18, stageWidth * 0.018));
+const responsiveLabelFontSize = Math.max(6, Math.min(9, stageWidth * 0.009));
+```
+
+### Formation Spacing (Normalized)
+OL uses 0.03 spacing between linemen:
+- LT: 0.44, LG: 0.47, C: 0.50, RG: 0.53, RT: 0.56
+
+### Size Change Protocol
+Before modifying visual sizes:
+1. Compare with reference design (FirstDown PlayBook style)
+2. Test at 100% browser zoom - OL should have clear gaps
+3. Verify routes visible behind nodes
+4. Update this section with new values
+
 ## Critical Exceptions (반성회에서 도출)
 
 ### BALL and QB Special Handling
