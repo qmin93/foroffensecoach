@@ -120,6 +120,7 @@ interface EditorActions {
 
   // Action operations
   addLine: (fromPlayerId: string, startPoint: Point, endPoint: Point, controlPoint?: Point) => void;
+  addRouteFromTree: (playerId: string, routePattern: string, depth: number) => void;
   updateAction: (actionId: string, updates: Partial<Action>) => void;
   deleteAction: (actionId: string) => void;
   updateActionStyle: (actionId: string, style: Partial<{ stroke: string; strokeWidth: number; lineStyle: LineStyle; endMarker: EndMarker }>) => void;
@@ -246,7 +247,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
       // Backfield (under center)
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.13 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.19 },
       { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
@@ -263,7 +264,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.2, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.2, y: -0.05 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
       { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
@@ -279,7 +280,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'LT', label: 'LT', x: 0.42, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.15, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.15, y: -0.05 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.58, y: -0.15 },
       { role: 'WR', label: 'Y', x: 0.85, y: -0.03 },
@@ -298,7 +299,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
-      { role: 'WR', label: 'H', x: 0.72, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.72, y: -0.05 },
       { role: 'WR', label: 'Y', x: 0.82, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
     ],
@@ -331,9 +332,9 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
-      { role: 'WR', label: 'H', x: 0.65, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.65, y: -0.05 },
       { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
     ],
   },
@@ -348,7 +349,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.42, y: -0.13 },
       { role: 'FB', label: 'FB', x: 0.58, y: -0.13 },
       { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
@@ -364,7 +365,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'LT', label: 'LT', x: 0.42, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.2, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.2, y: -0.05 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.10 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.18 },
       { role: 'WR', label: 'Y', x: 0.8, y: -0.03 },
@@ -384,7 +385,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
-      { role: 'WR', label: 'H', x: 0.78, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.78, y: -0.05 },
       { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
     ],
   },
@@ -399,7 +400,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.13 },
       { role: 'RB', label: 'WB', x: 0.70, y: -0.07 },
       { role: 'RB', label: 'TB', x: 0.42, y: -0.13 },
@@ -417,7 +418,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
       { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
     ],
@@ -432,7 +433,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'LT', label: 'LT', x: 0.42, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.2, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.2, y: -0.05 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'TE', label: 'Y', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'F', x: 0.85, y: -0.03 },
@@ -450,7 +451,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.11 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.17 },
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
@@ -469,7 +470,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'WR', label: 'X', x: 0.1, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
-      { role: 'WR', label: 'H', x: 0.78, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.78, y: -0.05 },
       { role: 'WR', label: 'Z', x: 0.9, y: -0.03 },
     ],
   },
@@ -485,7 +486,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'LT', label: 'LT', x: 0.42, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.15, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.15, y: -0.05 },
       { role: 'WR', label: 'Y', x: 0.25, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
@@ -520,7 +521,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.15, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.15, y: -0.05 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.58, y: -0.15 },
@@ -536,7 +537,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'LT', label: 'LT', x: 0.42, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.15, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.15, y: -0.05 },
       { role: 'WR', label: 'Y', x: 0.25, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
       { role: 'WR', label: 'F', x: 0.85, y: -0.03 },
@@ -554,7 +555,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.85, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.85, y: -0.05 },
       { role: 'WR', label: 'Y', x: 0.75, y: -0.03 },
       { role: 'WR', label: 'F', x: 0.70, y: -0.07 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
@@ -570,7 +571,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'LT', label: 'LT', x: 0.42, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.15, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.15, y: -0.05 },
       { role: 'WR', label: 'Y', x: 0.25, y: -0.03 },
       { role: 'WR', label: 'F', x: 0.30, y: -0.07 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
@@ -622,7 +623,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.75, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.75, y: -0.05 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
@@ -639,7 +640,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'TE', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.25, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.25, y: -0.05 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.58, y: -0.15 },
@@ -655,7 +656,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'LT', label: 'LT', x: 0.42, y: -0.03 },
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.20, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.20, y: -0.05 },
       { role: 'WR', label: 'Y', x: 0.80, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
@@ -673,7 +674,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'TE', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.20, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.20, y: -0.05 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.58, y: -0.15 },
@@ -693,8 +694,8 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.85, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'WR', label: 'H', x: 0.85, y: -0.05 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
     ],
   },
@@ -710,8 +711,8 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.15, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'WR', label: 'H', x: 0.15, y: -0.05 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
     ],
   },
@@ -727,7 +728,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.42, y: -0.13 },
       { role: 'FB', label: 'FB', x: 0.58, y: -0.13 },
     ],
@@ -745,7 +746,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'U', x: 0.70, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
     ],
   },
@@ -762,7 +763,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'U', x: 0.30, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
     ],
   },
@@ -778,7 +779,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.13 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.19 },
     ],
@@ -795,7 +796,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'TE', label: 'U', x: 0.64, y: -0.03 },
       { role: 'TE', label: 'F', x: 0.70, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.13 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.19 },
     ],
@@ -813,7 +814,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.45, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.45, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.45, y: -0.15 },
     ],
   },
@@ -830,7 +831,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'U', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.55, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.55, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.55, y: -0.15 },
     ],
   },
@@ -846,7 +847,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.55, y: -0.12 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.18 },
     ],
@@ -865,7 +866,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.45, y: -0.12 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.18 },
     ],
@@ -882,7 +883,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.13 },
       { role: 'RB', label: 'HB1', x: 0.42, y: -0.18 },
       { role: 'RB', label: 'HB2', x: 0.58, y: -0.18 },
@@ -900,7 +901,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.55, y: -0.10 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.18 },
     ],
@@ -917,7 +918,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'Y', x: 0.35, y: -0.03 },
       { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.13 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.19 },
     ],
@@ -934,7 +935,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.70, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
     ],
@@ -951,7 +952,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.35, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.30, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
     ],
@@ -968,7 +969,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'Y', x: 0.36, y: -0.03 },
       { role: 'TE', label: 'U', x: 0.65, y: -0.03 },
       { role: 'TE', label: 'F', x: 0.30, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.12 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.17 },
     ],
@@ -986,7 +987,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'WR', label: 'H', x: 0.72, y: -0.06 },
       { role: 'WR', label: 'Z', x: 0.72, y: -0.12 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
     ],
   },
@@ -1003,7 +1004,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'WR', label: 'H', x: 0.28, y: -0.06 },
       { role: 'WR', label: 'X', x: 0.28, y: -0.12 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'RB', x: 0.5, y: -0.15 },
     ],
   },
@@ -1018,7 +1019,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'LE', x: 0.35, y: -0.03 },
       { role: 'TE', label: 'RE', x: 0.65, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'LH', x: 0.42, y: -0.12 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.12 },
       { role: 'RB', label: 'RH', x: 0.58, y: -0.12 },
@@ -1037,7 +1038,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.12 },
       { role: 'RB', label: 'LH', x: 0.42, y: -0.18 },
       { role: 'RB', label: 'RH', x: 0.58, y: -0.18 },
@@ -1055,7 +1056,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'A', x: 0.32, y: -0.08 },
       { role: 'RB', label: 'B', x: 0.5, y: -0.15 },
     ],
@@ -1072,7 +1073,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'HB', x: 0.42, y: -0.10 },
       { role: 'RB', label: 'FB', x: 0.58, y: -0.10 },
     ],
@@ -1105,7 +1106,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'RT', label: 'RT', x: 0.58, y: -0.03 },
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
-      { role: 'WR', label: 'H', x: 0.15, y: -0.03 },
+      { role: 'WR', label: 'H', x: 0.15, y: -0.05 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
       { role: 'QB', label: 'QB', x: 0.5, y: -0.15 },
       { role: 'RB', label: 'RB', x: 0.42, y: -0.15 },
@@ -1123,7 +1124,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'FB', label: 'FB', x: 0.5, y: -0.12 },
       { role: 'RB', label: 'RB', x: 0.58, y: -0.15 },
     ],
@@ -1157,7 +1158,7 @@ export const FORMATION_PRESETS: Record<string, { name: string; players: Array<{ 
       { role: 'TE', label: 'TE', x: 0.65, y: -0.03 },
       { role: 'WR', label: 'X', x: 0.05, y: -0.03 },
       { role: 'WR', label: 'Z', x: 0.95, y: -0.03 },
-      { role: 'QB', label: 'QB', x: 0.5, y: -0.07 },
+      { role: 'QB', label: 'QB', x: 0.5, y: -0.08 },
       { role: 'RB', label: 'A', x: 0.68, y: -0.08 },
       { role: 'RB', label: 'B', x: 0.5, y: -0.15 },
     ],
@@ -1356,6 +1357,137 @@ export const useEditorStore = create<EditorState & EditorActions>()(
           endMarker: endMarker,
         },
       };
+      state.play.actions.push(route);
+      state.play.updatedAt = new Date().toISOString();
+    }),
+
+    addRouteFromTree: (playerId, routePattern, depth) => set((state) => {
+      get().saveToHistory();
+
+      // Find the player
+      const player = state.play.roster.players.find(p => p.id === playerId);
+      if (!player) return;
+
+      const startX = player.alignment.x;
+      const startY = player.alignment.y;
+      const onLeftSide = startX < 0.5;
+
+      // Convert depth in yards to normalized (1 yard = 0.04)
+      const depthNorm = depth * 0.04;
+
+      // Calculate control points based on route pattern
+      let controlPoints: Point[] = [];
+      let pathType: 'straight' | 'tension' = 'straight';
+      let tension = 0;
+
+      switch (routePattern.toLowerCase()) {
+        case 'go':
+          // Straight vertical
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX, y: startY + depthNorm },
+          ];
+          break;
+
+        case 'slant':
+          // Diagonal inside
+          const slantDirection = onLeftSide ? -0.08 : 0.08;
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX + slantDirection, y: startY + depthNorm },
+          ];
+          break;
+
+        case 'out':
+          // Stem then break outside
+          const outDirection = onLeftSide ? 0.12 : -0.12;
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX, y: startY + depthNorm },
+            { x: startX + outDirection, y: startY + depthNorm },
+          ];
+          break;
+
+        case 'in':
+        case 'dig':
+          // Stem then break inside
+          const inDirection = onLeftSide ? -0.12 : 0.12;
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX, y: startY + depthNorm },
+            { x: startX + inDirection, y: startY + depthNorm },
+          ];
+          break;
+
+        case 'curl':
+          // Up then back
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX, y: startY + depthNorm },
+            { x: startX, y: startY + depthNorm - 0.08 },
+          ];
+          break;
+
+        case 'post':
+          // Stem then break inside deep
+          const postDirection = onLeftSide ? -0.1 : 0.1;
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX, y: startY + depthNorm },
+            { x: startX + postDirection, y: startY + depthNorm + 0.12 },
+          ];
+          pathType = 'tension';
+          tension = 0.3;
+          break;
+
+        case 'corner':
+          // Stem then break outside deep
+          const cornerDirection = onLeftSide ? 0.1 : -0.1;
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX, y: startY + depthNorm },
+            { x: startX + cornerDirection, y: startY + depthNorm + 0.12 },
+          ];
+          pathType = 'tension';
+          tension = 0.3;
+          break;
+
+        case 'flat':
+          // Short and outside
+          const flatDirection = onLeftSide ? 0.15 : -0.15;
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX + flatDirection, y: startY + depthNorm },
+          ];
+          break;
+
+        default:
+          // Default straight line
+          controlPoints = [
+            { x: startX, y: startY },
+            { x: startX, y: startY + depthNorm },
+          ];
+      }
+
+      const route: RouteAction = {
+        id: uuidv4(),
+        actionType: 'route',
+        fromPlayerId: playerId,
+        route: {
+          pattern: routePattern,
+          depth: depth,
+          controlPoints,
+          pathType,
+          tension,
+        },
+        style: {
+          stroke: '#000000',
+          strokeWidth: 2,
+          lineStyle: 'solid',
+          endMarker: 'arrow',
+        },
+      };
+
       state.play.actions.push(route);
       state.play.updatedAt = new Date().toISOString();
     }),
@@ -2414,9 +2546,10 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     }),
 
     undo: () => set((state) => {
-      if (state.historyIndex > 0) {
-        state.historyIndex--;
+      if (state.historyIndex >= 0 && state.history.length > 0) {
+        // 현재 historyIndex의 상태로 복원 후 인덱스 감소
         state.play = JSON.parse(JSON.stringify(state.history[state.historyIndex]));
+        state.historyIndex--;
       }
     }),
 
@@ -2635,6 +2768,12 @@ export const useEditorStore = create<EditorState & EditorActions>()(
       if (maxX - minX < 0.01 && maxY - minY < 0.01) {
         state.marqueeStart = null;
         state.marqueeEnd = null;
+        // Clear selection when clicking on empty canvas
+        state.selectedPlayerIds = [];
+        state.selectedActionIds = [];
+        state.editingActionId = null;
+        state.editingPointType = null;
+        state.editingPointIndex = null;
         return;
       }
 

@@ -8,6 +8,7 @@ import { useConceptStore } from '@/store/conceptStore';
 import { Action, RouteAction, BlockAction, MotionAction, LandmarkAction, TextAction, SymbolAction, ZoneAction, Point, EndMarker, Player, SymbolType } from '@/types/dsl';
 import { toPixel, toNormalized, pointsToPixelArray, findClosestSegment } from '@/utils/coordinates';
 import { generateConceptPreview } from '@/lib/concept-preview';
+import { RouteTreeOverlay } from './RouteTreeOverlay';
 
 interface ActionLayerProps {
   width: number;
@@ -470,7 +471,19 @@ function BlockShape({
     onMouseEnter?.(action.id);
   };
 
-  const tension = block.pathType === 'tension' ? (block.tension || 0.3) : 0;
+  // Zone blocks use curves, gap blocks use straight lines
+  const ZONE_SCHEMES = ['zone_step', 'reach', 'combo', 'climb', 'scoop', 'zone'];
+  const isZoneBlock = ZONE_SCHEMES.some(scheme =>
+    block.scheme?.toLowerCase().includes(scheme)
+  );
+
+  // Zone blocks use higher tension for more noticeable curve
+  const tension = isZoneBlock
+    ? 0.5
+    : (block.pathType === 'tension' ? (block.tension || 0.3) : 0);
+
+  // Both zone and gap blocks use t_block marker
+  const endMarker = style.endMarker === 'arrow' && !isZoneBlock ? style.endMarker : 't_block' as const;
 
   // Get pixel positions for edit handles
   const pathPoints = block.pathPoints;
@@ -486,7 +499,7 @@ function BlockShape({
         strokeWidth={style.strokeWidth}
         dash={getDash(style.lineStyle, style.strokeWidth)}
         tension={tension}
-        endMarker={style.endMarker}
+        endMarker={endMarker}
         isSelected={isSelected}
         isHovered={isHovered}
         onClick={handleClick}
@@ -600,7 +613,13 @@ function MotionShape({
     onMouseEnter?.(action.id);
   };
 
-  const tension = motion.pathType === 'tension' ? (motion.tension || 0.3) : 0;
+  // Sweep/orbit motions should be curved
+  const isSweepMotion = ['sweep', 'orbit', 'jet', 'fly', 'rocket'].some(
+    type => motion.motionType?.toLowerCase().includes(type)
+  );
+  const tension = isSweepMotion
+    ? 0.4
+    : (motion.pathType === 'tension' ? (motion.tension || 0.3) : 0);
 
   // Get pixel positions for edit handles
   const pathPoints = motion.pathPoints;
@@ -969,6 +988,21 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
   const zoneDragStart = useEditorStore((state) => state.zoneDragStart);
   const zoneDragCurrent = useEditorStore((state) => state.zoneDragCurrent);
   const zonePlacementConfig = useEditorStore((state) => state.zonePlacementConfig);
+
+  // Route tree hover state
+  const hoveredPlayerId = useEditorStore((state) => state.hoveredPlayerId);
+  const addRouteFromTree = useEditorStore((state) => state.addRouteFromTree);
+  const setHoveredPlayer = useEditorStore((state) => state.setHoveredPlayer);
+  const hoveredPlayer = useMemo(() => {
+    if (!hoveredPlayerId) return null;
+    return players.find(p => p.id === hoveredPlayerId) || null;
+  }, [hoveredPlayerId, players]);
+
+  // Handle route selection from route tree overlay
+  const handleRouteTreeSelect = (playerId: string, routePattern: string, depth: number) => {
+    addRouteFromTree(playerId, routePattern, depth);
+    setHoveredPlayer(null); // Hide route tree after selection
+  };
 
   const handleSelect = (actionId: string, shiftKey: boolean) => {
     if (isReadOnly) return;
@@ -1400,6 +1434,15 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
       {!isReadOnly && renderConceptPreview()}
       {!isReadOnly && renderDrawingPreview()}
       {!isReadOnly && renderZonePreview()}
+      {/* Route tree overlay for hovered receiver */}
+      {!isReadOnly && hoveredPlayer && (
+        <RouteTreeOverlay
+          player={hoveredPlayer}
+          width={width}
+          height={height}
+          onRouteSelect={handleRouteTreeSelect}
+        />
+      )}
     </Layer>
   );
 }

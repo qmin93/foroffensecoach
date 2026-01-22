@@ -880,8 +880,8 @@ export function buildConceptActions(
             pattern: routePattern,
             depth: 15,
             controlPoints,
-            pathType: isOutside ? 'straight' : 'tension',
-            tension: isOutside ? 0 : 0.3,
+            pathType: 'tension',
+            tension: isOutside ? 0.4 : 0.3, // Sweeps get more curve
           },
         };
 

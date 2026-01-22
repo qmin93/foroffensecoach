@@ -10,6 +10,7 @@ import type {
   ConceptCardData,
 } from '@/types/concept';
 import { ALL_CONCEPTS, getConceptById } from '@/data/concepts';
+import { useTeamProfileStore } from './teamProfileStore';
 
 // ============================================
 // State Types
@@ -403,6 +404,107 @@ function computeRecommendations(
             score -= 10;
           }
         }
+      }
+    }
+
+    // ============================================
+    // Team Profile Based Adjustments
+    // ============================================
+    const teamProfile = useTeamProfileStore.getState().profile;
+    const { stylePreferences, unitStrength } = teamProfile;
+
+    // Run/Pass Balance preference
+    if (stylePreferences.runPassBalance === 'run_heavy') {
+      if (concept.conceptType === 'run') {
+        score += 15;
+        rationale.push('✓ Run-heavy offense preference');
+      } else {
+        score -= 10;
+      }
+    } else if (stylePreferences.runPassBalance === 'pass_heavy') {
+      if (concept.conceptType === 'pass') {
+        score += 15;
+        rationale.push('✓ Pass-heavy offense preference');
+      } else {
+        score -= 10;
+      }
+    }
+
+    // Unit Strength bonuses for pass concepts
+    if (concept.conceptType === 'pass') {
+      // WR Separation - boost man-beating routes
+      if (unitStrength.wrSeparation >= 4 && concept.suggestionHints.passHints?.manBeater) {
+        score += 10;
+        rationale.push('✓ Strong WR separation for man coverage');
+      }
+
+      // QB Arm - boost deep concepts
+      if (unitStrength.qbArm >= 4 && concept.suggestionHints.passHints?.category === 'deep') {
+        score += 15;
+        rationale.push('✓ Strong QB arm for deep shots');
+      }
+
+      // QB Mobility - boost RPO and scramble concepts
+      if (unitStrength.qbMobility >= 4 && concept.badges?.some(b => b.toLowerCase().includes('rpo') || b.toLowerCase().includes('scramble'))) {
+        score += 10;
+        rationale.push('✓ Mobile QB for RPO/scramble');
+      }
+
+      // OL Pass Protection - boost deep/intermediate concepts (need more time)
+      if (unitStrength.olPassPro >= 4 && (concept.suggestionHints.passHints?.category === 'deep' || concept.suggestionHints.passHints?.category === 'intermediate')) {
+        score += 10;
+        rationale.push('✓ Strong pass protection for deeper routes');
+      } else if (unitStrength.olPassPro <= 2 && concept.suggestionHints.passHints?.category === 'deep') {
+        score -= 15;
+        rationale.push('⚠ Weak pass protection for deep routes');
+      }
+    }
+
+    // Unit Strength bonuses for run concepts
+    if (concept.conceptType === 'run' && concept.suggestionHints.runHints) {
+      const runHints = concept.suggestionHints.runHints;
+
+      // OL Run Blocking - boost power/gap schemes
+      if (unitStrength.olRunBlock >= 4 && (runHints.category === 'gap' || runHints.category === 'power')) {
+        score += 15;
+        rationale.push('✓ Strong OL run blocking for gap schemes');
+      }
+
+      // RB Vision - boost zone concepts
+      if (unitStrength.rbVision >= 4 && (runHints.category === 'inside_zone' || runHints.category === 'outside_zone')) {
+        score += 15;
+        rationale.push('✓ RB vision for zone reads');
+      }
+
+      // RB Power - boost gap/power schemes
+      if (unitStrength.rbPower >= 4 && (runHints.category === 'gap' || runHints.category === 'power')) {
+        score += 10;
+        rationale.push('✓ Power back for downhill runs');
+      }
+
+      // TE Blocking - boost run concepts requiring TE
+      if (unitStrength.teBlock >= 4 && req.needsTE) {
+        score += 10;
+        rationale.push('✓ Strong TE blocking');
+      }
+    }
+
+    // Risk Tolerance
+    if (stylePreferences.riskTolerance === 'aggressive') {
+      // Boost deep shots and big plays
+      if (concept.conceptType === 'pass' && concept.suggestionHints.passHints?.category === 'deep') {
+        score += 10;
+        rationale.push('✓ Aggressive play-calling');
+      }
+    } else if (stylePreferences.riskTolerance === 'conservative') {
+      // Boost quick game and safe concepts
+      if (concept.conceptType === 'pass' && concept.suggestionHints.passHints?.category === 'quick') {
+        score += 10;
+        rationale.push('✓ Conservative quick game');
+      }
+      // Penalize deep shots for conservative teams
+      if (concept.conceptType === 'pass' && concept.suggestionHints.passHints?.category === 'deep') {
+        score -= 15;
       }
     }
 

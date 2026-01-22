@@ -329,7 +329,7 @@ export const DEFAULT_ACTION_STYLE: ActionStyle = {
 export const DEFAULT_MOTION_STYLE: ActionStyle = {
   stroke: '#000000',
   strokeWidth: 2,
-  lineStyle: 'dashed',
+  lineStyle: 'dotted',
   endMarker: 'none',
 };
 

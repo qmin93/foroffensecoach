@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useEditorStore } from '@/store/editorStore';
@@ -28,6 +28,7 @@ export function PlaysPanel({ isOpen, onToggle }: PlaysPanelProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const activePlayRef = useRef<HTMLButtonElement>(null);
 
   // Fetch plays
   const fetchPlays = useCallback(async () => {
@@ -63,6 +64,20 @@ export function PlaysPanel({ isOpen, onToggle }: PlaysPanelProps) {
       return () => clearTimeout(timer);
     }
   }, [currentPlay.updatedAt, fetchPlays, currentPlay.id]);
+
+  // Auto-scroll to active play when panel opens or currentPlayId changes
+  useEffect(() => {
+    if (isOpen && activePlayRef.current) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        activePlayRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, currentPlayId, loading]);
 
   const handlePlayClick = (playId: string) => {
     if (playId !== currentPlayId) {
@@ -203,6 +218,7 @@ export function PlaysPanel({ isOpen, onToggle }: PlaysPanelProps) {
                 return (
                   <button
                     key={play.id}
+                    ref={isActive ? activePlayRef : null}
                     onClick={() => handlePlayClick(play.id)}
                     className={`
                       w-full text-left rounded-lg overflow-hidden transition-all

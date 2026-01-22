@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useEditorStore } from '@/store/editorStore';
 import { PlayerShape, LineStyle, EndMarker } from '@/types/dsl';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { GripHorizontal } from 'lucide-react';
 
 const SHAPES: { value: PlayerShape; label: string }[] = [
   { value: 'circle', label: 'Circle' },
@@ -45,6 +47,54 @@ export function PropertiesPanel() {
   const deletePlayer = useEditorStore((state) => state.deletePlayer);
   const deleteAction = useEditorStore((state) => state.deleteAction);
 
+  // Draggable state
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Handle drag start
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    const rect = panelRef.current?.getBoundingClientRect();
+    if (rect) {
+      dragStartRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+        posX: position?.x ?? rect.left,
+        posY: position?.y ?? rect.top,
+      };
+    }
+  }, [position]);
+
+  // Handle drag move
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragStartRef.current) return;
+      const deltaX = e.clientX - dragStartRef.current.x;
+      const deltaY = e.clientY - dragStartRef.current.y;
+      setPosition({
+        x: dragStartRef.current.posX + deltaX,
+        y: dragStartRef.current.posY + deltaY,
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      dragStartRef.current = null;
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
   // Get selected player
   const selectedPlayer = selectedPlayerIds.length === 1
     ? play.roster.players.find((p) => p.id === selectedPlayerIds[0])
@@ -77,8 +127,28 @@ export function PropertiesPanel() {
     return null;
   }
 
+  // Dynamic positioning: use custom position if dragged, otherwise default to center-bottom
+  const panelStyle = position
+    ? { left: position.x, top: position.y, transform: 'none' }
+    : {};
+
   return (
-    <div className="hidden md:block fixed bottom-4 left-1/2 -translate-x-1/2 z-20 bg-zinc-900/95 backdrop-blur border border-zinc-700 rounded-xl shadow-2xl p-4 min-w-80 max-w-md animate-in fade-in slide-in-from-bottom-4 duration-200">
+    <div
+      ref={panelRef}
+      className={`hidden md:block fixed z-20 bg-zinc-900/95 backdrop-blur border border-zinc-700 rounded-xl shadow-2xl min-w-80 max-w-md animate-in fade-in slide-in-from-bottom-4 duration-200 ${
+        !position ? 'bottom-4 left-1/2 -translate-x-1/2' : ''
+      }`}
+      style={panelStyle}
+    >
+      {/* Drag Handle */}
+      <div
+        className="flex items-center justify-center py-1.5 cursor-move border-b border-zinc-700/50 hover:bg-zinc-800/50 rounded-t-xl"
+        onMouseDown={handleDragStart}
+      >
+        <GripHorizontal className="w-5 h-5 text-zinc-500" />
+      </div>
+
+      <div className="p-4">
       {/* Player Properties */}
       {selectedPlayer && (
         <div className="space-y-4">
@@ -266,6 +336,7 @@ export function PropertiesPanel() {
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }

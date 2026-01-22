@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEditorStore, FORMATION_PRESETS } from '@/store/editorStore';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +29,6 @@ import {
 } from '@/components/ui/tooltip';
 import {
   ChevronLeft,
-  Eye,
   Download,
   HelpCircle,
   Undo2,
@@ -77,10 +77,12 @@ export function TopBar({
   const flipPlay = useEditorStore((state) => state.flipPlay);
   const zoom = useEditorStore((state) => state.zoom);
   const setZoom = useEditorStore((state) => state.setZoom);
+  const playName = useEditorStore((state) => state.play.name);
+  const updatePlayName = useEditorStore((state) => state.updatePlayName);
 
   const [selectedFormation, setSelectedFormation] = useState<string>('');
 
-  const canUndo = historyIndex > 0;
+  const canUndo = historyIndex >= 0 && history.length > 0;
   const canRedo = historyIndex < history.length - 1;
 
   const handleFormationChange = (formationKey: string) => {
@@ -115,20 +117,15 @@ export function TopBar({
 
           <div className="h-6 w-px bg-border" />
 
-          {/* VIEW */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-9 px-2 text-muted-foreground hover:text-foreground"
-              >
-                <Eye className="w-4 h-4 mr-1" />
-                <span className="text-xs font-medium">VIEW</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>View Options</TooltipContent>
-          </Tooltip>
+          {/* Play Name Input */}
+          <Input
+            value={playName || ''}
+            onChange={(e) => updatePlayName(e.target.value)}
+            className="h-8 w-48 font-bold text-base border-none bg-transparent focus-visible:ring-1 focus-visible:ring-primary"
+            placeholder="작전 이름"
+          />
+
+          <div className="h-6 w-px bg-border" />
 
           {/* SAVE */}
           <Tooltip>

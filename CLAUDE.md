@@ -132,6 +132,29 @@ All entities use JSON with `schemaVersion: "1.0"`. Key types:
 - **Formation**: Preset player arrangements (Trips, 2x2, Bunch, etc.)
 - **Concept**: Pass/Run templates with `template.roles[]` for auto-build
 
+## Core Type Structures (Quick Reference)
+
+### Player 좌표 접근 (중요)
+```typescript
+// CORRECT
+player.alignment.x
+player.alignment.y
+
+// WRONG - position 속성 없음
+player.position.x  // ❌ TypeScript 오류
+```
+
+### Action 경로 데이터 (중요)
+| Action Type | Path Property | 설명 |
+|-------------|---------------|------|
+| RouteAction | `route.controlPoints[]` | 경로 포인트 배열 |
+| BlockAction | `block.pathPoints[]` | 블로킹 경로 배열 |
+| MotionAction | `motion.pathPoints[]` | 모션 경로 배열 |
+| ZoneAction | `zone.x`, `zone.y` | 중심점 좌표 |
+| SymbolAction | `symbol.x`, `symbol.y` | 심볼 위치 |
+
+**주의**: `startPoint`, `endPoint` 속성은 존재하지 않음
+
 ## Concept System Architecture
 
 Concepts are pre-defined play templates (Pass/Run) stored in `editor/src/data/concepts/`.
@@ -257,6 +280,14 @@ const radius = isBall ? (appearance.radius || 10) : Math.min(baseRadius, maxRadi
 ### Editor Colors
 - Canvas uses only black (#000000) and white (#ffffff)
 - Exception: BALL uses brown (#8B4513)
+
+### Drawing Tool UX (그리기 도구 규칙)
+**그리기 완료 후 반드시 Select 모드로 복귀**
+- Straight/Curved 라인 → `confirmDrawing()` → `mode = 'select'`
+- Angular 라인 (더블클릭) → `confirmAngularDrawing()` → `mode = 'select'`
+- Zone 배치 → `finishZoneDrag()` → `mode = 'select'` + `placementPhase = 'idle'`
+- 표준 드로잉 앱 패턴 (Figma, Sketch 등) 따름
+- 연속 그리기가 필요하면 Shift 키 등 수정자 키로 별도 구현 (향후)
 
 ## Design Principles
 
