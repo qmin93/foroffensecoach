@@ -11,6 +11,122 @@ import { ALL_CONCEPTS } from '@/data/concepts';
 import { buildConceptActions } from './concept-builder';
 import type { Concept, FormationContext } from '@/types/concept';
 
+/**
+ * Concept popularity weights based on NFL/NCAA usage statistics
+ * Higher weight = more commonly used = recommended first
+ * Tier 1: 30 points, Tier 2: 20 points, Tier 3: 10 points, Tier 4: 5 points, Tier 5: 0 points
+ */
+const CONCEPT_POPULARITY: Record<string, number> = {
+  // === PASS CONCEPTS ===
+  // Tier 1: Core concepts (most used)
+  'pass_slant_flat': 30,
+  'pass_mesh': 28,
+  'pass_stick': 26,
+  'pass_spacing': 24,
+  'pass_curl_flat': 22,
+  // Tier 2: Frequently used
+  'pass_smash': 20,
+  'pass_verts': 18,
+  'pass_flood': 17,
+  'pass_y_cross': 16,
+  'pass_levels': 15,
+  'pass_bubble': 14,
+  'pass_quick_out': 13,
+  // Tier 3: Situational
+  'pass_snag': 12,
+  'pass_drive': 11,
+  'pass_hitch_seam': 10,
+  'pass_post_dig': 10,
+  'pass_sail': 9,
+  'pass_dagger': 9,
+  'pass_texas': 8,
+  'pass_now_screen': 8,
+  // Tier 4: Niche
+  'pass_double_slant': 6,
+  'pass_tunnel': 6,
+  'pass_rocket': 5,
+  'pass_jail': 5,
+  'pass_china': 5,
+  'pass_hunt': 5,
+  'pass_scissor': 4,
+  'pass_whip': 4,
+  'pass_divide': 4,
+  'pass_bench': 4,
+  'pass_seattle': 4,
+  'pass_dragon': 3,
+  'pass_follow': 3,
+  // Tier 5: Rare
+  'pass_out_up': 2,
+  'pass_yankee': 2,
+  'pass_double_post': 2,
+  'pass_triple_slant': 2,
+  'pass_stick_draw': 2,
+  'pass_speed_out': 2,
+  'pass_hank': 1,
+  'pass_drive_out': 1,
+  'pass_slip_screen': 1,
+  'pass_middle_screen': 1,
+  'pass_swing_screen': 1,
+
+  // === RUN CONCEPTS ===
+  // Tier 1: Core concepts (most used)
+  'run_inside_zone': 30,
+  'run_outside_zone': 26,
+  'run_power': 24,
+  'run_duo': 22,
+  'run_draw': 20,
+  // Tier 2: Frequently used
+  'run_split_zone': 18,
+  'run_gt_counter': 17,
+  'run_rpo_zone': 16,
+  'run_stretch': 15,
+  'run_iso': 14,
+  'run_read_option': 13,
+  'run_jet_sweep': 12,
+  // Tier 3: Situational
+  'run_toss': 10,
+  'run_qb_power': 10,
+  'run_sweep': 9,
+  'run_pin_pull': 9,
+  'run_wham': 8,
+  'run_guard_trap': 8,
+  'run_tackle_trap': 8,
+  'run_wide_zone': 7,
+  'run_bootleg': 7,
+  // Tier 4: Niche
+  'run_buck_sweep': 6,
+  'run_oh_counter': 6,
+  'run_dart': 5,
+  'run_down_g': 5,
+  'run_lead_iso': 5,
+  'run_insert': 5,
+  'run_fb_dive': 4,
+  'run_lead_draw': 4,
+  'run_power_read': 4,
+  'run_zone_arc': 4,
+  'run_mid_zone': 4,
+  // Tier 5: Rare
+  'run_pitch': 3,
+  'run_fly_sweep': 3,
+  'run_end_around': 2,
+  'run_reverse': 2,
+  'run_counter_iso': 2,
+  'run_zone_read_give': 2,
+  'run_split_zone_weak': 2,
+  'run_rocket_toss': 1,
+  'run_speed_option': 1,
+  'run_waggle': 1,
+  'run_triple_option': 0,
+  'run_midline_option': 0,
+};
+
+/**
+ * Get popularity score for a concept (default 5 if not in map)
+ */
+function getConceptPopularity(conceptId: string): number {
+  return CONCEPT_POPULARITY[conceptId] ?? 5;
+}
+
 export interface GeneratedPlay {
   id: string;
   name: string;
@@ -97,8 +213,17 @@ function scoreConceptForFormation(
   concept: Concept,
   context: FormationContext
 ): { score: number; rationale: string[] } {
-  let score = 50;
+  // Start with popularity-based score (0-30 points based on NFL/NCAA usage)
+  const popularity = getConceptPopularity(concept.id);
+  let score = 50 + popularity; // Base 50 + popularity bonus (max 80 starting)
   const rationale: string[] = [];
+
+  // Add popularity tier info to rationale for high-popularity concepts
+  if (popularity >= 20) {
+    rationale.push('Highly used in NFL/NCAA');
+  } else if (popularity >= 10) {
+    rationale.push('Commonly used');
+  }
 
   const req = concept.requirements;
 
@@ -173,7 +298,8 @@ function scoreConceptForFormation(
     }
   }
 
-  return { score: Math.min(100, Math.max(0, score)), rationale };
+  // Max score now 130 (50 base + 30 popularity + 50 from formation match)
+  return { score: Math.min(130, Math.max(0, score)), rationale };
 }
 
 /**
@@ -334,6 +460,79 @@ export function getGeneratedPlaysStats(plays: GeneratedPlay[]) {
 }
 
 /**
+ * Identify the ball carrier role based on concept
+ * Returns the role/label of the player who should have the ball
+ */
+function getBallCarrierRole(concept: Concept): string {
+  const conceptId = concept.id?.toLowerCase() || '';
+  const conceptName = concept.name?.toLowerCase() || '';
+
+  // Pass concepts: QB holds the ball
+  if (concept.conceptType === 'pass') {
+    return 'QB';
+  }
+
+  // QB run concepts (QB Power, Read Option, Speed Option, QB Draw, QB Sneak)
+  if (conceptId.includes('qb_power') || conceptName.includes('qb power') ||
+      conceptId.includes('qb_draw') || conceptName.includes('qb draw') ||
+      conceptId.includes('qb_sneak') || conceptName.includes('qb sneak') ||
+      conceptId.includes('read_option') || conceptName.includes('read option') ||
+      conceptId.includes('speed_option') || conceptName.includes('speed option') ||
+      conceptId.includes('midline') || conceptName.includes('midline')) {
+    return 'QB';
+  }
+
+  // Motion/Jet sweep concepts: WR/Slot carries
+  if (conceptId.includes('jet_sweep') || conceptName.includes('jet sweep') ||
+      conceptId.includes('fly_sweep') || conceptName.includes('fly sweep') ||
+      conceptId.includes('end_around') || conceptName.includes('end around') ||
+      conceptId.includes('reverse') || conceptName.includes('reverse')) {
+    return 'H'; // Motion player (slot receiver)
+  }
+
+  // FB Dive: FB carries
+  if (conceptId.includes('fb_dive') || conceptName.includes('fb dive')) {
+    return 'FB';
+  }
+
+  // Default for run concepts: RB carries
+  return 'RB';
+}
+
+/**
+ * Find the ball carrier player and return their position
+ */
+function findBallCarrierPosition(
+  players: Array<{ role: string; label?: string; alignment: { x: number; y: number } }>,
+  ballCarrierRole: string
+): { x: number; y: number } | null {
+  // Try to find by role first
+  let carrier = players.find(p =>
+    p.role.toUpperCase() === ballCarrierRole.toUpperCase()
+  );
+
+  // Try by label if not found by role
+  if (!carrier) {
+    carrier = players.find(p =>
+      p.label?.toUpperCase() === ballCarrierRole.toUpperCase()
+    );
+  }
+
+  // For H/slot, also try WR positions
+  if (!carrier && (ballCarrierRole === 'H' || ballCarrierRole === 'SLOT')) {
+    carrier = players.find(p =>
+      p.role === 'WR' && p.label && ['H', 'F', 'SLOT'].includes(p.label.toUpperCase())
+    );
+  }
+
+  if (carrier) {
+    return { ...carrier.alignment };
+  }
+
+  return null;
+}
+
+/**
  * Convert a GeneratedPlay to a Play DSL format
  * Now includes auto-generated routes and blocks from concept template
  */
@@ -345,6 +544,9 @@ export function convertGeneratedPlayToPlayDSL(generatedPlay: GeneratedPlay) {
   }
 
   const now = new Date().toISOString();
+
+  // Identify ball carrier based on concept
+  const ballCarrierRole = getBallCarrierRole(generatedPlay.concept);
 
   // Create players from formation with proper Player type
   const players = formation.players.map((p) => ({
@@ -373,20 +575,63 @@ export function convertGeneratedPlayToPlayDSL(generatedPlay: GeneratedPlay) {
   try {
     const result = buildConceptActions(generatedPlay.concept, players as any);
     actions = result.actions;
-    console.log('Generated actions for play:', {
-      playName: generatedPlay.name,
-      conceptName: generatedPlay.concept.name,
-      formationKey: generatedPlay.formationKey,
-      playersCount: players.length,
-      actionsCount: actions.length,
-      firstAction: actions[0],
-    });
   } catch (err) {
-    console.error('Error building concept actions:', err, {
-      concept: generatedPlay.concept.name,
-      formation: generatedPlay.formationKey,
-    });
+    console.error('Error building concept actions:', err);
     // Continue with empty actions rather than failing
+  }
+
+  // Position the BALL on the ball carrier's route line
+  const ballPlayer = players.find(p => p.role === 'BALL');
+
+  if (ballPlayer) {
+    // Find the ball carrier player
+    let ballCarrier = players.find(p =>
+      p.role.toUpperCase() === ballCarrierRole.toUpperCase()
+    );
+    if (!ballCarrier) {
+      ballCarrier = players.find(p =>
+        p.label?.toUpperCase() === ballCarrierRole.toUpperCase()
+      );
+    }
+    // For H/slot, also try WR positions
+    if (!ballCarrier && (ballCarrierRole === 'H' || ballCarrierRole === 'SLOT')) {
+      ballCarrier = players.find(p =>
+        p.role === 'WR' && p.label && ['H', 'F', 'SLOT'].includes(p.label.toUpperCase())
+      );
+    }
+    // Fallback to QB
+    if (!ballCarrier) {
+      ballCarrier = players.find(p => p.role === 'QB');
+    }
+
+    if (ballCarrier) {
+      // Find the ball carrier's route action
+      const carrierAction = actions.find(a =>
+        a.actionType === 'route' && a.fromPlayerId === ballCarrier!.id
+      );
+
+      if (carrierAction && carrierAction.actionType === 'route') {
+        const controlPoints = carrierAction.route.controlPoints;
+        // Route has at least 2 control points (start and end)
+        if (controlPoints && controlPoints.length >= 2) {
+          const start = controlPoints[0];
+          const end = controlPoints[1];
+
+          // Position ball on the route line (20% along the first segment)
+          const t = 0.2;
+          ballPlayer.alignment.x = start.x + (end.x - start.x) * t;
+          ballPlayer.alignment.y = start.y + (end.y - start.y) * t;
+        } else {
+          // Not enough control points, position near ball carrier
+          ballPlayer.alignment.x = ballCarrier.alignment.x;
+          ballPlayer.alignment.y = ballCarrier.alignment.y + 0.02;
+        }
+      } else {
+        // No route found, position ball slightly in front of ball carrier
+        ballPlayer.alignment.x = ballCarrier.alignment.x;
+        ballPlayer.alignment.y = ballCarrier.alignment.y + 0.02;
+      }
+    }
   }
 
   return {

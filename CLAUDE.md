@@ -53,6 +53,11 @@ cd editor && npm run test:coverage  # Run tests with coverage
 cd editor && npm run test -- --run src/__tests__/specific.test.ts  # Single test
 ```
 
+### Test Files Location
+- `editor/src/__tests__/*.test.ts` - Unit tests (Vitest + jsdom)
+- Setup: `editor/src/__tests__/setup.ts`
+- Config: `editor/vitest.config.ts`
+
 ## UI Theming (shadcn/ui)
 
 **IMPORTANT**: UI 스타일링 작업 시 반드시 `docs/shadcn-ui-theming.md` 문서를 참조할 것.
@@ -97,6 +102,27 @@ grep -rn "zinc-\|gray-\|slate-" editor/src/app --include="*.tsx"
 | `DSL Specification.md` | Data model schemas |
 | `.claude/retrospectives/` | 반성회 기록 (문제 해결 후 작성) |
 
+## State Management (Zustand Stores)
+
+| Store | Purpose | Key State |
+|-------|---------|-----------|
+| `editorStore` | Canvas editor state | `play`, `mode`, `selectedPlayerIds`, `drawingConfig`, `history` |
+| `playbookStore` | Playbook collection | `playbook`, `plays[]`, CRUD operations |
+| `conceptStore` | Concept recommendations | `filteredConcepts`, `searchTerm`, filters |
+| `authStore` | Authentication | `user`, `session`, Supabase auth |
+| `teamProfileStore` | Team settings | `teamProfile`, preferences |
+| `toastStore` | UI notifications | `toasts[]`, `addToast()` |
+
+### Data Flow
+
+```
+Formation Selection → Concept Recommendation → Auto-build → Play DSL
+     │                      │                      │
+     ▼                      ▼                      ▼
+ editorStore          conceptStore           concept-builder.ts
+ (setFormation)       (filter by tags)       (buildConceptActions)
+```
+
 ## DSL Architecture
 
 All entities use JSON with `schemaVersion: "1.0"`. Key types:
@@ -105,6 +131,31 @@ All entities use JSON with `schemaVersion: "1.0"`. Key types:
 - **Playbook**: Collection of plays with sections
 - **Formation**: Preset player arrangements (Trips, 2x2, Bunch, etc.)
 - **Concept**: Pass/Run templates with `template.roles[]` for auto-build
+
+## Concept System Architecture
+
+Concepts are pre-defined play templates (Pass/Run) stored in `editor/src/data/concepts/`.
+
+```
+Concept Definition (pass-concepts.ts / run-concepts.ts)
+├── id, name, category (quick_game, dropback, rpo, etc.)
+├── tags: ['2x2', 'trips', 'bunch'] - for formation matching
+└── template.roles[]: role assignments
+    ├── role: 'X' | 'Y' | 'Z' | 'H' | 'RB' etc.
+    └── action: { type: 'route', pattern: 'slant', depth: 5 }
+```
+
+**Position Alias Mapping** (concept-builder.ts):
+- `Y` = TE, U
+- `Z` = WR, SE (split end)
+- `X` = WR, FL (flanker)
+- `H` = WR, SLOT
+
+**Auto-build Process**:
+1. User selects concept from recommendation panel
+2. `buildConceptActions()` matches concept roles to players
+3. Actions (routes, blocks) generated and added to `play.actions[]`
+4. Undo toast shown for reverting
 
 ## Konva Layer Architecture
 
@@ -153,9 +204,28 @@ const baseRadius = Math.max(8, Math.min(18, stageWidth * 0.018));
 const responsiveLabelFontSize = Math.max(7, Math.min(10, stageWidth * 0.01));
 ```
 
-### Formation Spacing (Normalized)
-OL uses 0.03 spacing between linemen:
-- LT: 0.44, LG: 0.47, C: 0.50, RG: 0.53, RT: 0.56
+### O-Line Formation Spacing (중요)
+**각 라인맨 간격: 0.04 = 1야드**
+| Position | X 좌표 |
+|----------|--------|
+| TE (Left) | 0.38 |
+| LT | 0.42 |
+| LG | 0.46 |
+| C | 0.50 |
+| RG | 0.54 |
+| RT | 0.58 |
+| TE (Right) | 0.62 |
+- 전체 O-Line 너비: 0.16 (4야드)
+- Y 좌표: -0.03 (LOS 뒤 약 0.75야드)
+- **TE 위치 규칙**: 방향에 따라 LT 또는 RT 옆에 배치, 간격 0.04 (1야드) 동일
+
+### 노드 겹침 방지 규칙 (중요)
+**모든 플레이어 간 최소 간격: 0.06**
+- 노드 반지름: ~0.018 (캔버스 너비의 1.8%)
+- 두 노드가 겹치지 않으려면 최소 0.036 필요
+- 안전 마진 포함하여 **0.06 이상** 간격 유지
+- 같은 X좌표 스택 (Tight Bunch, Stack): Y 간격 0.06 이상
+- 같은 Y좌표 라인 (Double Tight, TE 클러스터): X 간격 0.06 이상
 
 ### Size Change Protocol
 Before modifying visual sizes:
@@ -206,6 +276,23 @@ Do not implement:
 - Drill editor/scheduler
 - Film/video integration
 
+## 배포 권한 규칙 (중요)
+
+**git push는 사용자가 명시적으로 요청할 때만 수행한다.**
+
+### 허용되는 요청 예시
+- "배포해", "push해", "deploy", "푸시"
+- "Vercel에 올려줘", "원격에 푸시해"
+
+### 금지 사항
+- 작업 완료 후 자동 배포 (작업 완료 ≠ 배포 요청)
+- 사용자 승인 없이 `git push` 실행
+
+### 위험 명령어 (명시적 요청 필수)
+- `git push` - 원격 배포
+- `git push --force` - 강제 배포
+- `git reset --hard` - 작업 손실 가능
+
 ## Vercel 빌드 주의사항
 
 - **Monorepo 구조**: Root에 `package-lock.json`과 `editor/package-lock.json` 두 개 존재
@@ -214,7 +301,21 @@ Do not implement:
   - 로컬 빌드 성공 ≠ Vercel 빌드 성공
 
 ### 배포 전 체크리스트
-1. `cd editor && npm run build` 로컬 빌드 성공 확인
-2. TypeScript 오류 없는지 확인
-3. 새 파일 추가 시 git add 확인
-4. Vercel Root Directory가 `editor`로 설정되어 있는지 확인
+1. **`git status` 먼저 확인** - 커밋되지 않은 변경사항이 있으면 로컬 빌드 의미 없음
+2. `cd editor && npm run build` 로컬 빌드 성공 확인
+3. TypeScript 오류 없는지 확인
+4. 새 파일 추가 시 git add 확인
+5. Vercel Root Directory가 `editor`로 설정되어 있는지 확인
+
+### 배포 실패 시 대응 (2026-01-22 추가)
+1. **에러 로그 먼저 확인** - 사용자에게 Vercel 빌드 로그 요청
+2. **Vercel CLI 직접 배포 금지** - `vercel --prod` 사용 시 잘못된 프로젝트로 배포될 수 있음
+3. **반드시 Git push만 사용** - `foroffensecoach` 프로젝트는 Git 트리거로만 배포
+4. **로컬 파일 vs 커밋 파일 확인** - `git diff <파일>` 또는 `git show HEAD:<파일>`로 확인
+
+### 흔한 배포 실패 원인
+| 에러 | 원인 | 해결 |
+|------|------|------|
+| `Property 'X' is missing in type` | Props 인터페이스 불일치 | 해당 컴포넌트의 Props 타입 확인 후 선택적(?)으로 변경 또는 호출부에서 전달 |
+| `Module not found: '@/components/ui/X'` | UI 컴포넌트 미설치 | shadcn/ui 컴포넌트 추가 후 Radix 의존성도 확인 |
+| `outputFileTracingRoot and turbopack.root` 경고 | next.config.ts 설정 | 무시해도 되는 경고, 빌드에 영향 없음 |

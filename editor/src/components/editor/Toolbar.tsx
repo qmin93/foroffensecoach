@@ -1,7 +1,6 @@
 'use client';
 
 import { useEditorStore, FORMATION_PRESETS } from '@/store/editorStore';
-import { useConceptStore } from '@/store/conceptStore';
 import { EditorMode, PlayerShape, EndMarker, DrawLineType, LineStyle } from '@/types/dsl';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -95,11 +94,7 @@ const LINE_STYLES: { value: LineStyle; label: string }[] = [
   { value: 'dotted', label: 'Dotted · · ·' },
 ];
 
-interface ToolbarProps {
-  onConceptPanelToggle?: (isOpen: boolean) => void;
-}
-
-export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
+export function Toolbar() {
   const mode = useEditorStore((state) => state.mode);
   const setMode = useEditorStore((state) => state.setMode);
   const addPlayer = useEditorStore((state) => state.addPlayer);
@@ -120,8 +115,6 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
   const setDrawingConfig = useEditorStore((state) => state.setDrawingConfig);
   const drawingPhase = useEditorStore((state) => state.drawingPhase);
   const loadFormation = useEditorStore((state) => state.loadFormation);
-  const toggleConceptPanel = useConceptStore((state) => state.togglePanel);
-  const isPanelOpen = useConceptStore((state) => state.isPanelOpen);
   const conceptId = useEditorStore((state) => state.play.meta?.conceptId);
   const applyConceptTemplate = useEditorStore((state) => state.applyConceptTemplate);
 
@@ -246,27 +239,6 @@ export function Toolbar({ onConceptPanelToggle }: ToolbarProps) {
           </SelectContent>
         </Select>
       </div>
-
-      {/* Concepts Button */}
-      <div className="space-y-2">
-        <Button
-          onClick={() => {
-            const newState = !isPanelOpen;
-            toggleConceptPanel();
-            onConceptPanelToggle?.(newState);
-          }}
-          variant={isPanelOpen ? 'default' : 'outline'}
-          className={`w-full ${isPanelOpen ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-600'}`}
-        >
-          <span className="mr-2">💡</span>
-          {isPanelOpen ? 'Hide Concepts' : 'Show Concepts'}
-        </Button>
-        <p className="text-[10px] text-zinc-500 text-center">
-          Formation → Concept
-        </p>
-      </div>
-
-      <Separator className="bg-zinc-700" />
 
       {/* Drawing Config (visible when in draw mode) */}
       {mode === 'draw' && (

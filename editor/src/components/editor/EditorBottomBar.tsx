@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useEditorStore, FORMATION_PRESETS } from '@/store/editorStore';
-import { useConceptStore } from '@/store/conceptStore';
 import { EditorMode, EndMarker, DrawLineType, LineStyle } from '@/types/dsl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,11 +68,7 @@ const LINE_STYLES: { value: LineStyle; label: string }[] = [
   { value: 'dotted', label: '· · ·' },
 ];
 
-interface EditorBottomBarProps {
-  onConceptPanelToggle?: (isOpen: boolean) => void;
-}
-
-export function EditorBottomBar({ onConceptPanelToggle }: EditorBottomBarProps) {
+export function EditorBottomBar() {
   const mode = useEditorStore((state) => state.mode);
   const setMode = useEditorStore((state) => state.setMode);
   const addPlayer = useEditorStore((state) => state.addPlayer);
@@ -85,8 +80,6 @@ export function EditorBottomBar({ onConceptPanelToggle }: EditorBottomBarProps) 
   const loadFormation = useEditorStore((state) => state.loadFormation);
   const conceptId = useEditorStore((state) => state.play.meta?.conceptId);
   const applyConceptTemplate = useEditorStore((state) => state.applyConceptTemplate);
-  const toggleConceptPanel = useConceptStore((state) => state.togglePanel);
-  const isPanelOpen = useConceptStore((state) => state.isPanelOpen);
 
   const [addPlayerOpen, setAddPlayerOpen] = useState(false);
   const [lineSettingsOpen, setLineSettingsOpen] = useState(false);
@@ -337,22 +330,6 @@ export function EditorBottomBar({ onConceptPanelToggle }: EditorBottomBarProps) 
       </Popover>
 
       <div className="w-px h-6 bg-zinc-700" />
-
-      {/* Show Concepts - only when no concept is applied yet */}
-      {!conceptId && (
-        <Button
-          onClick={() => {
-            const newState = !isPanelOpen;
-            toggleConceptPanel();
-            onConceptPanelToggle?.(newState);
-          }}
-          variant={isPanelOpen ? 'default' : 'outline'}
-          size="sm"
-          className={`h-8 text-xs ${isPanelOpen ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-600'}`}
-        >
-          Concepts
-        </Button>
-      )}
 
       {/* Play Actions */}
       <Button

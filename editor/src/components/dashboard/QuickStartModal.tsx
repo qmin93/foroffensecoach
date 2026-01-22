@@ -24,25 +24,41 @@ interface QuickStartModalProps {
   ) => Promise<void>;
 }
 
-// Categorize formations
+// Categorize formations (ordered by NFL/NCAA usage frequency)
 const FORMATION_CATEGORIES: Record<string, string[]> = {
   'Spread / Air Raid': [
-    'shotgun', 'spread', 'tripsRight', 'tripsLeft', 'bunchRight', 'bunchLeft',
-    'twinsRight', 'twinsLeft', 'slotRight', 'slotLeft', 'emptySet', 'emptyTrips',
-    'stackRight', 'stackLeft', 'quadsRight', 'quadsLeft', 'treyRight', 'treyLeft',
-    'spreadTight'
+    // Tier 1: Most used (60%+)
+    'shotgun', 'spread', 'trips', 'tripsLeft', 'twins', 'twinsLeft',
+    // Tier 2: Frequently used (10-20%)
+    'emptySet', 'bunch', 'bunchLeft', 'slot', 'slotLeft', 'emptyTrips',
+    // Tier 3: Situational (5-10%)
+    'quadsRight', 'quadsLeft',
+    // Tier 4: Niche (1-5%)
+    'stackRight', 'stackLeft', 'treyRight', 'treyLeft', 'spreadTight'
   ],
   'Pro Style': [
-    'singleBack', 'proSet', 'ace', 'aceTwinsRight', 'aceTwinsLeft', 'splitBacks',
-    'doubleTightRight', 'doubleTightLeft', 'near', 'far', 'heavy', 'jumbo',
+    // Tier 1-2: High usage
+    'singleBack', 'ace',
+    // Tier 3: Situational
+    'proSet', 'aceTwinsRight', 'aceTwinsLeft', 'heavy', 'jumbo',
+    // Tier 4: Niche
+    'splitBacks', 'doubleTightRight', 'doubleTightLeft', 'near', 'far',
     'unbalancedRight', 'unbalancedLeft'
   ],
   'Power / Run': [
-    'iFormation', 'powerI', 'marylandI', 'fullHouse', 'wingT', 'wingRight', 'wingLeft',
-    'goalLine', 'big', 'tightBunchRight', 'tightBunchLeft', 'tFormation'
+    // Tier 3: Situational
+    'iFormation', 'goalLine',
+    // Tier 4: Niche
+    'wingT', 'powerI', 'marylandI', 'fullHouse', 'wingRight', 'wingLeft',
+    'big', 'tightBunchRight', 'tightBunchLeft',
+    // Tier 5: Rare
+    'tFormation'
   ],
   'Option': [
-    'pistol', 'wishbone', 'flexbone', 'veer', 'wildcat', 'speedOption',
+    // Tier 2: Most used in option category
+    'pistol',
+    // Tier 5: Rare/specialized
+    'wildcat', 'wishbone', 'flexbone', 'veer', 'speedOption',
     'midlineOption', 'loadOption', 'tripleRight'
   ],
 };

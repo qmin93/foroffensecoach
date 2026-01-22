@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
 
   // Security headers
   async headers() {
-    return [
+    const baseHeaders = [
       {
         source: '/(.*)',
         headers: [
@@ -30,21 +30,19 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          // Add HSTS only in production
+          ...(process.env.NODE_ENV === 'production'
+            ? [
+                {
+                  key: 'Strict-Transport-Security',
+                  value: 'max-age=31536000; includeSubDomains',
+                },
+              ]
+            : []),
         ],
       },
-      {
-        // Add HSTS only in production
-        source: '/(.*)',
-        headers: process.env.NODE_ENV === 'production'
-          ? [
-              {
-                key: 'Strict-Transport-Security',
-                value: 'max-age=31536000; includeSubDomains',
-              },
-            ]
-          : [],
-      },
     ];
+    return baseHeaders;
   },
 
   // Image optimization

@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useEditorStore } from '@/store/editorStore';
 import { GlobalNavbar } from '@/components/layout/GlobalNavbar';
 import { EditorSkeleton } from '@/components/ui/Skeleton';
 
@@ -14,6 +16,13 @@ const PlayEditor = dynamic(
 );
 
 export default function EditorPage() {
+  const resetPlay = useEditorStore((state) => state.resetPlay);
+
+  // Reset play to blank canvas when mounting (Start Building Free)
+  useEffect(() => {
+    resetPlay();
+  }, [resetPlay]);
+
   return (
     <div className="flex flex-col h-screen">
       <GlobalNavbar />

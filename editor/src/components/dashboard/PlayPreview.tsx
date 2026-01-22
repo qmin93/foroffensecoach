@@ -32,7 +32,7 @@ function renderArrow(
   prevX: number,
   prevY: number,
   stroke: string,
-  size: number = 6
+  size: number = 4
 ) {
   const angle = Math.atan2(endY - prevY, endX - prevX);
   const arrowAngle = Math.PI / 6; // 30 degrees
@@ -57,7 +57,7 @@ function renderTBlock(
   prevX: number,
   prevY: number,
   stroke: string,
-  size: number = 4
+  size: number = 3
 ) {
   const angle = Math.atan2(endY - prevY, endX - prevX);
   // Perpendicular angle for the T bar
@@ -75,13 +75,13 @@ function renderTBlock(
       x2={x2}
       y2={y2}
       stroke={stroke}
-      strokeWidth={2}
+      strokeWidth={1.5}
     />
   );
 }
 
 // Render circle marker
-function renderCircle(endX: number, endY: number, stroke: string, size: number = 3) {
+function renderCircle(endX: number, endY: number, stroke: string, size: number = 2) {
   return (
     <circle
       cx={endX}
@@ -116,27 +116,17 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
 
   if (!hasData) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-zinc-600">
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
         </svg>
       </div>
     );
   }
 
-  // Calculate min distance to prevent overlap
-  let minDistance = Infinity;
-  for (let i = 0; i < players.length; i++) {
-    for (let j = i + 1; j < players.length; j++) {
-      const p1 = toSVG(players[i].alignment.x, players[i].alignment.y, width, height);
-      const p2 = toSVG(players[j].alignment.x, players[j].alignment.y, width, height);
-      const dist = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-      if (dist < minDistance) minDistance = dist;
-    }
-  }
-  const maxSize = Math.max(4, (minDistance / 2) - 1);
-  const baseSize = 6;
-  const size = Math.min(baseSize, maxSize);
+  // Responsive player size based on thumbnail width
+  // Smaller than editor to prevent overlap in thumbnails
+  const baseSize = Math.max(2, Math.min(5, width * 0.025));
 
   // Lighten line color for yard lines
   const lightenColor = (color: string, amount: number = 0.3): string => {
@@ -153,6 +143,12 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
     return color;
   };
 
+  // Build player position map for route start point lookup
+  const playerPositionMap = new Map<string, { x: number; y: number }>();
+  players.forEach(player => {
+    playerPositionMap.set(player.id, { x: player.alignment.x, y: player.alignment.y });
+  });
+
   return (
     <svg
       width={width}
@@ -160,10 +156,10 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
       viewBox={`0 0 ${width} ${height}`}
       className="w-full h-full"
     >
-      {/* Field background - uses play's field settings */}
+      {/* Field background */}
       <rect x={0} y={0} width={width} height={height} fill={field.backgroundColor} />
 
-      {/* Yard lines - uses lightened line color */}
+      {/* Yard lines */}
       {field.showYardLines && [0.2, 0.4, 0.6, 0.8].map((y, i) => (
         <line
           key={i}
@@ -172,7 +168,7 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
           x2={width}
           y2={y * height}
           stroke={lightenColor(field.lineColor, 0.5)}
-          strokeWidth={1}
+          strokeWidth={0.5}
           opacity={0.5}
         />
       ))}
@@ -185,17 +181,23 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
           x2={width}
           y2={height * 0.6}
           stroke={field.lineColor}
-          strokeWidth={1}
+          strokeWidth={0.5}
           opacity={0.7}
         />
       )}
 
-      {/* Routes and Blocks - uses action's style settings */}
+      {/* Routes and Blocks */}
       {actions.map((action, i) => {
         if (action.actionType === 'route') {
           const routeAction = action as RouteAction;
-          const controlPoints = routeAction.route?.controlPoints || [];
+          let controlPoints = [...(routeAction.route?.controlPoints || [])];
           if (controlPoints.length < 2) return null;
+
+          // Attach route start to player position (like editor does)
+          const playerPos = playerPositionMap.get(routeAction.fromPlayerId);
+          if (playerPos && controlPoints.length > 0) {
+            controlPoints[0] = { x: playerPos.x, y: playerPos.y };
+          }
 
           const style: ActionStyle = { ...DEFAULT_ACTION_STYLE, ...routeAction.style };
           const stroke = style.stroke || '#000000';
@@ -216,9 +218,9 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 d={pathD}
                 fill="none"
                 stroke={stroke}
-                strokeWidth={2}
+                strokeWidth={1.5}
                 strokeLinecap="round"
-                strokeDasharray={lineStyle === 'dashed' ? '4,2' : lineStyle === 'dotted' ? '1,2' : undefined}
+                strokeDasharray={lineStyle === 'dashed' ? '3,1.5' : lineStyle === 'dotted' ? '1,1.5' : undefined}
               />
               {/* End marker based on style */}
               {endMarker === 'arrow' && renderArrow(lastPoint.x, lastPoint.y, prevPoint.x, prevPoint.y, stroke)}
@@ -249,7 +251,7 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 x2={points[1].x}
                 y2={points[1].y}
                 stroke={stroke}
-                strokeWidth={2}
+                strokeWidth={1.5}
               />
               {/* End marker based on style */}
               {endMarker === 't_block' && renderTBlock(lastPoint.x, lastPoint.y, prevPoint.x, prevPoint.y, stroke)}
@@ -262,17 +264,19 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
         return null;
       })}
 
-      {/* Players - uses player's appearance settings */}
+      {/* Players - Editor uses white fill, black border */}
       {players.map((player, i) => {
         if (player.role === 'BALL') return null;
 
         const pos = toSVG(player.alignment.x, player.alignment.y, width, height);
         const appearance: PlayerAppearance = { ...DEFAULT_PLAYER_APPEARANCE, ...player.appearance };
-        const fill = appearance.fill || '#ffffff';
-        const stroke = appearance.stroke || '#000000';
         const shape = appearance.shape || 'circle';
         const isOL = ['C', 'LG', 'RG', 'LT', 'RT'].includes(player.label || '');
-        const playerSize = isOL ? size * 0.9 : size;
+        const playerSize = isOL ? baseSize * 0.9 : baseSize;
+
+        // Editor style: white fill, black border
+        const fill = '#ffffff';
+        const stroke = '#000000';
 
         return (
           <g key={player.id || i}>
@@ -284,21 +288,21 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 height={playerSize * 2}
                 fill={fill}
                 stroke={stroke}
-                strokeWidth={1}
+                strokeWidth={0.8}
               />
             ) : shape === 'triangle' ? (
               <polygon
                 points={`${pos.x},${pos.y - playerSize} ${pos.x - playerSize},${pos.y + playerSize} ${pos.x + playerSize},${pos.y + playerSize}`}
                 fill={fill}
                 stroke={stroke}
-                strokeWidth={1}
+                strokeWidth={0.8}
               />
             ) : shape === 'diamond' ? (
               <polygon
                 points={`${pos.x},${pos.y - playerSize} ${pos.x + playerSize},${pos.y} ${pos.x},${pos.y + playerSize} ${pos.x - playerSize},${pos.y}`}
                 fill={fill}
                 stroke={stroke}
-                strokeWidth={1}
+                strokeWidth={0.8}
               />
             ) : (
               <circle
@@ -307,7 +311,7 @@ export function PlayPreview({ play, width = 160, height = 120 }: PlayPreviewProp
                 r={playerSize}
                 fill={fill}
                 stroke={stroke}
-                strokeWidth={1}
+                strokeWidth={0.8}
               />
             )}
           </g>
