@@ -25,7 +25,8 @@ export type PlayerShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'star' 
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 export type PathType = 'straight' | 'quadratic' | 'bezier' | 'tension';
 export type EndMarker = 'arrow' | 'none' | 'circle' | 't_block';
-export type EditorMode = 'select' | 'draw' | 'text';
+export type EditorMode = 'select' | 'draw' | 'text' | 'symbol' | 'zone';
+export type PlacementPhase = 'idle' | 'placing';
 export type DrawLineType = 'straight' | 'curved' | 'angular';
 
 // Drawing configuration for unified draw mode
@@ -33,6 +34,8 @@ export interface DrawingConfig {
   lineType: DrawLineType;
   lineStyle: LineStyle;
   endMarker: EndMarker;
+  lineColor?: string;
+  lineWidth?: number;
 }
 
 // Drawing state phases
@@ -172,7 +175,53 @@ export interface TextAction {
   };
 }
 
-export type Action = RouteAction | BlockAction | MotionAction | LandmarkAction | TextAction;
+// Symbol types for field markers and indicators
+export type SymbolType =
+  | 'football' | 'cone' | 'star' | 'asterisk'
+  | 'exclamation' | 'dollar' | 'flag'
+  | 'arrow_up' | 'arrow_down' | 'arrow_left' | 'arrow_right'
+  | 'arrow_ne' | 'arrow_se' | 'arrow_sw' | 'arrow_nw';
+
+export interface SymbolAction {
+  id: string;
+  actionType: 'symbol';
+  symbol: {
+    type: SymbolType;
+    x: number;  // normalized position
+    y: number;
+    rotation?: number;  // degrees, 0-360
+    scale?: number;  // 1.0 = normal
+  };
+  style: {
+    fill: string;
+    stroke: string;
+    size: 'small' | 'medium' | 'large';
+  };
+}
+
+// Zone types for coverage areas and highlights
+export type ZoneShapeType = 'circle' | 'square' | 'triangle';
+
+export interface ZoneAction {
+  id: string;
+  actionType: 'zone';
+  zone: {
+    shape: ZoneShapeType;
+    x: number;  // center position (normalized)
+    y: number;
+    width: number;  // normalized dimensions
+    height: number;
+    rotation?: number;  // degrees
+  };
+  style: {
+    fill: string;
+    fillOpacity: number;  // 0.0-1.0
+    stroke: string;
+    strokeWidth: number;
+  };
+}
+
+export type Action = RouteAction | BlockAction | MotionAction | LandmarkAction | TextAction | SymbolAction | ZoneAction;
 
 // ============================================
 // Play Types
@@ -297,6 +346,21 @@ export const DEFAULT_DRAWING_CONFIG: DrawingConfig = {
   lineType: 'straight',
   lineStyle: 'solid',
   endMarker: 'arrow',
+  lineColor: '#000000',
+  lineWidth: 2,
+};
+
+export const DEFAULT_SYMBOL_STYLE = {
+  fill: '#000000',
+  stroke: '#000000',
+  size: 'medium' as const,
+};
+
+export const DEFAULT_ZONE_STYLE = {
+  fill: '#3b82f6',
+  fillOpacity: 0.5,
+  stroke: '#000000',
+  strokeWidth: 1,
 };
 
 // ============================================

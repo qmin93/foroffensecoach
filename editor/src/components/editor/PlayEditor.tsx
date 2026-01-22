@@ -5,7 +5,6 @@ import { Stage, Layer } from 'react-konva';
 import Konva from 'konva';
 import { useRouter } from 'next/navigation';
 import { useEditorStore } from '@/store/editorStore';
-import { useConceptStore } from '@/store/conceptStore';
 import { useAuthStore } from '@/store/authStore';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { FieldLayer } from './FieldLayer';
@@ -14,7 +13,6 @@ import { ActionLayer } from './ActionLayer';
 import { EditorBottomBar } from './EditorBottomBar';
 import { Toolbar } from './Toolbar';
 import { ContextMenu } from './ContextMenu';
-import { ConceptPanel } from './ConceptPanel';
 import { InstallFocusPanel } from './InstallFocusPanel';
 import { UndoToast } from './UndoToast';
 import { toNormalized } from '@/utils/coordinates';
@@ -33,6 +31,7 @@ import { MobileBottomBar } from './MobileBottomBar';
 import { FloatingActions } from './FloatingActions';
 import { PropertiesPanel } from './PropertiesPanel';
 import { PlaysPanel } from './PlaysPanel';
+import { DrawingToolsPanel } from './DrawingToolsPanel';
 
 export function PlayEditor() {
   const stageRef = useRef<Konva.Stage>(null);
@@ -83,7 +82,6 @@ export function PlayEditor() {
 
   const mode = useEditorStore((state) => state.mode);
   const play = useEditorStore((state) => state.play);
-  const applyConceptTemplate = useEditorStore((state) => state.applyConceptTemplate);
   const undo = useEditorStore((state) => state.undo);
   const drawingPhase = useEditorStore((state) => state.drawingPhase);
   const drawingConfig = useEditorStore((state) => state.drawingConfig);
@@ -112,14 +110,18 @@ export function PlayEditor() {
   const history = useEditorStore((state) => state.history);
   const redo = useEditorStore((state) => state.redo);
 
+  // Symbol/Zone placement
+  const placementPhase = useEditorStore((state) => state.placementPhase);
+  const placeSymbol = useEditorStore((state) => state.placeSymbol);
+  const cancelPlacement = useEditorStore((state) => state.cancelPlacement);
+  const zoneDragStart = useEditorStore((state) => state.zoneDragStart);
+  const startZoneDrag = useEditorStore((state) => state.startZoneDrag);
+  const finishZoneDrag = useEditorStore((state) => state.finishZoneDrag);
+
   // Computed undo/redo availability
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
-  // Concept panel state for mobile toggle buttons
-  const isConceptPanelOpen = useConceptStore((state) => state.isPanelOpen);
-  const openConceptPanel = useConceptStore((state) => state.openPanel);
-  const closeConceptPanel = useConceptStore((state) => state.closePanel);
 
   // Responsive canvas sizing
   useEffect(() => {
@@ -174,6 +176,18 @@ export function PlayEditor() {
 
       const normalized = toNormalized(pointerPos, stageWidth, stageHeight);
 
+      // Handle symbol placement
+      if (mode === 'symbol' && placementPhase === 'placing') {
+        placeSymbol(normalized);
+        return;
+      }
+
+      // Handle zone placement (start drag)
+      if (mode === 'zone' && placementPhase === 'placing' && !zoneDragStart) {
+        startZoneDrag(normalized);
+        return;
+      }
+
       // Handle drawing phases
       if (mode === 'draw') {
         if (drawingPhase === 'start_selected') {
@@ -197,7 +211,7 @@ export function PlayEditor() {
         clearSelection();
       }
     },
-    [mode, drawingPhase, stageWidth, stageHeight, setDrawingEndPoint, confirmDrawing, clearSelection, addAngularPoint]
+    [mode, drawingPhase, placementPhase, zoneDragStart, stageWidth, stageHeight, setDrawingEndPoint, confirmDrawing, clearSelection, addAngularPoint, placeSymbol, startZoneDrag]
   );
 
   // Handle mouse move for drawing preview and control point adjustment
@@ -236,12 +250,26 @@ export function PlayEditor() {
     [mode, drawingPhase, stageWidth, stageHeight, setDrawingControlPoint, setPreviewPoint, editingActionId, updateEditingPoint]
   );
 
-  // Handle mouse up for finishing editing
-  const handleMouseUp = useCallback(() => {
-    if (editingActionId) {
-      finishEditingAction();
-    }
-  }, [editingActionId, finishEditingAction]);
+  // Handle mouse up for finishing editing and zone placement
+  const handleMouseUp = useCallback(
+    (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+      // Handle zone drag end
+      if (mode === 'zone' && zoneDragStart) {
+        const stage = e.target.getStage();
+        if (!stage) return;
+        const pointerPos = stage.getPointerPosition();
+        if (!pointerPos) return;
+        const normalized = toNormalized(pointerPos, stageWidth, stageHeight);
+        finishZoneDrag(normalized);
+        return;
+      }
+
+      if (editingActionId) {
+        finishEditingAction();
+      }
+    },
+    [editingActionId, finishEditingAction, mode, zoneDragStart, stageWidth, stageHeight, finishZoneDrag]
+  );
 
   // Handle double-click for confirming angular drawing
   const handleDoubleClick = useCallback(
@@ -284,20 +312,6 @@ export function PlayEditor() {
     setContextMenu(null);
   }, []);
 
-  // Handle applying a concept template
-  const handleApplyConcept = useCallback(
-    (conceptId: string) => {
-      const result = applyConceptTemplate(conceptId);
-      if (result.success) {
-        setUndoToast({
-          visible: true,
-          message: result.message,
-        });
-      }
-    },
-    [applyConceptTemplate]
-  );
-
   // Handle undo from toast
   const handleUndoFromToast = useCallback(() => {
     undo();
@@ -321,9 +335,11 @@ export function PlayEditor() {
         return;
       }
 
-      // Escape to cancel drawing or deselect
+      // Escape to cancel drawing, placement, or deselect
       if (e.key === 'Escape') {
-        if (drawingPhase !== 'idle') {
+        if (placementPhase === 'placing') {
+          cancelPlacement();
+        } else if (drawingPhase !== 'idle') {
           cancelDrawing();
         } else if (editingActionId) {
           finishEditingAction();
@@ -420,7 +436,7 @@ export function PlayEditor() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [drawingPhase, cancelDrawing, clearSelection, editingActionId, finishEditingAction, confirmAngularDrawing]);
+  }, [drawingPhase, cancelDrawing, clearSelection, editingActionId, finishEditingAction, confirmAngularDrawing, placementPhase, cancelPlacement]);
 
   // Export function
   const handleExport = useCallback(() => {
@@ -515,7 +531,7 @@ export function PlayEditor() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-950">
+    <div className="flex flex-col h-full bg-background">
       {/* Desktop TopBar */}
       <TopBar
         onSave={save}
@@ -600,13 +616,7 @@ export function PlayEditor() {
         `}
       >
         <div className="flex-1 overflow-y-auto">
-          <Toolbar
-            onConceptPanelToggle={(isOpen) => {
-              if (isOpen) {
-                setShowInstallFocus(false);
-              }
-            }}
-          />
+          <Toolbar />
         </div>
       </div>
 
@@ -623,33 +633,10 @@ export function PlayEditor() {
       <div className="md:hidden flex items-center justify-center gap-2 py-2 px-3 border-b border-zinc-800 bg-zinc-900/50">
         <button
           onClick={() => {
-            if (isConceptPanelOpen) {
-              closeConceptPanel();
-            } else {
-              openConceptPanel();
-              setShowInstallFocus(false);
-            }
-          }}
-          className={`
-            flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
-            ${isConceptPanelOpen
-              ? 'bg-blue-600 text-white'
-              : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-            }
-          `}
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-          </svg>
-          Concepts
-        </button>
-        <button
-          onClick={() => {
             if (showInstallFocus) {
               setShowInstallFocus(false);
             } else {
               setShowInstallFocus(true);
-              closeConceptPanel();
             }
           }}
           className={`
@@ -668,7 +655,7 @@ export function PlayEditor() {
         </button>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Canvas (flex-1) */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Canvas */}
         <div
@@ -689,7 +676,7 @@ export function PlayEditor() {
             className={`p-2 rounded-lg border transition-colors ${
               gridSnapEnabled
                 ? 'bg-blue-600 border-blue-500 text-white'
-                : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700'
+                : 'bg-muted border-border text-muted-foreground hover:bg-muted/80'
             }`}
             title={`Grid snap: ${gridSnapEnabled ? 'ON' : 'OFF'}`}
             aria-pressed={gridSnapEnabled}
@@ -700,7 +687,7 @@ export function PlayEditor() {
           </button>
           <button
             onClick={() => setShowShortcuts(true)}
-            className="p-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 transition-colors"
+            className="p-2 rounded-lg bg-muted border border-border text-muted-foreground hover:bg-muted/80 transition-colors"
             title="Keyboard shortcuts (?)"
             aria-label="Show keyboard shortcuts"
           >
@@ -731,7 +718,12 @@ export function PlayEditor() {
             <PlayerLayer width={stageWidth} height={stageHeight} />
           </Stage>
         </div>
+        </div>
       </div>
+
+      {/* Drawing Tools Panel - Right side (Desktop only) */}
+      <div className="hidden md:block flex-shrink-0">
+        <DrawingToolsPanel />
       </div>
       </div> {/* End Main Content with Sidebar */}
 
@@ -773,16 +765,6 @@ export function PlayEditor() {
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={closeContextMenu} />
       )}
 
-      {/* Concept Panel - hidden when Install Focus is open */}
-      {!showInstallFocus && (
-        <ConceptPanel
-          onApplyConcept={handleApplyConcept}
-          onOpenInstallFocus={() => {
-            setShowInstallFocus(true);
-            useConceptStore.getState().closePanel();
-          }}
-        />
-      )}
 
       {/* Install Focus Panel - mutually exclusive with Concept Panel */}
       <InstallFocusPanel
@@ -847,32 +829,17 @@ export function PlayEditor() {
             }
           );
         }}
-        onOpenConcepts={() => {
-          openConceptPanel();
-          setShowInstallFocus(false);
-        }}
-        showConcepts={!play.meta?.conceptId}
       />
 
       {/* Properties Panel - Shows when element is selected */}
       <PropertiesPanel />
 
-      {/* Desktop Bottom Toolbar */}
-      <EditorBottomBar
-        onConceptPanelToggle={(isOpen) => {
-          if (isOpen) {
-            setShowInstallFocus(false);
-          }
-        }}
-      />
+      {/* Desktop Bottom Toolbar - Replaced by DrawingToolsPanel */}
+      {/* <EditorBottomBar /> */}
 
       {/* Mobile Bottom Bar - Fixed at bottom */}
       <MobileBottomBar
         onOpenMenu={() => setIsMobileMenuOpen(true)}
-        onOpenConcepts={() => {
-          openConceptPanel();
-          setShowInstallFocus(false);
-        }}
         canUndo={canUndo}
         canRedo={canRedo}
       />

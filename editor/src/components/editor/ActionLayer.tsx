@@ -5,7 +5,7 @@ import { Layer, Arrow, Line, Shape, Circle, Text } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useEditorStore } from '@/store/editorStore';
 import { useConceptStore } from '@/store/conceptStore';
-import { Action, RouteAction, BlockAction, MotionAction, LandmarkAction, TextAction, Point, EndMarker, Player } from '@/types/dsl';
+import { Action, RouteAction, BlockAction, MotionAction, LandmarkAction, TextAction, SymbolAction, ZoneAction, Point, EndMarker, Player, SymbolType } from '@/types/dsl';
 import { toPixel, toNormalized, pointsToPixelArray, findClosestSegment } from '@/utils/coordinates';
 import { generateConceptPreview } from '@/lib/concept-preview';
 
@@ -769,6 +769,164 @@ function TextShape({ action, width, height, isSelected, onSelect }: {
   );
 }
 
+// Symbol icon mapping
+const SYMBOL_ICONS: Record<SymbolType, string> = {
+  football: '🏈',
+  cone: '🔺',
+  star: '⭐',
+  asterisk: '✳',
+  exclamation: '❗',
+  dollar: '$',
+  flag: '🚩',
+  arrow_up: '↑',
+  arrow_down: '↓',
+  arrow_left: '←',
+  arrow_right: '→',
+  arrow_ne: '↗',
+  arrow_se: '↘',
+  arrow_sw: '↙',
+  arrow_nw: '↖',
+};
+
+// Render Symbol action
+function SymbolShape({ action, width, height, isSelected, onSelect }: {
+  action: SymbolAction;
+  width: number;
+  height: number;
+  isSelected: boolean;
+  onSelect: (id: string, shiftKey: boolean) => void;
+}) {
+  const { symbol, style } = action;
+  const { x, y } = toPixel({ x: symbol.x, y: symbol.y }, width, height);
+
+  const handleClick = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    e.cancelBubble = true;
+    const nativeEvent = e.evt as MouseEvent;
+    onSelect(action.id, nativeEvent.shiftKey);
+  };
+
+  const sizeMap = { small: 16, medium: 24, large: 36 };
+  const size = sizeMap[style.size] * (symbol.scale || 1);
+  const rotation = symbol.rotation || 0;
+
+  // Use Text element to render emoji/symbol
+  const iconText = SYMBOL_ICONS[symbol.type] || '?';
+
+  return (
+    <>
+      <Text
+        x={x}
+        y={y}
+        text={iconText}
+        fontSize={size}
+        rotation={rotation}
+        offsetX={size / 2}
+        offsetY={size / 2}
+        onClick={handleClick}
+        onTap={handleClick}
+      />
+      {/* Selection indicator */}
+      {isSelected && (
+        <Circle
+          x={x}
+          y={y}
+          radius={size / 2 + 4}
+          stroke="#3b82f6"
+          strokeWidth={2}
+          dash={[4, 4]}
+          fill="transparent"
+        />
+      )}
+    </>
+  );
+}
+
+// Render Zone action
+function ZoneShape({ action, width, height, isSelected, onSelect }: {
+  action: ZoneAction;
+  width: number;
+  height: number;
+  isSelected: boolean;
+  onSelect: (id: string, shiftKey: boolean) => void;
+}) {
+  const { zone, style } = action;
+  const center = toPixel({ x: zone.x, y: zone.y }, width, height);
+  const zoneWidth = zone.width * width;
+  const zoneHeight = zone.height * height;
+  const rotation = zone.rotation || 0;
+
+  const handleClick = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    e.cancelBubble = true;
+    const nativeEvent = e.evt as MouseEvent;
+    onSelect(action.id, nativeEvent.shiftKey);
+  };
+
+  // Zone rendered based on shape type
+  if (zone.shape === 'circle') {
+    const radius = Math.min(zoneWidth, zoneHeight) / 2;
+    return (
+      <Circle
+        x={center.x}
+        y={center.y}
+        radius={radius}
+        fill={style.fill}
+        opacity={style.fillOpacity}
+        stroke={isSelected ? '#3b82f6' : style.stroke}
+        strokeWidth={isSelected ? 2 : style.strokeWidth}
+        rotation={rotation}
+        onClick={handleClick}
+        onTap={handleClick}
+      />
+    );
+  }
+
+  if (zone.shape === 'triangle') {
+    // Render triangle using Shape
+    return (
+      <Shape
+        x={center.x}
+        y={center.y}
+        rotation={rotation}
+        sceneFunc={(context, shape) => {
+          context.beginPath();
+          context.moveTo(0, -zoneHeight / 2);
+          context.lineTo(-zoneWidth / 2, zoneHeight / 2);
+          context.lineTo(zoneWidth / 2, zoneHeight / 2);
+          context.closePath();
+          context.fillStrokeShape(shape);
+        }}
+        fill={style.fill}
+        opacity={style.fillOpacity}
+        stroke={isSelected ? '#3b82f6' : style.stroke}
+        strokeWidth={isSelected ? 2 : style.strokeWidth}
+        onClick={handleClick}
+        onTap={handleClick}
+      />
+    );
+  }
+
+  // Default: square/rectangle
+  return (
+    <Shape
+      x={center.x}
+      y={center.y}
+      rotation={rotation}
+      sceneFunc={(context, shape) => {
+        context.beginPath();
+        context.rect(-zoneWidth / 2, -zoneHeight / 2, zoneWidth, zoneHeight);
+        context.closePath();
+        context.fillStrokeShape(shape);
+      }}
+      fill={style.fill}
+      opacity={style.fillOpacity}
+      stroke={isSelected ? '#3b82f6' : style.stroke}
+      strokeWidth={isSelected ? 2 : style.strokeWidth}
+      onClick={handleClick}
+      onTap={handleClick}
+    />
+  );
+}
+
 export function ActionLayer({ width, height, actions: propActions, isReadOnly = false }: ActionLayerProps) {
   const storeActions = useEditorStore((state) => state.play.actions);
   const players = useEditorStore((state) => state.play.roster.players);
@@ -927,6 +1085,28 @@ export function ActionLayer({ width, height, actions: propActions, isReadOnly = 
           <TextShape
             key={action.id}
             action={action}
+            width={width}
+            height={height}
+            isSelected={isSelected}
+            onSelect={handleSelect}
+          />
+        );
+      case 'symbol':
+        return (
+          <SymbolShape
+            key={action.id}
+            action={action as SymbolAction}
+            width={width}
+            height={height}
+            isSelected={isSelected}
+            onSelect={handleSelect}
+          />
+        );
+      case 'zone':
+        return (
+          <ZoneShape
+            key={action.id}
+            action={action as ZoneAction}
             width={width}
             height={height}
             isSelected={isSelected}

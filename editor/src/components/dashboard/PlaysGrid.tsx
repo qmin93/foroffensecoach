@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { PlayCard } from './PlayCard';
-import { getPlays, deletePlay, duplicatePlay } from '@/lib/api/plays';
+import { getPlays, deletePlay, deleteAllPlays, duplicatePlay } from '@/lib/api/plays';
 import { Tables } from '@/types/database';
 import { PlayCardSkeleton } from '@/components/ui/Skeleton';
+import { Trash2 } from 'lucide-react';
 
 type PlayRow = Tables<'plays'>;
 
@@ -71,6 +72,23 @@ export function PlaysGrid({ workspaceId, userId, onOpenPlay, onCreatePlay }: Pla
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (plays.length === 0) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete all ${plays.length} plays? This action cannot be undone.`
+    );
+
+    if (confirmed) {
+      try {
+        await deleteAllPlays(workspaceId);
+        setPlays([]);
+      } catch (err) {
+        console.error('Failed to delete all plays:', err);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4">
@@ -100,7 +118,7 @@ export function PlaysGrid({ workspaceId, userId, onOpenPlay, onCreatePlay }: Pla
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3 sm:mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 sm:mb-6">
         <h3 className="text-base sm:text-lg font-medium text-foreground shrink-0">My Plays ({plays.length})</h3>
 
         {/* Search Bar */}
@@ -139,6 +157,20 @@ export function PlaysGrid({ workspaceId, userId, onOpenPlay, onCreatePlay }: Pla
               )}
             </div>
           </div>
+        )}
+
+        {/* Spacer to push Delete All to the right */}
+        <div className="hidden sm:block flex-1" />
+
+        {/* Delete All Button */}
+        {plays.length > 0 && (
+          <button
+            onClick={handleDeleteAll}
+            className="px-3 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 shrink-0 sm:ml-auto"
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete All
+          </button>
         )}
       </div>
 
