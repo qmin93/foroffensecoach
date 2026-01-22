@@ -289,6 +289,13 @@ const radius = isBall ? (appearance.radius || 10) : Math.min(baseRadius, maxRadi
 - 표준 드로잉 앱 패턴 (Figma, Sketch 등) 따름
 - 연속 그리기가 필요하면 Shift 키 등 수정자 키로 별도 구현 (향후)
 
+### 시각적 요소 변경 시 확인 규칙 (2026-01-22 추가)
+**위치/크기/색상 변경 시 구체적 값 사용자 확인 필수**
+- **위치 (y좌표)**: "겹치지 않게" → 구체적 y값 (예: -0.08) 확인
+- **마커/스타일**: 불명확 시 기존 동작 유지 또는 명시적 확인
+- **UI 상호작용**: 새 UI 요소 추가 시 "보기만" vs "클릭 가능" 확인
+- **dev 서버**: 시작 후 실제 포트 번호 사용자에게 명시
+
 ## Design Principles
 
 1. **Recommendations are filtering, not judgment** - Show options, not "AI picks"
