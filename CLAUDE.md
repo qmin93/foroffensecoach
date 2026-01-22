@@ -72,6 +72,16 @@ cd editor && npm run test -- --run src/__tests__/specific.test.ts  # Single test
 | `bg-blue-600` | `bg-primary` |
 | `bg-red-600` | `bg-destructive` |
 
+### 허용 예외 (의미적 색상)
+- `green-600/500` - 성공 액션 (Complete, Save, Copy)
+- `orange-500` - Team/Owner 뱃지
+- `red-500` - 에러 상태 (destructive 대신 사용하는 경우)
+
+### 하드코딩 색상 감지
+```bash
+grep -rn "zinc-\|gray-\|slate-" editor/src/app --include="*.tsx"
+```
+
 ## Repository Structure
 
 | Path | Purpose |
