@@ -851,6 +851,7 @@ export function PlayEditor() {
           openConceptPanel();
           setShowInstallFocus(false);
         }}
+        showConcepts={!play.meta?.conceptId}
       />
 
       {/* Properties Panel - Shows when element is selected */}

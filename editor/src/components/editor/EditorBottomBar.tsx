@@ -338,19 +338,21 @@ export function EditorBottomBar({ onConceptPanelToggle }: EditorBottomBarProps) 
 
       <div className="w-px h-6 bg-zinc-700" />
 
-      {/* Show Concepts */}
-      <Button
-        onClick={() => {
-          const newState = !isPanelOpen;
-          toggleConceptPanel();
-          onConceptPanelToggle?.(newState);
-        }}
-        variant={isPanelOpen ? 'default' : 'outline'}
-        size="sm"
-        className={`h-8 text-xs ${isPanelOpen ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-600'}`}
-      >
-        Concepts
-      </Button>
+      {/* Show Concepts - only when no concept is applied yet */}
+      {!conceptId && (
+        <Button
+          onClick={() => {
+            const newState = !isPanelOpen;
+            toggleConceptPanel();
+            onConceptPanelToggle?.(newState);
+          }}
+          variant={isPanelOpen ? 'default' : 'outline'}
+          size="sm"
+          className={`h-8 text-xs ${isPanelOpen ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-600'}`}
+        >
+          Concepts
+        </Button>
+      )}
 
       {/* Play Actions */}
       <Button
