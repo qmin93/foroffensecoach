@@ -461,6 +461,19 @@ function calculateBlockEndPoint(
 }
 
 /**
+ * Check if concept is an outside run (sweep, toss, etc.)
+ */
+function isOutsideRun(concept: Concept): boolean {
+  const outsidePatterns = ['sweep', 'toss', 'jet', 'fly', 'rocket', 'pitch', 'stretch'];
+  const conceptId = concept.id?.toLowerCase() || '';
+  const conceptName = concept.name?.toLowerCase() || '';
+
+  return outsidePatterns.some(pattern =>
+    conceptId.includes(pattern) || conceptName.includes(pattern)
+  );
+}
+
+/**
  * Build actions from a concept template for given players
  */
 export function buildConceptActions(
@@ -473,6 +486,7 @@ export function buildConceptActions(
 
   const template = concept.template;
   const defaultSide = template.buildPolicy.defaultSide || 'strength';
+  const isOutside = isOutsideRun(concept);
 
   // Process each role in the template
   for (const role of template.roles) {
@@ -813,17 +827,45 @@ export function buildConceptActions(
         actions.push(routeAction);
         actionsCreated++;
       } else {
-        // Run path for RB (15 yards) - draw a path toward the play side
+        // Run path for RB
         const rbRunDepth = 14 * 0.04; // 14 yards in normalized coords (max)
-        const runEndPoint: Point = {
-          x: startPoint.x + (defaultSide === 'right' ? 0.05 : -0.05),
-          y: startPoint.y + rbRunDepth,
-        };
+        const sideMultiplier = defaultSide === 'right' ? 1 : -1;
 
-        const controlPoint: Point = {
-          x: startPoint.x,
-          y: startPoint.y + rbRunDepth * 0.4,
-        };
+        let controlPoints: Point[];
+        let routePattern: string;
+
+        if (isOutside) {
+          // Sweep/Toss: First move horizontally, then turn upfield
+          // Phase 1: Lateral movement toward play side (receive handoff)
+          const lateralPoint: Point = {
+            x: startPoint.x + (sideMultiplier * 0.15), // Move 15% canvas width laterally
+            y: startPoint.y + 0.02, // Slight forward movement
+          };
+          // Phase 2: Turn corner and go upfield
+          const turnPoint: Point = {
+            x: startPoint.x + (sideMultiplier * 0.20),
+            y: startPoint.y + 0.08,
+          };
+          // Phase 3: Upfield toward sideline
+          const runEndPoint: Point = {
+            x: startPoint.x + (sideMultiplier * 0.25),
+            y: startPoint.y + rbRunDepth,
+          };
+          controlPoints = [startPoint, lateralPoint, turnPoint, runEndPoint];
+          routePattern = 'sweep';
+        } else {
+          // Inside run: More vertical path toward play side
+          const runEndPoint: Point = {
+            x: startPoint.x + (sideMultiplier * 0.05),
+            y: startPoint.y + rbRunDepth,
+          };
+          const controlPoint: Point = {
+            x: startPoint.x,
+            y: startPoint.y + rbRunDepth * 0.4,
+          };
+          controlPoints = [startPoint, controlPoint, runEndPoint];
+          routePattern = 'go';
+        }
 
         const routeAction: RouteAction = {
           id: uuidv4(),
@@ -835,11 +877,11 @@ export function buildConceptActions(
             strokeWidth: 3,
           },
           route: {
-            pattern: 'go',
+            pattern: routePattern,
             depth: 15,
-            controlPoints: [startPoint, controlPoint, runEndPoint],
-            pathType: 'tension',
-            tension: 0.3,
+            controlPoints,
+            pathType: isOutside ? 'straight' : 'tension',
+            tension: isOutside ? 0 : 0.3,
           },
         };
 
