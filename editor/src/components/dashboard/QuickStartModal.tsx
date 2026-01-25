@@ -155,7 +155,11 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
 
   const handleCreate = async () => {
     const selectedPlays = generatedPlays.filter(p => p.selected);
-    if (selectedPlays.length === 0) return;
+    console.log('[QuickStartModal] handleCreate called, selectedPlays:', selectedPlays.length);
+    if (selectedPlays.length === 0) {
+      console.warn('[QuickStartModal] No plays selected');
+      return;
+    }
 
     setIsCreating(true);
     setCreationProgress({ current: 0, total: selectedPlays.length, currentPlayName: '' });
@@ -164,14 +168,16 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
       const playbookName = `Quick Playbook ${new Date().toLocaleDateString()}`;
       const tags = ['quick-start', ...selectedFormations.slice(0, 3).map(f => getFormationName(f).toLowerCase())];
 
+      console.log('[QuickStartModal] Calling onCreate...');
       await onCreate(playbookName, tags, selectedPlays, (progress) => {
         setCreationProgress(progress);
       });
+      console.log('[QuickStartModal] onCreate completed successfully');
 
       resetForm();
       onClose();
     } catch (err) {
-      console.error('Failed to create playbook:', err);
+      console.error('[QuickStartModal] Failed to create playbook:', err);
     } finally {
       setIsCreating(false);
       setCreationProgress(null);

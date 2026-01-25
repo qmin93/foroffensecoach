@@ -32,6 +32,7 @@ import { MobileBottomBar } from './MobileBottomBar';
 import { PropertiesPanel } from './PropertiesPanel';
 import { PlaysPanel } from './PlaysPanel';
 import { DrawingToolsPanel } from './DrawingToolsPanel';
+import { EditorBottomPanel } from './EditorBottomPanel';
 
 export function PlayEditor() {
   const stageRef = useRef<Konva.Stage>(null);
@@ -758,6 +759,11 @@ export function PlayEditor() {
             <PlayerLayer width={stageWidth} height={stageHeight} />
             <SelectionLayer width={stageWidth} height={stageHeight} />
           </Stage>
+        </div>
+
+        {/* Assignment & Install Focus Bottom Panel (Desktop only) */}
+        <div className="hidden md:block">
+          <EditorBottomPanel />
         </div>
         </div>
       </div>

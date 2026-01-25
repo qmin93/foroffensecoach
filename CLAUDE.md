@@ -2,6 +2,22 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Commands](#commands)
+- [UI Theming](#ui-theming-shadcnui)
+- [Repository Structure](#repository-structure)
+- [State Management](#state-management-zustand-stores)
+- [DSL Architecture](#dsl-architecture)
+- [Concept System](#concept-system-architecture)
+- [Konva Layer Architecture](#konva-layer-architecture)
+- [Coordinate System](#coordinate-system)
+- [Visual Specifications](#visual-specifications-canvas--nodes)
+- [Critical Exceptions](#critical-exceptions-반성회에서-도출)
+- [Design Principles](#design-principles)
+- [배포 권한 규칙](#배포-권한-규칙-중요)
+- [Vercel 빌드 주의사항](#vercel-빌드-주의사항)
+
 ## Project Overview
 
 **ForOffenseCoach** is a football playbook builder & concept recommender SaaS for coaches.
@@ -100,6 +116,7 @@ grep -rn "zinc-\|gray-\|slate-" editor/src/app --include="*.tsx"
 | `editor/src/types/dsl.ts` | Core DSL type definitions |
 | `prd.md` | Product Requirements Document |
 | `DSL Specification.md` | Data model schemas |
+| `docs/formations-and-concepts.md` | 51개 포메이션 + 65개 컨셉 레퍼런스 |
 | `.claude/retrospectives/` | 반성회 기록 (문제 해결 후 작성) |
 
 ## State Management (Zustand Stores)

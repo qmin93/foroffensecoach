@@ -6,6 +6,7 @@ import { useEditorStore } from '@/store/editorStore';
 import { PlayerNode } from './PlayerNode';
 import { toNormalized, toPixel } from '@/utils/coordinates';
 import { Player } from '@/types/dsl';
+import { buildAssignmentMap } from '@/lib/assignments/buildAssignmentMap';
 
 interface PlayerLayerProps {
   width: number;
@@ -41,6 +42,7 @@ function calculateMaxRadius(players: Player[], width: number, height: number): n
 
 export function PlayerLayer({ width, height, players: propPlayers, isReadOnly = false }: PlayerLayerProps) {
   const storePlayers = useEditorStore((state) => state.play.roster.players);
+  const actions = useEditorStore((state) => state.play.actions);
   const selectedPlayerIds = useEditorStore((state) => state.selectedPlayerIds);
   const hoveredPlayerId = useEditorStore((state) => state.hoveredPlayerId);
   const selectPlayer = useEditorStore((state) => state.selectPlayer);
@@ -50,8 +52,15 @@ export function PlayerLayer({ width, height, players: propPlayers, isReadOnly = 
   const mode = useEditorStore((state) => state.mode);
   const drawingPhase = useEditorStore((state) => state.drawingPhase);
   const startDrawingFromPlayer = useEditorStore((state) => state.startDrawingFromPlayer);
+  const showAssignmentsOnCanvas = useEditorStore((state: any) => state.ui?.showAssignmentsOnCanvas ?? false);
 
   const players = propPlayers ?? storePlayers;
+
+  // Build assignment map for canvas badges
+  const assignmentMap = useMemo(() => {
+    if (!showAssignmentsOnCanvas) return new Map<string, string>();
+    return buildAssignmentMap(actions ?? []);
+  }, [actions, showAssignmentsOnCanvas]);
 
   // Calculate max radius to prevent overlap
   const maxRadius = useMemo(() => {
@@ -105,6 +114,7 @@ export function PlayerLayer({ width, height, players: propPlayers, isReadOnly = 
           onMouseEnter={isReadOnly ? undefined : handleMouseEnter}
           onMouseLeave={isReadOnly ? undefined : handleMouseLeave}
           draggable={!isReadOnly && mode === 'select'}
+          assignmentText={showAssignmentsOnCanvas ? (assignmentMap.get(player.id) ?? null) : null}
         />
       ))}
     </Layer>

@@ -43,6 +43,7 @@ export const TIER1_PASS_CONCEPT_IDS = [
   'pass_curl_flat',
   'pass_smash',
   'pass_mesh',
+  'pass_shallow',
   'pass_drive',
   'pass_levels',
   'pass_y_cross',

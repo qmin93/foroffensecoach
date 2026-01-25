@@ -79,14 +79,32 @@ export default function DashboardPage() {
     generatedPlays: GeneratedPlay[],
     onProgress?: (progress: { current: number; total: number; currentPlayName: string }) => void
   ) => {
-    if (!workspace || !user) return;
+    console.log('[handleCreatePlaybook] called', { workspace, user, name, playsCount: generatedPlays.length });
+    if (!workspace || !user) {
+      console.error('[handleCreatePlaybook] Missing workspace or user', { workspace, user });
+      return;
+    }
 
     // 1. Create the playbook
-    const playbook = await createPlaybook(workspace.id, user.id, name, tags);
+    console.log('[handleCreatePlaybook] Creating playbook...', { name, tags });
+    let playbook;
+    try {
+      playbook = await createPlaybook(workspace.id, user.id, name, tags);
+      console.log('[handleCreatePlaybook] Playbook created:', playbook?.id);
+    } catch (err) {
+      console.error('[handleCreatePlaybook] Failed to create playbook:', err);
+      throw err;
+    }
+
+    if (!playbook) {
+      console.error('[handleCreatePlaybook] Playbook is null/undefined');
+      return;
+    }
 
     // 2. Create each generated play and add to playbook
     const selectedPlays = generatedPlays.filter(p => p.selected);
     const total = selectedPlays.length;
+    console.log('[handleCreatePlaybook] Creating', total, 'plays...');
 
     for (let i = 0; i < selectedPlays.length; i++) {
       const generatedPlay = selectedPlays[i];

@@ -1,6 +1,6 @@
 'use client';
 
-import { Group, Circle, Rect, RegularPolygon, Star, Text, Shape } from 'react-konva';
+import { Group, Circle, Rect, RegularPolygon, Star, Text, Shape, Label, Tag } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Player, PlayerShape } from '@/types/dsl';
 import { toPixel } from '@/utils/coordinates';
@@ -19,6 +19,7 @@ interface PlayerNodeProps {
   onMouseEnter?: (playerId: string) => void;
   onMouseLeave?: () => void;
   draggable?: boolean;
+  assignmentText?: string | null;
 }
 
 export function PlayerNode({
@@ -34,6 +35,7 @@ export function PlayerNode({
   onMouseEnter,
   onMouseLeave,
   draggable = true,
+  assignmentText,
 }: PlayerNodeProps) {
   const mode = useEditorStore((state) => state.mode);
   const drawingPhase = useEditorStore((state) => state.drawingPhase);
@@ -249,6 +251,26 @@ export function PlayerNode({
           offsetY={responsiveLabelFontSize / 2}
           fontStyle="bold"
         />
+      )}
+
+      {/* Assignment badge - shows above the player */}
+      {assignmentText && (
+        <Label x={0} y={-radius - 22} offsetX={0}>
+          <Tag
+            fill="rgba(17,24,39,0.92)"
+            cornerRadius={4}
+            pointerDirection="down"
+            pointerWidth={6}
+            pointerHeight={4}
+          />
+          <Text
+            text={assignmentText.length > 28 ? assignmentText.slice(0, 28) + '…' : assignmentText}
+            fontSize={9}
+            fontStyle="600"
+            fill="white"
+            padding={4}
+          />
+        </Label>
       )}
     </Group>
   );
