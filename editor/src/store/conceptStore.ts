@@ -3,6 +3,7 @@ import { immer } from 'zustand/middleware/immer';
 import type {
   Concept,
   ConceptType,
+  ConceptTier,
   PassCategory,
   RunCategory,
   FormationContext,
@@ -20,6 +21,7 @@ interface ConceptFilters {
   type: ConceptType | 'all';
   category: PassCategory | RunCategory | 'all';
   searchQuery: string;
+  maxTier: ConceptTier; // 1=Core only, 2=Core+Situational, 3=All
 }
 
 interface ConceptState {
@@ -57,6 +59,7 @@ interface ConceptActions {
   // Filters
   setTypeFilter: (type: ConceptType | 'all') => void;
   setCategoryFilter: (category: PassCategory | RunCategory | 'all') => void;
+  setMaxTierFilter: (tier: ConceptTier) => void;
   setSearchQuery: (query: string) => void;
   clearFilters: () => void;
 
@@ -91,6 +94,7 @@ const initialState: ConceptState = {
     type: 'all',
     category: 'all',
     searchQuery: '',
+    maxTier: 3, // Default: show all tiers
   },
 
   formationContext: null,
@@ -147,6 +151,11 @@ export const useConceptStore = create<ConceptState & ConceptActions>()(
         state.filters.category = category;
       }),
 
+    setMaxTierFilter: (tier) =>
+      set((state) => {
+        state.filters.maxTier = tier;
+      }),
+
     setSearchQuery: (query) =>
       set((state) => {
         state.filters.searchQuery = query;
@@ -158,6 +167,7 @@ export const useConceptStore = create<ConceptState & ConceptActions>()(
           type: 'all',
           category: 'all',
           searchQuery: '',
+          maxTier: 3,
         };
       }),
 
@@ -250,6 +260,11 @@ export const useConceptStore = create<ConceptState & ConceptActions>()(
             c.summary.toLowerCase().includes(query) ||
             c.badges?.some((b) => b.toLowerCase().includes(query))
         );
+      }
+
+      // Filter by tier (show concepts at or below maxTier)
+      if (filters.maxTier < 3) {
+        concepts = concepts.filter((c) => c.tier <= filters.maxTier);
       }
 
       return concepts;
@@ -543,6 +558,7 @@ function computeRecommendations(
         id: concept.id,
         name: concept.name,
         conceptType: concept.conceptType,
+        tier: concept.tier,
         category,
         summary: concept.summary,
         badges: concept.badges ?? [],

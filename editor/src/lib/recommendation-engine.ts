@@ -25,6 +25,7 @@ import type {
   PreferredStructure,
 } from '@/types/concept';
 import { ALL_CONCEPTS } from '@/data/concepts';
+import { TIER1_CONCEPT_SET } from '@/data/tier1-lock';
 
 // ============================================
 // Configuration
@@ -57,7 +58,8 @@ const CONFIG = {
 export function getRecommendations(input: RecommendationInput): RecommendationResult {
   const { formation, defense, preferredType } = input;
 
-  let concepts = ALL_CONCEPTS;
+  // Tier-1 lock: 추천에는 현대 풋볼 표준 컨셉만 노출
+  let concepts = ALL_CONCEPTS.filter((c) => TIER1_CONCEPT_SET.has(c.id));
 
   // Pre-filter by type if specified
   if (preferredType) {
@@ -84,6 +86,7 @@ export function getRecommendations(input: RecommendationInput): RecommendationRe
     id: sc.concept.id,
     name: sc.concept.name,
     conceptType: sc.concept.conceptType,
+    tier: sc.concept.tier,
     category: getCategory(sc.concept),
     summary: sc.concept.summary,
     badges: sc.concept.badges ?? [],
