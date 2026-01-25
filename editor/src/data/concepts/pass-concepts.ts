@@ -25,6 +25,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_stick',
     name: 'Stick',
     conceptType: 'pass',
+    tier: 1,
     summary: '3-level quick game with flat, stick, and corner routes',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -36,27 +37,43 @@ export const PASS_CONCEPTS: Concept[] = [
       roles: [
         {
           roleName: 'STICK',
-          appliesTo: ['Y', 'H'],
+          appliesTo: ['Y', 'H', 'TE'],
           defaultRoute: { pattern: 'stick', depth: 6, direction: 'inside' },
+          assignment: 'TE: Stick 6y — settle vs zone',
           notes: 'Settle in soft spot between LBs',
         },
         {
           roleName: 'FLAT',
           appliesTo: ['RB'],
           defaultRoute: { pattern: 'flat', depth: 2, direction: 'outside' },
+          assignment: 'RB: Flat/arrow (or protect tag)',
           notes: 'Quick release to flat, eye defender',
         },
         {
           roleName: 'CORNER',
-          appliesTo: ['Z'],
+          appliesTo: ['Z', 'WR'],
           defaultRoute: { pattern: 'corner', depth: 12 },
+          assignment: 'WR: Clear/spacing by alignment',
           notes: 'Clear out defender, option route vs man',
         },
         {
           roleName: 'BACKSIDE',
           appliesTo: ['X'],
           defaultRoute: { pattern: 'slant', depth: 6, direction: 'inside' },
+          assignment: 'X: Slant — backside option',
           notes: 'Backside slant for scramble',
+        },
+        {
+          roleName: 'OL_PRO',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          assignment: 'OL: Quick pro',
+          notes: 'Quick pass protection',
+        },
+        {
+          roleName: 'QB_READ',
+          appliesTo: ['QB'],
+          assignment: 'QB: Read stick/flat (quick game)',
+          notes: 'Quick game read progression',
         },
       ],
       buildPolicy: {
@@ -104,6 +121,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_spacing',
     name: 'Spacing',
     conceptType: 'pass',
+    tier: 1,
     summary: 'Horizontal stretch with 5 receivers on different levels',
     badges: ['air_raid', 'spread'],
     requirements: {
@@ -115,27 +133,43 @@ export const PASS_CONCEPTS: Concept[] = [
       roles: [
         {
           roleName: 'SNAG',
-          appliesTo: ['Y'],
+          appliesTo: ['Y', 'TE'],
           defaultRoute: { pattern: 'snag', depth: 6, direction: 'inside' },
+          assignment: 'TE: Snag — settle in soft spot',
           notes: 'Settle in open grass',
         },
         {
           roleName: 'SIT',
           appliesTo: ['X'],
           defaultRoute: { pattern: 'hitch', depth: 5 },
+          assignment: 'X: Hitch 5y — sit',
           notes: 'Hitch at 5 yards',
         },
         {
           roleName: 'SPEED_OUT',
           appliesTo: ['Z'],
           defaultRoute: { pattern: 'speed_out', depth: 5 },
+          assignment: 'Z: Speed out 5y',
           notes: 'Quick speed out',
         },
         {
           roleName: 'FLAT',
           appliesTo: ['RB', 'H'],
           defaultRoute: { pattern: 'flat', depth: 1 },
+          assignment: 'RB: Check-release to flat',
           notes: 'Check release to flat',
+        },
+        {
+          roleName: 'OL_PRO',
+          appliesTo: ['LT', 'LG', 'C', 'RG', 'RT'],
+          assignment: 'OL: Quick pro',
+          notes: 'Quick pass protection',
+        },
+        {
+          roleName: 'QB_READ',
+          appliesTo: ['QB'],
+          assignment: 'QB: Read windows — quick throw',
+          notes: 'Quick progression read',
         },
       ],
       buildPolicy: {
@@ -174,6 +208,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_quick_out',
     name: 'Quick Out',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Outside receiver quick out with flat underneath',
     badges: ['nfl_style'],
     requirements: {
@@ -238,6 +273,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_slant_flat',
     name: 'Slant/Flat',
     conceptType: 'pass',
+    tier: 1,
     summary: 'Classic high-low read with slant and flat combination',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -302,6 +338,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_hitch_seam',
     name: 'Hitch/Seam',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Outside hitch with inside seam stretch',
     badges: ['nfl_style'],
     requirements: {
@@ -369,6 +406,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_curl_flat',
     name: 'Curl/Flat',
     conceptType: 'pass',
+    tier: 1,
     summary: 'Curl route with flat underneath for high-low read',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -433,6 +471,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_smash',
     name: 'Smash',
     conceptType: 'pass',
+    tier: 1,
     summary: 'Corner/hitch combo attacking Cover 2 corner',
     badges: ['nfl_style', 'air_raid'],
     requirements: {
@@ -497,6 +536,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_levels',
     name: 'Levels',
     conceptType: 'pass',
+    tier: 1,
     summary: 'Crossing routes at different depths for layered attack',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -576,6 +616,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_mesh',
     name: 'Mesh',
     conceptType: 'pass',
+    tier: 1,
     summary: 'Dual shallow crosses creating natural picks',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -646,6 +687,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_drive',
     name: 'Drive',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Shallow drive route with dig over the top',
     badges: ['nfl_style'],
     requirements: {
@@ -716,6 +758,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_y_cross',
     name: 'Y-Cross',
     conceptType: 'pass',
+    tier: 1,
     summary: 'TE crossing route with deep clear-out',
     badges: ['nfl_style', 'pro_style'],
     requirements: {
@@ -790,6 +833,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_flood',
     name: 'Flood',
     conceptType: 'pass',
+    tier: 1,
     summary: '3-level outside stretch attacking flat defender',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -860,6 +904,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_dagger',
     name: 'Dagger',
     conceptType: 'pass',
+    tier: 1,
     summary: 'Post with dig underneath for 2-level middle attack',
     badges: ['nfl_style'],
     requirements: {
@@ -939,6 +984,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_sail',
     name: 'Sail',
     conceptType: 'pass',
+    tier: 2,
     summary: '3-level attack with go, corner, and flat',
     badges: ['nfl_style', 'air_raid'],
     requirements: {
@@ -1009,6 +1055,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_post_dig',
     name: 'Post/Dig',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Post and dig combo attacking middle of field',
     badges: ['nfl_style'],
     requirements: {
@@ -1079,6 +1126,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_verts',
     name: 'Verts',
     conceptType: 'pass',
+    tier: 1,
     summary: '4-vertical routes stretching the safeties',
     badges: ['air_raid', 'spread'],
     requirements: {
@@ -1155,6 +1203,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_switch_verts',
     name: 'Switch Verts',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Vertical routes with crossing action to create confusion',
     badges: ['air_raid'],
     requirements: {
@@ -1228,6 +1277,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_bubble',
     name: 'Bubble Screen',
     conceptType: 'pass',
+    tier: 1,
     summary: 'Quick bubble screen to slot receiver',
     badges: ['spread', 'rpo'],
     requirements: {
@@ -1292,6 +1342,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_tunnel',
     name: 'Tunnel Screen',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Screen to outside receiver with linemen releasing',
     badges: ['nfl_style'],
     requirements: {
@@ -1356,6 +1407,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_jail',
     name: 'Jail Screen',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Screen to outside WR with blockers in front',
     badges: ['spread'],
     requirements: {
@@ -1429,6 +1481,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_snag',
     name: 'Snag',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Triangle concept with snag, flat, and corner for 3-level read',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -1499,6 +1552,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_now_screen',
     name: 'Now Screen',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Quick screen with crack block from inside receiver',
     badges: ['spread', 'air_raid'],
     requirements: {
@@ -1563,6 +1617,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_rocket',
     name: 'Rocket Screen',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Jet motion screen with lead blockers',
     badges: ['spread', 'air_raid'],
     requirements: {
@@ -1628,6 +1683,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_double_slant',
     name: 'Double Slant',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Two slants attacking inside leverage',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -1698,6 +1754,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_triple_slant',
     name: 'Triple Slant',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Three slants overloading middle of field',
     badges: ['nfl_style'],
     requirements: {
@@ -1768,6 +1825,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_stick_draw',
     name: 'Stick Draw',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Stick concept paired with draw fake action',
     badges: ['west_coast', 'play_action'],
     requirements: {
@@ -1838,6 +1896,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_speed_out',
     name: 'Speed Out',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Quick speed out to boundary with flat underneath',
     badges: ['nfl_style'],
     requirements: {
@@ -1908,6 +1967,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_hank',
     name: 'Hank',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Hitch adjustment route based on coverage',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -1981,6 +2041,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_china',
     name: 'China',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Deep crossing route with shallow underneath',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -2051,6 +2112,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_hunt',
     name: 'Hunt',
     conceptType: 'pass',
+    tier: 2,
     summary: 'In-out combination to isolate defender',
     badges: ['nfl_style'],
     requirements: {
@@ -2121,6 +2183,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_scissor',
     name: 'Scissor',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Crossing routes at intermediate depth creating traffic',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -2191,6 +2254,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_divide',
     name: 'Divide',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Seam and flat combination to stress LB',
     badges: ['nfl_style', 'pro_style'],
     requirements: {
@@ -2262,6 +2326,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_drive_out',
     name: 'Drive Out',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Drive route with out underneath for horizontal stretch',
     badges: ['nfl_style'],
     requirements: {
@@ -2332,6 +2397,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_bench',
     name: 'Bench',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Sideline bench route with clear out',
     badges: ['nfl_style'],
     requirements: {
@@ -2402,6 +2468,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_out_up',
     name: 'Out & Up',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Double move with out fake and go',
     badges: ['nfl_style'],
     requirements: {
@@ -2472,6 +2539,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_texas',
     name: 'Texas',
     conceptType: 'pass',
+    tier: 2,
     summary: 'RB angle route with flat combo',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -2542,6 +2610,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_whip',
     name: 'Whip',
     conceptType: 'pass',
+    tier: 2,
     summary: 'Whip route combination with flat',
     badges: ['nfl_style'],
     requirements: {
@@ -2615,6 +2684,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_yankee',
     name: 'Yankee',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Post-dig combo with frontside emphasis',
     badges: ['nfl_style'],
     requirements: {
@@ -2685,6 +2755,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_dragon',
     name: 'Dragon',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Deep corner with flat underneath for 2-level read',
     badges: ['nfl_style'],
     requirements: {
@@ -2755,6 +2826,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_seattle',
     name: 'Seattle',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Go route with comeback underneath',
     badges: ['nfl_style'],
     requirements: {
@@ -2825,6 +2897,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_follow',
     name: 'Follow',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Wheel route with flat in front',
     badges: ['nfl_style', 'west_coast'],
     requirements: {
@@ -2895,6 +2968,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_double_post',
     name: 'Double Post',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Two posts attacking middle of field',
     badges: ['nfl_style', 'air_raid'],
     requirements: {
@@ -2968,6 +3042,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_slip_screen',
     name: 'Slip Screen',
     conceptType: 'pass',
+    tier: 3,
     summary: 'OL slips out for RB screen',
     badges: ['nfl_style'],
     requirements: {
@@ -3038,6 +3113,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_middle_screen',
     name: 'Middle Screen',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Screen up the middle with interior OL releasing',
     badges: ['nfl_style'],
     requirements: {
@@ -3108,6 +3184,7 @@ export const PASS_CONCEPTS: Concept[] = [
     id: 'pass_swing_screen',
     name: 'Swing Screen',
     conceptType: 'pass',
+    tier: 3,
     summary: 'Quick swing screen with WR blocking',
     badges: ['spread'],
     requirements: {
