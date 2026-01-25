@@ -5,7 +5,7 @@ import { useConceptStore } from '@/store/conceptStore';
 import { useEditorStore } from '@/store/editorStore';
 import { ConceptCard } from './ConceptCard';
 import { buildFormationContext, getRecommendations } from '@/lib/recommendation-engine';
-import { PASS_CATEGORIES, RUN_CATEGORIES, CATEGORY_LABELS } from '@/types/concept';
+import { PASS_CATEGORIES, RUN_CATEGORIES, CATEGORY_LABELS, TIER_LABELS, type ConceptTier } from '@/types/concept';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ConceptCardData } from '@/types/concept';
 
@@ -21,6 +21,7 @@ export function ConceptPanel({ onApplyConcept, onOpenInstallFocus }: ConceptPane
   const filters = useConceptStore((state) => state.filters);
   const setTypeFilter = useConceptStore((state) => state.setTypeFilter);
   const setCategoryFilter = useConceptStore((state) => state.setCategoryFilter);
+  const setMaxTierFilter = useConceptStore((state) => state.setMaxTierFilter);
   const setSearchQuery = useConceptStore((state) => state.setSearchQuery);
   const selectedConceptId = useConceptStore((state) => state.selectedConceptId);
   const hoveredConceptId = useConceptStore((state) => state.hoveredConceptId);
@@ -65,6 +66,7 @@ export function ConceptPanel({ onApplyConcept, onOpenInstallFocus }: ConceptPane
       id: c.id,
       name: c.name,
       conceptType: c.conceptType,
+      tier: c.tier,
       category:
         c.conceptType === 'pass'
           ? c.suggestionHints.passHints?.category ?? 'quick'
@@ -177,6 +179,28 @@ export function ConceptPanel({ onApplyConcept, onOpenInstallFocus }: ConceptPane
                 }`}
               >
                 {CATEGORY_LABELS[cat]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tier Filter */}
+      {activeTab !== 'recommended' && (
+        <div className="px-3 py-2 border-b border-zinc-700">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-zinc-400">Show:</span>
+            {([1, 2, 3] as ConceptTier[]).map((tier) => (
+              <button
+                key={tier}
+                onClick={() => setMaxTierFilter(tier)}
+                className={`px-2 py-1 text-xs rounded transition-colors ${
+                  filters.maxTier === tier
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                }`}
+              >
+                {tier === 1 ? 'Core' : tier === 2 ? 'Core + Situational' : 'All'}
               </button>
             ))}
           </div>
