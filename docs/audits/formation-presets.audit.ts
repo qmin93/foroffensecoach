@@ -7,9 +7,11 @@
  *
  * NOTE: This file uses symbolic position names that map to
  * editor/src/types/formation.ts PositionKey type
+ *
+ * OL positions are always standard (LT=0.42, LG=0.46, C=0.50, RG=0.54, RT=0.58)
  */
 
-import type { FormationPreset } from '@/types/formation';
+import type { FormationPreset } from './types';
 
 export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
   /* =========================
@@ -22,6 +24,13 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '12',
     tags: ['balanced', 'play_action', 'power', 'zone'],
     positions: {
+      // O-Line (standard)
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
+      // Skill positions
       QB: 'under_center',
       RB: 'i_depth',
       X: 'wide_left',
@@ -38,9 +47,14 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '21',
     tags: ['downhill', 'power', 'iso'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'under_center',
+      FB: 'fb_center',
       RB: 'deep_i',
-      // FB: 'offset_strong' - FB not in positions type, use RB
       X: 'wide_left',
       Z: 'wide_right',
       Y: 'inline_right',
@@ -57,6 +71,11 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '11',
     tags: ['spread', 'quick_game', 'zone', 'rpo'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'shotgun',
       RB: 'offset_weak',
       X: 'wide_left',
@@ -73,6 +92,11 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '11',
     tags: ['spread', 'isolation', 'flood', 'trips', '3x1'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'shotgun',
       RB: 'offset_weak',
       X: 'wide_left',
@@ -82,8 +106,6 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     },
   },
 
-  // NOTE: gun_trips_open removed - was duplicate of gun_3x1
-
   {
     id: 'gun_bunch',
     name: 'Shotgun Bunch',
@@ -91,6 +113,11 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '11',
     tags: ['pick', 'rub', 'quick_game', 'bunch'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'shotgun',
       RB: 'offset_weak',
       X: 'point',
@@ -107,6 +134,11 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '11',
     tags: ['release', 'man_beater', 'stack'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'shotgun',
       RB: 'offset_weak',
       X: 'stack_front_left',
@@ -126,6 +158,11 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '11',
     tags: ['downhill', 'zone', 'play_action', 'rpo'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'pistol',
       RB: 'pistol_depth',
       X: 'wide_left',
@@ -142,6 +179,11 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '12',
     tags: ['power', 'duo', 'play_action'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'pistol',
       RB: 'pistol_depth',
       X: 'wide_left',
@@ -161,6 +203,11 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '10',
     tags: ['quick_game', 'spread', 'qb_run_alert', 'empty'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'shotgun',
       X: 'wide_left',
       H: 'slot_left',
@@ -177,12 +224,17 @@ export const FORMATION_PRESETS_AUDIT: FormationPreset[] = [
     personnel: '10',
     tags: ['isolation', 'qb_draw', 'empty', 'trips'],
     positions: {
+      LT: 'ol_standard',
+      LG: 'ol_standard',
+      C: 'ol_standard',
+      RG: 'ol_standard',
+      RT: 'ol_standard',
       QB: 'shotgun',
       X: 'wide_left',
       Z: 'wide_right',
       Y: 'slot_right',
       H: 'inside_slot_right',
-      // Note: 5th receiver would need additional position
+      RB: 'wide_left', // 5th receiver lined up wide
     },
   },
 ];
