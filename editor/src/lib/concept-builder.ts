@@ -8,6 +8,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { Concept } from '@/types/concept';
 import type { Player, Point, Action, RouteAction, BlockAction, ActionStyle } from '@/types/dsl';
+import { buildAssignmentActionsForConcept, type AssignmentAction } from './assignments/assignmentTemplates';
 
 const DEFAULT_ACTION_STYLE: ActionStyle = {
   stroke: '#000000', // Black - editor uses only black and white
@@ -76,8 +77,9 @@ interface BuildConceptResult {
 /**
  * Calculate route control points based on pattern, direction, and break angle
  * Returns multiple points for angular routes with sharp breaks
+ * Exported for use in assignment-to-route sync
  */
-function calculateRouteEndPoint(
+export function calculateRouteEndPoint(
   startPoint: Point,
   pattern: string,
   direction: string | undefined,
@@ -892,5 +894,74 @@ export function buildConceptActions(
     }
   }
 
+  // Generate assignment actions - prefer inline assignments from template roles
+  const assignmentActions = buildAssignmentsFromTemplate(concept, players) ||
+    buildAssignmentActionsForConcept({
+      conceptId: concept.id ?? '',
+      players: players.map((p) => ({ id: p.id, position: p.role ?? p.label ?? '' })),
+      strength: 'right', // TODO: get from play meta if available
+    });
+  actions.push(...assignmentActions);
+
   return { actions, actionsCreated };
+}
+
+/**
+ * Build assignment actions from concept template roles (unified blueprint approach)
+ * Returns null if no inline assignments are defined in the template
+ */
+function buildAssignmentsFromTemplate(
+  concept: Concept,
+  players: Player[]
+): AssignmentAction[] | null {
+  const template = concept.template;
+  const rolesWithAssignments = template.roles.filter((r) => r.assignment);
+
+  // If no roles have inline assignments, fall back to assignmentTemplates
+  if (rolesWithAssignments.length === 0) {
+    return null;
+  }
+
+  const assignmentActions: AssignmentAction[] = [];
+  const assignedPlayerIds = new Set<string>();
+
+  // Process each role with an assignment
+  for (const role of template.roles) {
+    if (!role.assignment) continue;
+
+    // Find matching players for this role
+    const matchingPlayers = players.filter((p) =>
+      role.appliesTo.some((roleMatch) => playerMatchesRole(p, roleMatch))
+    );
+
+    for (const player of matchingPlayers) {
+      if (assignedPlayerIds.has(player.id)) continue;
+
+      // Determine the assignment group
+      const posToGroup = (pos: string): 'OL' | 'QB' | 'BACK' | 'WR' | 'TE' | 'DEF' | 'OTHER' => {
+        const p = (pos ?? '').toUpperCase();
+        if (['C', 'LG', 'RG', 'LT', 'RT'].includes(p)) return 'OL';
+        if (['QB'].includes(p)) return 'QB';
+        if (['RB', 'FB', 'TB'].includes(p)) return 'BACK';
+        if (['TE', 'Y'].includes(p)) return 'TE';
+        if (['WR', 'X', 'Z', 'H'].includes(p)) return 'WR';
+        if (['DE', 'DT', 'NT', 'OLB', 'ILB', 'MLB', 'CB', 'SS', 'FS', 'NB'].includes(p)) return 'DEF';
+        return 'OTHER';
+      };
+
+      assignmentActions.push({
+        id: `a_asg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
+        actionType: 'assignment',
+        fromPlayerId: player.id,
+        assignment: {
+          text: role.assignment,
+          group: posToGroup(player.role || player.label || ''),
+          priority: 50,
+        },
+      });
+      assignedPlayerIds.add(player.id);
+    }
+  }
+
+  return assignmentActions.length > 0 ? assignmentActions : null;
 }
