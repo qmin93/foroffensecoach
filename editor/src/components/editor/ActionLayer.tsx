@@ -83,6 +83,40 @@ function CircleMarker({ x, y, stroke, strokeWidth }: {
   );
 }
 
+// Render double arrow marker (for combo blocks - double team then climb)
+function DoubleArrowMarker({ x, y, angle, stroke, strokeWidth }: {
+  x: number;
+  y: number;
+  angle: number;
+  stroke: string;
+  strokeWidth: number;
+}) {
+  const size = 10;
+  return (
+    <Shape
+      x={x}
+      y={y}
+      rotation={angle}
+      sceneFunc={(context, shape) => {
+        context.beginPath();
+        // First arrow (outer)
+        context.moveTo(-size, size * 0.6);
+        context.lineTo(0, 0);
+        context.lineTo(size, size * 0.6);
+        // Second arrow (inner, smaller)
+        context.moveTo(-size * 0.6, size);
+        context.lineTo(0, size * 0.4);
+        context.lineTo(size * 0.6, size);
+        context.strokeShape(shape);
+      }}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+      lineCap="round"
+      lineJoin="round"
+    />
+  );
+}
+
 // Generic line renderer with end marker support
 function LineWithMarker({
   points,
@@ -193,6 +227,15 @@ function LineWithMarker({
         <CircleMarker
           x={lastX}
           y={lastY}
+          stroke={displayStroke}
+          strokeWidth={displayWidth}
+        />
+      )}
+      {endMarker === 'double_arrow' && (
+        <DoubleArrowMarker
+          x={lastX}
+          y={lastY}
+          angle={angle}
           stroke={displayStroke}
           strokeWidth={displayWidth}
         />
@@ -471,19 +514,40 @@ function BlockShape({
     onMouseEnter?.(action.id);
   };
 
-  // Zone blocks use curves, gap blocks use straight lines
-  const ZONE_SCHEMES = ['zone_step', 'reach', 'combo', 'climb', 'scoop', 'zone'];
-  const isZoneBlock = ZONE_SCHEMES.some(scheme =>
-    block.scheme?.toLowerCase().includes(scheme)
-  );
+  // Determine block scheme-specific visual styles
+  const schemeLower = (block.scheme ?? '').toLowerCase();
 
-  // Zone blocks use higher tension for more noticeable curve
-  const tension = isZoneBlock
-    ? 0.5
-    : (block.pathType === 'tension' ? (block.tension || 0.3) : 0);
+  // Scheme detection helpers
+  const isZone = schemeLower.includes('zone_step') || schemeLower === 'zone';
+  const isCombo = schemeLower.includes('combo') || schemeLower.includes('climb');
+  const isDown = schemeLower.includes('down');
+  const isReach = schemeLower.includes('reach');
+  const isPull = schemeLower.includes('pull');
+  const isScoop = schemeLower.includes('scoop');
 
-  // Both zone and gap blocks use t_block marker
-  const endMarker = style.endMarker === 'arrow' && !isZoneBlock ? style.endMarker : 't_block' as const;
+  // Determine tension (curvature)
+  let tension = 0;
+  if (isZone || isCombo) tension = 0.5;
+  else if (isReach || isScoop) tension = 0.4;
+  else if (isPull) tension = 0.6;
+  else tension = block.pathType === 'tension' ? (block.tension || 0.3) : 0;
+
+  // Determine line style (solid/dashed/dotted)
+  let lineStyle = style.lineStyle;
+  if (isZone || isScoop) lineStyle = 'dotted';
+  else if (isReach) lineStyle = 'dashed';
+  // combo, down, pull stay solid
+
+  // Determine end marker
+  let endMarker: EndMarker = 't_block';
+  if (isCombo) endMarker = 'double_arrow';
+  else if (isZone || isReach || isPull || isScoop) endMarker = 'arrow';
+  // down stays t_block (gap block)
+
+  // Determine stroke width adjustment
+  let strokeWidthDelta = 0;
+  if (isCombo) strokeWidthDelta = 1; // thick for combo (double team)
+  else if (isDown) strokeWidthDelta = -0.5; // thinner for down block
 
   // Get pixel positions for edit handles
   const pathPoints = block.pathPoints;
@@ -491,13 +555,15 @@ function BlockShape({
   const endPixel = pathPoints.length > 1 ? toPixel(pathPoints[pathPoints.length - 1], width, height) : null;
   const controlPixel = pathPoints.length > 2 ? toPixel(pathPoints[1], width, height) : null;
 
+  const effectiveStrokeWidth = Math.max(1, style.strokeWidth + strokeWidthDelta);
+
   return (
     <>
       <LineWithMarker
         points={points}
         stroke={style.stroke}
-        strokeWidth={style.strokeWidth}
-        dash={getDash(style.lineStyle, style.strokeWidth)}
+        strokeWidth={effectiveStrokeWidth}
+        dash={getDash(lineStyle, effectiveStrokeWidth)}
         tension={tension}
         endMarker={endMarker}
         isSelected={isSelected}

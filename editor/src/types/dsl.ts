@@ -24,7 +24,7 @@ export interface Point {
 export type PlayerShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'star' | 'x_mark' | 'football';
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 export type PathType = 'straight' | 'quadratic' | 'bezier' | 'tension';
-export type EndMarker = 'arrow' | 'none' | 'circle' | 't_block';
+export type EndMarker = 'arrow' | 'none' | 'circle' | 't_block' | 'double_arrow';
 export type EditorMode = 'select' | 'draw' | 'text' | 'symbol' | 'zone';
 export type PlacementPhase = 'idle' | 'placing';
 export type DrawLineType = 'straight' | 'curved' | 'angular';
@@ -221,7 +221,22 @@ export interface ZoneAction {
   };
 }
 
-export type Action = RouteAction | BlockAction | MotionAction | LandmarkAction | TextAction | SymbolAction | ZoneAction;
+// Assignment types for player responsibilities (Install Focus system)
+export type AssignmentGroup = 'OL' | 'QB' | 'BACK' | 'WR' | 'TE' | 'DEF' | 'OTHER';
+
+export interface AssignmentAction {
+  id: string;
+  actionType: 'assignment';
+  fromPlayerId: string;
+  assignment: {
+    text: string;
+    group?: AssignmentGroup;
+    priority?: number;  // lower = higher priority (manual edits = 1)
+  };
+  meta?: Record<string, any>;
+}
+
+export type Action = RouteAction | BlockAction | MotionAction | LandmarkAction | TextAction | SymbolAction | ZoneAction | AssignmentAction;
 
 // ============================================
 // Play Types
