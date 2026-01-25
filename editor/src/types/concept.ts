@@ -12,6 +12,26 @@
 
 export type ConceptType = 'pass' | 'run';
 
+/**
+ * Concept Tier Classification
+ * 1 = Core: 현대 풋볼에서 80%+ 사용 (NFL/NCAA 표준)
+ * 2 = Situational: 상황/팀 스타일에 따라 사용
+ * 3 = Legacy: 특수 오펜스 또는 드물게 사용
+ */
+export type ConceptTier = 1 | 2 | 3;
+
+export const TIER_LABELS: Record<ConceptTier, string> = {
+  1: 'Core',
+  2: 'Situational',
+  3: 'Legacy',
+};
+
+export const TIER_DESCRIPTIONS: Record<ConceptTier, string> = {
+  1: 'Commonly used in modern football (NFL/NCAA)',
+  2: 'Effective in specific situations or team styles',
+  3: 'Specialized schemes or less common concepts',
+};
+
 export type PassCategory = 'quick' | 'intermediate' | 'deep' | 'screen';
 export type RunCategory = 'inside_zone' | 'outside_zone' | 'gap' | 'power' | 'counter' | 'option' | 'special';
 
@@ -191,6 +211,7 @@ export interface TemplateRole {
   defaultRoute?: RouteAssignment;
   defaultBlock?: BlockAssignment;
   defaultMotion?: MotionAssignment;
+  assignment?: string; // Player's assignment text (e.g., "Zone step, combo to LB")
   notes?: string;
 }
 
@@ -262,6 +283,7 @@ export interface Concept {
   id: string;
   name: string;
   conceptType: ConceptType;
+  tier: ConceptTier; // 1=Core, 2=Situational, 3=Legacy
   summary: string;
   badges?: string[]; // e.g., ['nfl_style', 'air_raid', 'west_coast']
 
@@ -291,6 +313,7 @@ export interface ConceptCardData {
   id: string;
   name: string;
   conceptType: ConceptType;
+  tier: ConceptTier; // 1=Core, 2=Situational, 3=Legacy
   category: PassCategory | RunCategory;
   summary: string;
   badges: string[];
