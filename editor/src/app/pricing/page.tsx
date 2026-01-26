@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PRICING, SubscriptionTier } from '@/lib/subscription';
+import { PRICING, SubscriptionTier, PaymentProvider } from '@/lib/subscription';
 import { useAuthStore } from '@/store/authStore';
 import { GlobalNavbar } from '@/components/layout/GlobalNavbar';
+import { PaymentMethodSelector } from '@/components/subscription/PaymentMethodSelector';
 
 export default function PricingPage() {
   const router = useRouter();
   const { user } = useAuthStore();
   const [loading, setLoading] = useState<SubscriptionTier | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [paymentProvider, setPaymentProvider] = useState<PaymentProvider>('stripe');
 
   const handleSubscribe = async (tier: SubscriptionTier) => {
     if (tier === 'free') {
@@ -27,7 +29,11 @@ export default function PricingPage() {
     setError(null);
 
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const endpoint = paymentProvider === 'lemonsqueezy'
+        ? '/api/lemonsqueezy/checkout'
+        : '/api/stripe/checkout';
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +47,7 @@ export default function PricingPage() {
         throw new Error(data.error || 'Failed to create checkout session');
       }
 
-      // Redirect to Stripe Checkout
+      // Redirect to checkout
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -73,6 +79,17 @@ export default function PricingPage() {
             {error}
           </div>
         )}
+
+        {/* Payment Method Selection */}
+        <div className="max-w-md mx-auto mb-10">
+          <p className="text-center text-sm text-muted-foreground mb-3">
+            Choose your payment method
+          </p>
+          <PaymentMethodSelector
+            selected={paymentProvider}
+            onSelect={setPaymentProvider}
+          />
+        </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {PRICING.map((plan) => (

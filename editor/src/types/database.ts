@@ -21,6 +21,7 @@ export interface Database {
           display_name: string | null;
           avatar_url: string | null;
           stripe_customer_id: string | null;
+          ls_customer_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -30,6 +31,7 @@ export interface Database {
           display_name?: string | null;
           avatar_url?: string | null;
           stripe_customer_id?: string | null;
+          ls_customer_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -39,6 +41,7 @@ export interface Database {
           display_name?: string | null;
           avatar_url?: string | null;
           stripe_customer_id?: string | null;
+          ls_customer_id?: string | null;
           updated_at?: string;
         };
       };
@@ -235,6 +238,9 @@ export interface Database {
           user_id: string;
           stripe_customer_id: string | null;
           stripe_subscription_id: string | null;
+          ls_customer_id: string | null;
+          ls_subscription_id: string | null;
+          payment_provider: 'stripe' | 'lemonsqueezy';
           tier: 'free' | 'pro' | 'team';
           status: 'active' | 'canceled' | 'past_due' | 'trialing';
           current_period_start: string | null;
@@ -248,6 +254,9 @@ export interface Database {
           user_id: string;
           stripe_customer_id?: string | null;
           stripe_subscription_id?: string | null;
+          ls_customer_id?: string | null;
+          ls_subscription_id?: string | null;
+          payment_provider?: 'stripe' | 'lemonsqueezy';
           tier?: 'free' | 'pro' | 'team';
           status?: 'active' | 'canceled' | 'past_due' | 'trialing';
           current_period_start?: string | null;
@@ -259,6 +268,9 @@ export interface Database {
         Update: {
           stripe_customer_id?: string | null;
           stripe_subscription_id?: string | null;
+          ls_customer_id?: string | null;
+          ls_subscription_id?: string | null;
+          payment_provider?: 'stripe' | 'lemonsqueezy';
           tier?: 'free' | 'pro' | 'team';
           status?: 'active' | 'canceled' | 'past_due' | 'trialing';
           current_period_start?: string | null;

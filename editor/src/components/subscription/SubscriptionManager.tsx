@@ -7,6 +7,7 @@ import {
   TIER_FEATURES,
   formatPrice,
   Subscription,
+  PaymentProvider,
 } from '@/lib/subscription';
 
 interface SubscriptionManagerProps {
@@ -29,7 +30,13 @@ export function SubscriptionManager({
     setError(null);
 
     try {
-      const response = await fetch('/api/stripe/portal', {
+      // Use the correct portal based on payment provider
+      const paymentProvider: PaymentProvider = subscription?.paymentProvider || 'stripe';
+      const endpoint = paymentProvider === 'lemonsqueezy'
+        ? '/api/lemonsqueezy/portal'
+        : '/api/stripe/portal';
+
+      const response = await fetch(endpoint, {
         method: 'POST',
       });
 
@@ -119,6 +126,15 @@ export function SubscriptionManager({
             </span>
             <span className="text-white">
               {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+            </span>
+          </div>
+        )}
+
+        {subscription?.paymentProvider && tier !== 'free' && (
+          <div className="flex items-center justify-between py-3 border-b border-zinc-700">
+            <span className="text-zinc-400">Payment Method</span>
+            <span className="text-white">
+              {subscription.paymentProvider === 'lemonsqueezy' ? 'Lemon Squeezy' : 'Stripe'}
             </span>
           </div>
         )}

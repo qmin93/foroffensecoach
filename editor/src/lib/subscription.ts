@@ -6,6 +6,9 @@
 // Subscription tiers
 export type SubscriptionTier = 'free' | 'pro' | 'team';
 
+// Payment providers
+export type PaymentProvider = 'stripe' | 'lemonsqueezy';
+
 // Subscription status
 export interface Subscription {
   tier: SubscriptionTier;
@@ -13,6 +16,7 @@ export interface Subscription {
   currentPeriodStart?: string;
   currentPeriodEnd?: string;
   cancelAtPeriodEnd?: boolean;
+  paymentProvider?: PaymentProvider;
 }
 
 // Feature access configuration per tier

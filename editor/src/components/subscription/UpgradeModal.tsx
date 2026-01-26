@@ -7,7 +7,9 @@ import {
   PRICING,
   PricingInfo,
   FeatureAccess,
+  PaymentProvider,
 } from '@/lib/subscription';
+import { PaymentMethodSelector } from './PaymentMethodSelector';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -24,6 +26,8 @@ export function UpgradeModal({
   blockedFeature,
   suggestedTier,
 }: UpgradeModalProps) {
+  const [paymentProvider, setPaymentProvider] = useState<PaymentProvider>('stripe');
+
   // Filter out current tier and below
   const availablePlans = useMemo(() => {
     const tierOrder: SubscriptionTier[] = ['free', 'pro', 'team'];
@@ -93,11 +97,20 @@ export function UpgradeModal({
         {/* Content */}
         <div className="p-6">
           {/* Current Plan Badge */}
-          <div className="mb-6 flex items-center gap-2 text-sm text-zinc-400">
+          <div className="mb-4 flex items-center gap-2 text-sm text-zinc-400">
             <span>Current plan:</span>
             <span className="px-2 py-0.5 bg-zinc-800 rounded text-zinc-300 capitalize">
               {currentTier}
             </span>
+          </div>
+
+          {/* Payment Method Selection */}
+          <div className="mb-6">
+            <p className="text-sm text-zinc-400 mb-2">Payment method:</p>
+            <PaymentMethodSelector
+              selected={paymentProvider}
+              onSelect={setPaymentProvider}
+            />
           </div>
 
           {/* Plans Grid */}
@@ -108,6 +121,7 @@ export function UpgradeModal({
                 plan={plan}
                 isRecommended={plan.tier === suggestedTier || plan.highlighted}
                 onClose={onClose}
+                paymentProvider={paymentProvider}
               />
             ))}
           </div>
@@ -131,9 +145,10 @@ interface PlanCardProps {
   plan: PricingInfo;
   isRecommended?: boolean;
   onClose: () => void;
+  paymentProvider: PaymentProvider;
 }
 
-function PlanCard({ plan, isRecommended, onClose }: PlanCardProps) {
+function PlanCard({ plan, isRecommended, onClose, paymentProvider }: PlanCardProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -145,7 +160,11 @@ function PlanCard({ plan, isRecommended, onClose }: PlanCardProps) {
     setError(null);
 
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const endpoint = paymentProvider === 'lemonsqueezy'
+        ? '/api/lemonsqueezy/checkout'
+        : '/api/stripe/checkout';
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
