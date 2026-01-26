@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "validCriteria": [
+      "Assignment 논리적 모순 없음",
+      "실제 현대 미식축구에서 반복 사용됨",
+      "Formation–Concept–Assignment 충돌 없음",
+      "코치/선수가 즉시 이해 가능"
+    ],
+    "tierDefinitions": {
+      "1": "Base / Install Core",
+      "2": "Situational / Punish / Counter"
+    }
+  },
+  "pass": [
+    { "id": "pass_stick", "name": "Stick", "tier": 1, "dropType": "quick", "summary": "quick game 기준" },
+    { "id": "pass_mesh", "name": "Mesh", "tier": 1, "dropType": "dropback", "summary": "man/zone 공용" },
+    { "id": "pass_flood", "name": "Flood", "tier": 1, "dropType": "rollout", "summary": "sideline stretch" },
+    { "id": "pass_four_verts", "name": "Four Verticals", "tier": 1, "dropType": "dropback", "summary": "MOFO/MOFC 대응" },
+    { "id": "pass_dagger", "name": "Dagger", "tier": 1, "dropType": "dropback", "summary": "middle-field stress" },
+
+    { "id": "pass_sail", "name": "Sail", "tier": 2, "dropType": "play-action", "summary": "Flood 적응 대응" },
+    { "id": "pass_post_wheel", "name": "Post Wheel", "tier": 2, "dropType": "play-action", "summary": "match coverage 파괴" },
+    { "id": "pass_shallow", "name": "Shallow Cross", "tier": 2, "dropType": "quick", "summary": "Mesh 단순화" },
+    { "id": "pass_y_cross", "name": "Y-Cross", "tier": 2, "dropType": "dropback", "summary": "full-field concept" },
+    { "id": "pass_yankee", "name": "Yankee (PA Shot)", "tier": 2, "dropType": "play-action", "summary": "run overplay punish" }
+  ],
+  "run": [
+    { "id": "run_inside_zone", "name": "Inside Zone", "tier": 1, "aim": "a_gap", "boxTolerance": 7, "summary": "모든 런의 기준" },
+    { "id": "run_duo", "name": "Duo", "tier": 1, "aim": "b_gap", "boxTolerance": 7, "summary": "pull 없는 power" },
+    { "id": "run_power", "name": "Power", "tier": 1, "aim": "b_gap", "needsPuller": "G", "summary": "gap scheme 기준" },
+    { "id": "run_gt_counter", "name": "GT Counter", "tier": 1, "aim": "a_gap", "needsPuller": "GT", "summary": "power 반대 각 punish" },
+    { "id": "run_pin_pull", "name": "Pin-Pull", "tier": 1, "aim": "edge", "summary": "perimeter gap run" },
+
+    { "id": "run_split_zone_arc", "name": "Split Zone Arc", "tier": 2, "aim": "a_gap", "summary": "backside DE 처벌" },
+    { "id": "run_counter_bash", "name": "Counter Bash", "tier": 2, "aim": "b_gap", "summary": "DE crash punish" },
+    { "id": "run_wham_insert", "name": "Wham Insert", "tier": 2, "aim": "a_gap", "summary": "DT 과침투 대응" },
+    { "id": "run_pin_pull_toss", "name": "Pin-Pull Toss", "tier": 2, "aim": "edge", "summary": "force defender 고정 시" },
+    { "id": "run_qb_counter", "name": "QB Counter", "tier": 2, "aim": "a_gap", "summary": "option punish 런" }
+  ],
+  "summary": {
+    "pass": { "tier1": 5, "tier2": 5, "total": 10 },
+    "run": { "tier1": 5, "tier2": 5, "total": 10 },
+    "total": 20
+  }
+}

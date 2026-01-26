@@ -1,0 +1,187 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Formation + Concept 선택 시 모든 포지션 Assignment를 자동 생성하는 엔진",
+    "rulebook": "ASSIGNMENT_RULEBOOK.v1을 절대 규칙으로 사용"
+  },
+  "input": {
+    "formation": {
+      "id": "string",
+      "personnel": "string[]",
+      "structure": "string"
+    },
+    "concept": {
+      "id": "string",
+      "type": "pass | run",
+      "scheme": "zone | gap | perimeter | quick | dropback | play-action | rollout"
+    },
+    "context": {
+      "playSide": "left | right",
+      "fieldSide": "boundary | field | middle"
+    }
+  },
+  "output": {
+    "assignments": {
+      "OL": {
+        "LT": { "action": "string", "target": "string", "note": "string" },
+        "LG": { "action": "string", "target": "string", "note": "string" },
+        "C": { "action": "string", "target": "string", "note": "string" },
+        "RG": { "action": "string", "target": "string", "note": "string" },
+        "RT": { "action": "string", "target": "string", "note": "string" }
+      },
+      "SKILL": {
+        "QB": { "action": "string", "read": "string", "note": "string" },
+        "RB": { "action": "string", "aim": "string", "note": "string" },
+        "WR_X": { "action": "string", "role": "string", "note": "string" },
+        "WR_Z": { "action": "string", "role": "string", "note": "string" },
+        "WR_H": { "action": "string", "role": "string", "note": "string" },
+        "TE_Y": { "action": "string", "role": "string", "note": "string" }
+      }
+    },
+    "validation": {
+      "valid": "boolean",
+      "errors": "string[]"
+    }
+  },
+  "engine": {
+    "run": {
+      "zone": {
+        "OL_logic": [
+          "IF covered THEN play-side gap",
+          "IF uncovered THEN combo to LB",
+          "Backside: cutoff/reach"
+        ],
+        "RB_logic": [
+          "Aim = concept.aim (a_gap | b_gap)",
+          "Read = 1st DL past center",
+          "Decision = bounce/bang/bend"
+        ],
+        "WR_TE_logic": [
+          "Playside: stalk block",
+          "Backside: cutoff or crack"
+        ]
+      },
+      "gap": {
+        "OL_logic": [
+          "Playside: down block",
+          "Identify puller(s) from concept.needsPuller",
+          "Puller action = kick (inside shoulder) or log (outside leverage)",
+          "Center: backside A-gap"
+        ],
+        "RB_logic": [
+          "Aim = designed gap",
+          "Path = follow puller",
+          "IF spill THEN cut"
+        ],
+        "WR_TE_logic": [
+          "Playside: crack or stalk",
+          "Backside: cutoff"
+        ]
+      },
+      "perimeter": {
+        "OL_logic": [
+          "Pin: inside DL 고정",
+          "Pull: identify pullers",
+          "Target: first color"
+        ],
+        "RB_logic": [
+          "Aim = edge",
+          "DO NOT cut until edge secured",
+          "Maintain speed"
+        ],
+        "WR_TE_logic": [
+          "Crack: force defender",
+          "Lead: first color"
+        ]
+      }
+    },
+    "pass": {
+      "quick": {
+        "QB_logic": [
+          "Drop = 1-step or 3-step",
+          "Read = pre-snap leverage",
+          "Throw on rhythm"
+        ],
+        "WR_logic": [
+          "Route from concept.routes",
+          "Role from concept.roles (clear/under/intermediate/checkdown)"
+        ],
+        "OL_logic": [
+          "Pass set",
+          "Inside-out priority"
+        ],
+        "RB_TE_logic": [
+          "Check protection first",
+          "Release if clean"
+        ]
+      },
+      "dropback": {
+        "QB_logic": [
+          "Drop = 5-step",
+          "Progression = high to low",
+          "Check middle open"
+        ],
+        "WR_logic": [
+          "Route from concept.routes",
+          "Role assignment based on depth"
+        ],
+        "OL_logic": [
+          "Pass set",
+          "Inside-out, color to threat"
+        ],
+        "RB_TE_logic": [
+          "Inside gap priority",
+          "Chip then release on call only"
+        ]
+      },
+      "play_action": {
+        "QB_logic": [
+          "Fake completion required",
+          "Eyes up after fake",
+          "Shot = safety check first"
+        ],
+        "WR_logic": [
+          "Sell run block briefly",
+          "Release to route"
+        ],
+        "OL_logic": [
+          "Run action fake",
+          "Transition to pass pro"
+        ],
+        "RB_TE_logic": [
+          "Fake action",
+          "Check/release"
+        ]
+      },
+      "rollout": {
+        "QB_logic": [
+          "Roll to playside",
+          "Progression = flat to corner",
+          "Run option if nothing open"
+        ],
+        "WR_logic": [
+          "Playside: flood routes (flat/out/corner)",
+          "Backside: drag/cross"
+        ],
+        "OL_logic": [
+          "Playside: reach/hinge",
+          "Backside: cutoff"
+        ]
+      }
+    }
+  },
+  "validation_rules": {
+    "must_pass": [
+      "All positions have assignment",
+      "No assignment conflicts with RULEBOOK",
+      "Aim/Read/Role defined for all skill positions",
+      "Puller roles clear if needsPuller defined"
+    ],
+    "invalid_if": [
+      "Assignment 설명 불가",
+      "Aim / Read / Role 없음",
+      "Formation과 Concept 충돌",
+      "특정 선수 능력 전제"
+    ]
+  }
+}

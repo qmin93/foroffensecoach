@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "validCriteria": [
+      "Assignment 논리적 모순 없음",
+      "실제 현대 미식축구에서 반복 사용됨",
+      "Formation–Concept–Assignment 충돌 없음",
+      "코치/선수가 즉시 이해 가능"
+    ],
+    "tierDefinitions": {
+      "1": "Base / Install Core",
+      "2": "Situational / Punish / Counter"
+    }
+  },
+  "formations": [
+    {
+      "id": "shotgun-2x2",
+      "name": "Shotgun 2x2",
+      "tier": 1,
+      "personnel": ["10", "11"],
+      "structure": "2x2",
+      "runFitWeight": 0.3,
+      "passFitWeight": 0.7,
+      "summary": "현대 공격의 기본 스프레드 구조"
+    },
+    {
+      "id": "shotgun-trips",
+      "name": "Shotgun Trips",
+      "tier": 1,
+      "personnel": ["10", "11"],
+      "structure": "3x1",
+      "runFitWeight": 0.25,
+      "passFitWeight": 0.75,
+      "summary": "수적 우위 강제용 기본 Trips"
+    },
+    {
+      "id": "shotgun-bunch",
+      "name": "Shotgun Bunch",
+      "tier": 1,
+      "personnel": ["10", "11"],
+      "structure": "bunch",
+      "runFitWeight": 0.2,
+      "passFitWeight": 0.8,
+      "summary": "man/press 대응용 압축 정렬"
+    },
+    {
+      "id": "ace",
+      "name": "Ace (Single Back)",
+      "tier": 1,
+      "personnel": ["12"],
+      "structure": "2x2",
+      "runFitWeight": 0.5,
+      "passFitWeight": 0.5,
+      "summary": "run/pass 밸런스 최고 포메이션"
+    },
+    {
+      "id": "i-formation",
+      "name": "I Formation",
+      "tier": 1,
+      "personnel": ["21", "22"],
+      "structure": "I",
+      "runFitWeight": 0.8,
+      "passFitWeight": 0.2,
+      "summary": "downhill run 기준 포메이션"
+    },
+    {
+      "id": "gun-trips-y-off",
+      "name": "Gun Trips Y-Off",
+      "tier": 2,
+      "personnel": ["11", "12"],
+      "structure": "3x1",
+      "runFitWeight": 0.45,
+      "passFitWeight": 0.55,
+      "summary": "TE off-ball로 유연성 확보"
+    },
+    {
+      "id": "tight-trips",
+      "name": "Tight Trips",
+      "tier": 2,
+      "personnel": ["11"],
+      "structure": "tight-3x1",
+      "runFitWeight": 0.4,
+      "passFitWeight": 0.6,
+      "summary": "man coverage 파괴용"
+    },
+    {
+      "id": "ace-wing",
+      "name": "Ace Wing",
+      "tier": 2,
+      "personnel": ["12", "21"],
+      "structure": "ace-wing",
+      "runFitWeight": 0.65,
+      "passFitWeight": 0.35,
+      "summary": "run 각도 + PA 위협 증가"
+    },
+    {
+      "id": "pistol-strong-slot",
+      "name": "Pistol Strong Slot",
+      "tier": 2,
+      "personnel": ["11"],
+      "structure": "pistol-strong",
+      "runFitWeight": 0.55,
+      "passFitWeight": 0.45,
+      "summary": "downhill + option 병행"
+    },
+    {
+      "id": "empty-qb-safe",
+      "name": "Empty 3x2 QB Safe",
+      "tier": 2,
+      "personnel": ["10", "01"],
+      "structure": "empty-3x2",
+      "runFitWeight": 0.15,
+      "passFitWeight": 0.85,
+      "summary": "Empty지만 QB draw 허용"
+    }
+  ],
+  "summary": {
+    "tier1": 5,
+    "tier2": 5,
+    "total": 10
+  }
+}

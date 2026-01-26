@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "FOOTBALL BANK의 모든 Formation / Run / Pass가 의존하는 공통 Assignment 규칙집",
+    "constraint": "이 규칙과 충돌하는 작전은 BANK에 포함될 수 없다",
+    "application": "본 Rulebook은 BANK v2의 모든 Entry에 적용된다",
+    "change_policy": "Rulebook 변경 시 모든 Entry는 재검증 대상이 된다"
+  },
+  "OL": {
+    "principles": [
+      "Gap 책임 우선 → Man 아님",
+      "Inside gap > Outside gap",
+      "Pull은 명령이 있을 때만"
+    ],
+    "schemes": {
+      "zone": {
+        "rules": {
+          "covered": "Play-side gap 확보",
+          "uncovered": "Combo → LB",
+          "eyes": "1st DL past center",
+          "backside": "Cutoff / Reach"
+        },
+        "prohibited": [
+          "Zone에서 pull",
+          "Aim 없는 zone"
+        ]
+      },
+      "gap": {
+        "rules": {
+          "playside": "Down block",
+          "backside": "Puller 지정",
+          "puller_kick": "EMOL inside shoulder",
+          "puller_log": "EMOL outside leverage",
+          "center": "Backside A-gap 보호"
+        },
+        "prohibited": [
+          "Puller 2명인데 역할 미정",
+          "Kick/Log 판단 불가"
+        ]
+      },
+      "perimeter": {
+        "rules": {
+          "pin": "Inside DL 고정",
+          "pull": "Edge/Force target",
+          "target": "First color = block target"
+        },
+        "prohibited": [
+          "Edge defender 방치"
+        ]
+      }
+    }
+  },
+  "RB": {
+    "principles": [
+      "Aim Point 명시 필수",
+      "Press → Read → Cut"
+    ],
+    "schemes": {
+      "zone": {
+        "rules": {
+          "aim": "A/B-gap",
+          "read": "1st down lineman",
+          "order": "Bounce / Bang / Bend 순서"
+        },
+        "prohibited": [
+          "즉시 bounce",
+          "read 없이 방향 고정"
+        ]
+      },
+      "gap": {
+        "rules": {
+          "aim": "Designed gap",
+          "path": "Follow puller",
+          "spill": "Spill 시 즉시 cut"
+        },
+        "prohibited": [
+          "Puller 무시",
+          "freelancing"
+        ]
+      },
+      "perimeter": {
+        "rules": {
+          "edge": "Edge 확보 전 cut 금지",
+          "speed": "Speed 유지"
+        }
+      }
+    }
+  },
+  "QB_RUN": {
+    "rules": {
+      "mesh": "Mesh 깊이 고정",
+      "option_read": "Read defender 명확",
+      "option_decision": "Read 이후 판단 금지",
+      "fake": "Fake는 진짜처럼"
+    },
+    "prohibited": [
+      "Read 중 고개 두 번 움직임",
+      "Fake 생략"
+    ]
+  },
+  "WR_TE_BLOCK": {
+    "rules": {
+      "leverage": "Inside leverage 우선",
+      "crack": "Crack 시 force/ally 구분",
+      "stalk": "Stalk: 어깨 square"
+    },
+    "prohibited": [
+      "뒤에서 미는 block",
+      "crack 없이 안전 노림"
+    ]
+  },
+  "QB_PASS": {
+    "principles": [
+      "Drop = Concept에 고정",
+      "Progression = leverage 기준"
+    ],
+    "dropTypes": {
+      "quick": {
+        "rules": {
+          "read": "Pre-snap leverage",
+          "timing": "1-step → throw"
+        }
+      },
+      "dropback": {
+        "rules": {
+          "progression": "High → Low",
+          "middle": "Middle open 여부 확인"
+        }
+      },
+      "play_action": {
+        "rules": {
+          "fake": "Fake 완료 후 eyes up",
+          "shot": "Shot은 안전 확인 후"
+        }
+      }
+    },
+    "prohibited": [
+      "Fake 미완",
+      "Progression 무시"
+    ]
+  },
+  "WR_ROUTE_ROLES": {
+    "roles": {
+      "clear": {
+        "purpose": "수비 끌고 가는 역할",
+        "success": "공 못 받아도 성공"
+      },
+      "under": {
+        "purpose": "Space 창출",
+        "priority": "Timing 우선"
+      },
+      "intermediate": {
+        "purpose": "Window 공격",
+        "read": "LB leverage 기준"
+      },
+      "checkdown": {
+        "purpose": "즉시 시야 제공",
+        "mindset": "야드 욕심 금지"
+      }
+    },
+    "prohibited": [
+      "Role 없는 자유 route"
+    ]
+  },
+  "PASS_PRO": {
+    "principles": [
+      "Inside-out",
+      "Color → Threat 순",
+      "Free rusher 발생 시 QB 즉시 대응"
+    ],
+    "back_te": {
+      "rules": {
+        "priority": "Inside gap 우선",
+        "chip": "Chip 후 release는 call 있을 때만"
+      },
+      "prohibited": [
+        "Release 타이밍 자유",
+        "Gap 방치"
+      ]
+    }
+  },
+  "BANK_INVALID_CONDITIONS": {
+    "description": "아래 중 하나라도 해당 시 BANK 제외",
+    "conditions": [
+      "Assignment 설명 불가",
+      "Aim / Read / Role 없음",
+      "Formation과 Concept 충돌",
+      "특정 선수 능력 전제"
+    ]
+  }
+}
