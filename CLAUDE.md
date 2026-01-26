@@ -326,6 +326,25 @@ const radius = isBall ? (appearance.radius || 10) : Math.min(baseRadius, maxRadi
 - 저장 후 Read 도구로 참조하여 작업
 - JSON 스키마와 TypeScript 구현을 분리하여 관리
 
+### Concept vs Play 데이터 모델 (2026-01-26 추가)
+**두 계층의 데이터 구조 명확히 구분**
+| 타입 | 위치 | 구조 | 용도 |
+|------|------|------|------|
+| **Concept** | `docs/audits/*-concepts.json` | `{ id, name, needsPuller, summary }` | 메타데이터/템플릿 |
+| **Play** | 런타임 DSL | `{ id, name, formation, assignments[], diagram{} }` | 실제 플레이 인스턴스 |
+
+- **Concept**: 스킴 규칙 정의 (GT는 G+T 풀, Zone은 풀 없음 등)
+- **Play**: 실제 Assignment와 Diagram 포함된 인스턴스
+- **Proofread 2단계**:
+  1. Concept 레벨: 스키마 규칙 검증 (needsPuller 등)
+  2. Play 레벨: Assignment ↔ Diagram 일관성 검증
+
+### Proofreader 모듈 위치 (2026-01-26 추가)
+```
+docs/audits/proofreader/  ← 사양/검증용 (Audit 목적)
+editor/src/lib/           ← 프로덕션용 (런타임 사용 시)
+```
+
 ## Design Principles
 
 1. **Recommendations are filtering, not judgment** - Show options, not "AI picks"
