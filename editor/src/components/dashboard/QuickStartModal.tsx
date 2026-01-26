@@ -24,44 +24,21 @@ interface QuickStartModalProps {
   ) => Promise<void>;
 }
 
-// Categorize formations (ordered by NFL/NCAA usage frequency)
-const FORMATION_CATEGORIES: Record<string, string[]> = {
-  'Spread / Air Raid': [
-    // Tier 1: Most used (60%+)
-    'shotgun', 'spread', 'trips', 'tripsLeft', 'twins', 'twinsLeft',
-    // Tier 2: Frequently used (10-20%)
-    'emptySet', 'bunch', 'bunchLeft', 'slot', 'slotLeft', 'emptyTrips',
-    // Tier 3: Situational (5-10%)
-    'quadsRight', 'quadsLeft',
-    // Tier 4: Niche (1-5%)
-    'stackRight', 'stackLeft', 'treyRight', 'treyLeft', 'spreadTight'
-  ],
-  'Pro Style': [
-    // Tier 1-2: High usage
-    'singleBack', 'ace',
-    // Tier 3: Situational
-    'proSet', 'aceTwinsRight', 'aceTwinsLeft', 'heavy', 'jumbo',
-    // Tier 4: Niche
-    'splitBacks', 'doubleTightRight', 'doubleTightLeft', 'near', 'far',
-    'unbalancedRight', 'unbalancedLeft'
-  ],
-  'Power / Run': [
-    // Tier 3: Situational
-    'iFormation', 'goalLine',
-    // Tier 4: Niche
-    'wingT', 'powerI', 'marylandI', 'fullHouse', 'wingRight', 'wingLeft',
-    'big', 'tightBunchRight', 'tightBunchLeft',
-    // Tier 5: Rare
-    'tFormation'
-  ],
-  'Option': [
-    // Tier 2: Most used in option category
-    'pistol',
-    // Tier 5: Rare/specialized
-    'wildcat', 'wishbone', 'flexbone', 'veer', 'speedOption',
-    'midlineOption', 'loadOption', 'tripleRight'
-  ],
-};
+// All formation keys in usage order (flat list, no categories)
+const ALL_FORMATION_KEYS = [
+  // Spread / Shotgun
+  'shotgun', 'spread', 'trips', 'tripsLeft', 'twins', 'twinsLeft',
+  'bunch', 'bunchLeft', 'slot', 'slotLeft', 'stackRight', 'stackLeft',
+  // Pistol
+  'pistol',
+  // Pro Style / Under Center
+  'singleBack', 'proSet', 'ace', 'aceTwinsRight', 'aceTwinsLeft',
+  'doubleTightRight', 'doubleTightLeft',
+  // Power / Run Heavy
+  'iFormation', 'goalLine',
+  // Empty
+  'emptySet', 'emptyTrips',
+].filter(key => FORMATION_PRESETS[key]);
 
 export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalProps) {
   const [step, setStep] = useState<QuickStartStep>('formations');
@@ -69,7 +46,6 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
   const [generatedPlays, setGeneratedPlays] = useState<GeneratedPlay[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [creationProgress, setCreationProgress] = useState<CreationProgress | null>(null);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>('Spread / Air Raid');
 
   const stats = useMemo(() => getGeneratedPlaysStats(generatedPlays), [generatedPlays]);
 
@@ -79,7 +55,6 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
     setGeneratedPlays([]);
     setIsCreating(false);
     setCreationProgress(null);
-    setExpandedCategory('Spread / Air Raid');
   }, []);
 
   if (!isOpen) return null;
@@ -100,22 +75,6 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
       if (selectedFormations.length < 10) {
         setSelectedFormations(prev => [...prev, formationKey]);
       }
-    }
-  };
-
-  const selectAllInCategory = (category: string) => {
-    const categoryFormations = FORMATION_CATEGORIES[category] || [];
-    const validFormations = categoryFormations.filter(f => FORMATION_PRESETS[f]);
-    const allSelected = validFormations.every(f => selectedFormations.includes(f));
-
-    if (allSelected) {
-      setSelectedFormations(prev => prev.filter(f => !validFormations.includes(f)));
-    } else {
-      const newSelections = new Set(selectedFormations);
-      validFormations.forEach(f => {
-        if (newSelections.size < 10) newSelections.add(f);
-      });
-      setSelectedFormations(Array.from(newSelections));
     }
   };
 
@@ -269,72 +228,29 @@ export function QuickStartModal({ isOpen, onClose, onCreate }: QuickStartModalPr
                 </div>
               )}
 
-              {/* Formation Categories */}
-              <div className="space-y-2">
-                {Object.entries(FORMATION_CATEGORIES).map(([category, formationKeys]) => {
-                  const validFormations = formationKeys.filter(f => FORMATION_PRESETS[f]);
-                  const selectedInCategory = validFormations.filter(f => selectedFormations.includes(f)).length;
-                  const isExpanded = expandedCategory === category;
+              {/* Formation Grid (flat list) */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {ALL_FORMATION_KEYS.map(key => {
+                  const isSelected = selectedFormations.includes(key);
+                  const isDisabled = !isSelected && selectedFormations.length >= 10;
 
                   return (
-                    <div key={category} className="border border-border rounded-lg overflow-hidden">
-                      {/* Category Header */}
-                      <button
-                        onClick={() => setExpandedCategory(isExpanded ? null : category)}
-                        className="w-full flex items-center justify-between p-4 bg-muted hover:bg-muted/80 transition-colors"
-                      >
-                        <span className="font-semibold text-foreground text-lg">{category}</span>
-                        <div className="flex items-center gap-3">
-                          {selectedInCategory > 0 && (
-                            <span className="px-2 py-0.5 bg-green-600 text-white text-xs rounded-full">
-                              {selectedInCategory} selected
-                            </span>
-                          )}
-                          <span className="text-muted-foreground text-xl">{isExpanded ? '−' : '+'}</span>
-                        </div>
-                      </button>
-
-                      {/* Formation Grid */}
-                      {isExpanded && (
-                        <div className="p-4 bg-background">
-                          <div className="flex justify-end mb-3">
-                            <button
-                              onClick={() => selectAllInCategory(category)}
-                              className="text-sm text-blue-600 hover:text-blue-500 font-medium"
-                            >
-                              {validFormations.every(f => selectedFormations.includes(f))
-                                ? 'Deselect All'
-                                : 'Select All'}
-                            </button>
-                          </div>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                            {validFormations.map(key => {
-                              const isSelected = selectedFormations.includes(key);
-                              const isDisabled = !isSelected && selectedFormations.length >= 10;
-
-                              return (
-                                <button
-                                  key={key}
-                                  onClick={() => !isDisabled && toggleFormation(key)}
-                                  disabled={isDisabled}
-                                  className={`
-                                    p-3 text-sm rounded-lg border-2 transition-all font-medium
-                                    ${isSelected
-                                      ? 'bg-green-600 border-green-500 text-white shadow-lg shadow-green-600/20'
-                                      : isDisabled
-                                        ? 'bg-muted border-border text-muted-foreground cursor-not-allowed'
-                                        : 'bg-card border-border text-foreground hover:border-green-500'
-                                    }
-                                  `}
-                                >
-                                  {getFormationName(key)}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <button
+                      key={key}
+                      onClick={() => !isDisabled && toggleFormation(key)}
+                      disabled={isDisabled}
+                      className={`
+                        p-3 text-sm rounded-lg border-2 transition-all font-medium
+                        ${isSelected
+                          ? 'bg-green-600 border-green-500 text-white shadow-lg shadow-green-600/20'
+                          : isDisabled
+                            ? 'bg-muted border-border text-muted-foreground cursor-not-allowed'
+                            : 'bg-card border-border text-foreground hover:border-green-500'
+                        }
+                      `}
+                    >
+                      {getFormationName(key)}
+                    </button>
                   );
                 })}
               </div>
