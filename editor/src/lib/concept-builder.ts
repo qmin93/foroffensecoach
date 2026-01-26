@@ -476,6 +476,33 @@ function isOutsideRun(concept: Concept): boolean {
 }
 
 /**
+ * Check if concept is a draw play (delayed handoff)
+ */
+function isDrawPlay(concept: Concept): boolean {
+  const drawPatterns = ['draw', 'delay'];
+  const conceptId = concept.id?.toLowerCase() || '';
+  const conceptName = concept.name?.toLowerCase() || '';
+
+  return drawPatterns.some(pattern =>
+    conceptId.includes(pattern) || conceptName.includes(pattern)
+  );
+}
+
+/**
+ * Get appropriate RB run depth based on concept type
+ * Draw = 5 yards (quick hit), Inside = 8 yards, Outside = 14 yards
+ */
+function getRbRunDepth(concept: Concept): number {
+  if (isDrawPlay(concept)) {
+    return 5 * 0.04; // 5 yards for draw plays
+  }
+  if (isOutsideRun(concept)) {
+    return 14 * 0.04; // 14 yards for outside runs
+  }
+  return 8 * 0.04; // 8 yards for inside zone/gap runs
+}
+
+/**
  * Build actions from a concept template for given players
  */
 export function buildConceptActions(
@@ -489,6 +516,7 @@ export function buildConceptActions(
   const template = concept.template;
   const defaultSide = template.buildPolicy.defaultSide || 'strength';
   const isOutside = isOutsideRun(concept);
+  const rbRunDepth = getRbRunDepth(concept);
 
   // Process each role in the template
   for (const role of template.roles) {
@@ -829,8 +857,7 @@ export function buildConceptActions(
         actions.push(routeAction);
         actionsCreated++;
       } else {
-        // Run path for RB
-        const rbRunDepth = 14 * 0.04; // 14 yards in normalized coords (max)
+        // Run path for RB - depth varies by concept type (draw=5yd, inside=8yd, outside=14yd)
         const sideMultiplier = defaultSide === 'right' ? 1 : -1;
 
         let controlPoints: Point[];

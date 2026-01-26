@@ -616,7 +616,7 @@ export const RUN_CONCEPTS: Concept[] = [
         },
         {
           roleName: 'BACK',
-          appliesTo: ['H', 'FB', 'RB'],
+          appliesTo: ['H', 'FB'],
           defaultBlock: { scheme: 'lead', target: 'PSLB' },
           assignment: 'FB/H: Lead through for playside LB',
           notes: 'Lead through for playside LB',
