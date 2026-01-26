@@ -313,6 +313,19 @@ const radius = isBall ? (appearance.radius || 10) : Math.min(baseRadius, maxRadi
 - **UI 상호작용**: 새 UI 요소 추가 시 "보기만" vs "클릭 가능" 확인
 - **dev 서버**: 시작 후 실제 포트 번호 사용자에게 명시
 
+### Audit 파일 규칙 (2026-01-26 추가)
+**docs/audits/ 파일은 실행 가능한 코드로 취급**
+- **타입 정의 필수**: `docs/audits/types.ts`에서 공용 타입 import
+- **Formation 완전성**: OL 라벨 필수 포함 (LT, LG, C, RG, RT)
+- **Lint 스크립트**: `npm run lint:concepts`로 검증
+- **Go route 예외**: Clear-out 역할이므로 depth 검증에서 제외
+
+### 대량 데이터 처리 규칙 (2026-01-26 추가)
+**10줄 이상의 코드/데이터는 즉시 파일로 저장**
+- 컨텍스트 소진 방지를 위해 대량 데이터는 파일로 먼저 저장
+- 저장 후 Read 도구로 참조하여 작업
+- JSON 스키마와 TypeScript 구현을 분리하여 관리
+
 ## Design Principles
 
 1. **Recommendations are filtering, not judgment** - Show options, not "AI picks"
