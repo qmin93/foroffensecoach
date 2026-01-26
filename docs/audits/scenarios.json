@@ -1,0 +1,30 @@
+[
+  { "id": "S01", "formationId": "gun_2x2", "tendency": "PASS", "down": 1, "distance": 10, "fieldZone": "own_40", "box": 6, "front": "even", "coverage": "single_high" },
+  { "id": "S02", "formationId": "gun_2x2", "tendency": "PASS", "down": 3, "distance": 3,  "fieldZone": "midfield", "box": 6, "front": "even", "coverage": "two_high" },
+  { "id": "S03", "formationId": "gun_2x2", "tendency": "PASS", "down": 3, "distance": 8,  "fieldZone": "opp_45", "box": 5, "front": "odd",  "coverage": "two_high" },
+
+  { "id": "S04", "formationId": "gun_3x1", "tendency": "PASS", "down": 1, "distance": 10, "fieldZone": "midfield", "box": 6, "front": "even", "coverage": "single_high" },
+  { "id": "S05", "formationId": "gun_3x1", "tendency": "PASS", "down": 2, "distance": 6,  "fieldZone": "opp_35", "box": 6, "front": "even", "coverage": "quarters" },
+  { "id": "S06", "formationId": "gun_3x1", "tendency": "PASS", "down": 3, "distance": 10, "fieldZone": "opp_40", "box": 5, "front": "odd",  "coverage": "two_high" },
+
+  { "id": "S07", "formationId": "gun_bunch", "tendency": "PASS", "down": 3, "distance": 2,  "fieldZone": "opp_25", "box": 7, "front": "even", "coverage": "man" },
+  { "id": "S08", "formationId": "gun_bunch", "tendency": "PASS", "down": 2, "distance": 3,  "fieldZone": "redzone", "box": 7, "front": "even", "coverage": "quarters" },
+
+  { "id": "S09", "formationId": "gun_stack", "tendency": "PASS", "down": 1, "distance": 10, "fieldZone": "own_25", "box": 6, "front": "odd",  "coverage": "single_high" },
+  { "id": "S10", "formationId": "gun_stack", "tendency": "PASS", "down": 3, "distance": 6,  "fieldZone": "midfield", "box": 6, "front": "even", "coverage": "man" },
+
+  { "id": "S11", "formationId": "empty_3x2", "tendency": "PASS", "down": 2, "distance": 8,  "fieldZone": "own_35", "box": 5, "front": "even", "coverage": "two_high" },
+  { "id": "S12", "formationId": "empty_3x1", "tendency": "PASS", "down": 3, "distance": 5,  "fieldZone": "opp_45", "box": 5, "front": "odd",  "coverage": "man" },
+
+  { "id": "S13", "formationId": "pistol_2x2", "tendency": "RUN",  "down": 1, "distance": 10, "fieldZone": "own_40", "box": 7, "front": "even", "coverage": "single_high" },
+  { "id": "S14", "formationId": "pistol_2x2", "tendency": "RUN",  "down": 2, "distance": 4,  "fieldZone": "midfield", "box": 7, "front": "odd",  "coverage": "quarters" },
+
+  { "id": "S15", "formationId": "pistol_ace", "tendency": "RUN",  "down": 1, "distance": 10, "fieldZone": "own_30", "box": 8, "front": "even", "coverage": "single_high" },
+  { "id": "S16", "formationId": "pistol_ace", "tendency": "RUN",  "down": 3, "distance": 1,  "fieldZone": "opp_10", "box": 8, "front": "goal_line", "coverage": "man" },
+
+  { "id": "S17", "formationId": "under_ace", "tendency": "RUN",  "down": 1, "distance": 10, "fieldZone": "own_35", "box": 7, "front": "under", "coverage": "single_high" },
+  { "id": "S18", "formationId": "under_i",   "tendency": "RUN",  "down": 2, "distance": 2,  "fieldZone": "opp_5",  "box": 9, "front": "goal_line", "coverage": "man" },
+
+  { "id": "S19", "formationId": "gun_2x2", "tendency": "PASS", "down": 2, "distance": 12, "fieldZone": "2_min", "box": 5, "front": "even", "coverage": "two_high" },
+  { "id": "S20", "formationId": "gun_3x1", "tendency": "PASS", "down": 4, "distance": 4,  "fieldZone": "midfield", "box": 6, "front": "even", "coverage": "man" }
+]
